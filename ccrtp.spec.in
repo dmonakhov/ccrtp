@@ -50,7 +50,7 @@ rm -fr %{buildroot}
 rm -fr %{buildroot}
 
 %files
-%exclude %{_libdir}/*.la
+#%exclude %{_libdir}/*.la
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING COPYING.addendum README
 %{_prefix}/lib/libccrtp*.so.*

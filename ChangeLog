@@ -1,3 +1,6 @@
+2004-05-19  David Sugar <dyfet@ostel.com>
+	* ccrtp.spec.in: allow .la files to be included.
+
 2004-05-09  David Sugar <dyfet@ostel.com>
 	* src/ccrtp/channel.h: use UDPSocket::setPeer with cast rather
 	than re-impliment to support future merged ipv4/ipv6 release.
