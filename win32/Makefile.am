@@ -10,5 +10,6 @@
 
 MAINTAINERCLEANFILES = Makefile.in Makefile
 
-EXTRA_DIST =  README msvcpp/GNUccRTP.dsw msvcpp/GNUccRTP.dsp\
-	msvcpp/ccRTPdemo.dsw msvcpp/demo/*.dsp
+EXTRA_DIST =  README msvcpp/ccrtp1.dsw msvcpp/ccrtp1.dsp \
+	msvcpp/ccRTPdemo.dsw msvcpp/demo/*.dsp \
+	mingw32/Makefile.gcc
