@@ -10,15 +10,8 @@
 
 MAINTAINERCLEANFILES = Makefile.in Makefile
 
-if COMMON
-
-W32_DIST =  src/*.cpp include/cc++/*.h template/cc++/*.h \
-	common/*.dsp common/cc++/*.h
-
-endif
-
 EXTRA_DIST =  README msvcpp/ccrtp1.dsw msvcpp/ccrtp1.dsp \
         msvcpp/ccRTPdemo.dsw msvcpp/demo/*.dsp \
         cape/*.dsw cape/*.dsp \
-        mingw32/Makefile.gcc common/*.dsp $(W32_DIST)
+        mingw32/Makefile.gcc common/*.dsp
 

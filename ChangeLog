@@ -1,3 +1,17 @@
+2005-01-20  David Sugar <dyfet@ostel.com>
+	* libccrtp1.pc[.in], configure.ac: pkgconfig file generated for 
+	libccrtp1
+
+	* Makefile.am, w32/Makefile.am, doc/Makefile.am: stripped out 
+	symlink stuff for w32 since "cape.exe" installer provides known
+	directory location for w32 installed versions of GNU Common C++.
+
+	* configure.ac: version bumped to 1.2.0.
+
+	* getRawTimestamp() was not needed after all, change unmade.
+
+	* src/ccrtp/rtppkt.h: definitions for rfc2833 telephony payloads.
+
 2005-01-16  David Sugar <dyfet@ostel.com>
 	* src/ccrtp/iqueue.h: virtual methods for packet filtering were
 	hidden as private; made protected so they can be used.

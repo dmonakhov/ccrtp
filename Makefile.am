@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2002 Open Source Telecom Corporation.
+# Copyright (C) 2000-2005 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -11,11 +11,13 @@
 AUTOMAKE_OPTIONS = no-dependencies dist-shar dist-zip
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in COPYING.addendum \
-	ccrtp.list ccrtp.list.in autoconf/*
+	ccrtp.list ccrtp.list.in libccrtp1.pc libccrtp1.pc.in autoconf/*
 
 SUBDIRS = src doc
 DIST_SUBDIRS = m4 src phone doc demo w32
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libccrtp1.pc
 
 
 

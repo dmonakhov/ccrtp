@@ -17,16 +17,9 @@ ccrtp_TEXINFOS = gpl.texi fdl.texi fdlnotice.texi
 if DOXY
 noinst_DATA = doxy
 
-if COMMON
-doxy:   Doxyfile
-	(cd @srcdir@ ; $(DOXYGEN) Doxyfile)
-	touch doxy
-else
 doxy:   Doxyfile
 	(cd @srcdir@ ; $(DOXYGEN) Doxymini)
 	touch doxy
-endif
-
 
 endif
 

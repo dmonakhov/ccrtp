@@ -31,10 +31,10 @@ if test ! -z "$cfg_options" ; then
         exit -1
 fi
 
-VERSION="1.1.2"
+VERSION="1.2.0"
 REQUIRES="1.1.2"
-LT_RELEASE="1.1"
-LT_VERSION="0:1"
+LT_RELEASE="1.2"
+LT_VERSION="0:0"
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CANONICAL_SYSTEM
 AC_PROG_CPP
@@ -73,33 +73,10 @@ KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
 AC_SUBST(KDOC_DIR)
 
-AC_ARG_WITH(commoncpp,
-	[  --with-commoncpp=<sources> where commonc++ sources are],
-	[COMMONCPP=`echo $with_commoncpp`
-	rm -f doc/doxy
-	if test -d "$COMMONCPP" ; then
-		if test ! -d w32/include; then mkdir w32/include ; fi
-		if test ! -d w32/template ; then mkdir w32/template ; fi
-		rm -f w32/src
-		ln -s "$COMMONCPP/src" w32/src
-		rm -f w32/include/cc++
-		ln -s "$COMMONCPP/include/cc++" w32/include/cc++
-		rm -f w32/template/cc++
-		ln -s "$COMMONCPP/template" w32/template/cc++
-		rm -f w32/common/cc++
-		ln -s "$COMMONCPP/w32/cc++" w32/common/cc++
-	else
-		rm -rf include
-		rm -rf template
-		rm -f w32/src
-		rm -f w32/common/cc++
-	fi])	
-
 AC_PATH_PROG(DOXYGEN, doxygen, no)
 AC_SUBST(DOXYGEN)
 AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
-AM_CONDITIONAL(COMMON, test -d w32/include)
 
 AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile 
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
-ccrtp.list)
+ccrtp.list libccrtp1.pc)

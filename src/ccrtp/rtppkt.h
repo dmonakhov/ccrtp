@@ -123,7 +123,7 @@ public:
 	{ return (uint8*)(buffer + getHeaderSize()); }
 		
 	/**
-	 * @return lenght of the payload section, in octets.
+	 * @return length of the payload section, in octets.
 	 **/
 	inline uint32
 	getPayloadSize() const
@@ -323,7 +323,6 @@ protected:
 	 return (reinterpret_cast<RTPHeaderExt*>(buffer + fixsize));
 	}
 
-public:		
 	/**
 	 * Obtain the absolute timestamp carried in the packet header.
 	 *
@@ -333,7 +332,6 @@ public:
 	getRawTimestamp() const
 	{ return ntohl(getHeader()->timestamp); };
 
-protected:
 	inline void 
 	setbuffer(const void* src, size_t len, size_t pos)
 	{ memcpy(buffer + pos,src,len); }
@@ -389,6 +387,31 @@ private:
 		uint32 timestamp;       ///< timestamp
 		uint32 sources[1];      ///< contributing sources
 	};
+
+	/**
+ 	 * @struct RFC2833Payload
+	 * @short a structure defining RFC2833 Telephony events.
+	 *
+	 * structure to define RFC2833 telephony events in RTP.  You can
+	 * use this by recasing the pointer returned by getPayload().
+	 */
+
+	struct RFC2833Payload
+	{
+#if __BYTE_ORDER == __BIG_ENDIAN
+        	uint8 event : 8;
+        	bool ebit : 1;
+        	bool rbit : 1;
+        	uint8 vol : 6;
+        	uint16 duration : 16;
+#else
+        	uint8 event : 8;
+        	uint8 vol : 6;
+        	bool rbit : 1;
+        	bool ebit : 1; 
+        	uint16 duration : 16;
+#endif
+	};	
 	
 	/**
 	 * @struct RTPHeaderExt
@@ -403,6 +426,32 @@ private:
 		uint16 length;    ///< number of 32-bit words in the extension
 	};
 #pragma pack()
+
+	/* definitions for access to most common 2833 fields... */
+
+	/**
+	 * Fetch a raw 2833 packet.
+	 *
+	 * @return low level 2833 data structure.
+	 */
+	inline struct RFC2833Payload *getRaw2833Payload(void)
+		{return (struct RFC2833Payload *)getPayload();};
+
+	/**
+	 * Fetch 2833 duration field.
+	 *
+	 * @return 2833 duration in native host machine byte order.
+	 */
+	inline uint16 get2833Duration(void)
+		{return ntohs(getRaw2833Payload()->duration);};
+
+	/**
+	 * Set 2833 duration field.
+	 *
+	 * @param timestamp to use, native host machine byte order.
+	 */
+	inline void set2833Duration(uint16 d)
+		{getRaw2833Payload()->duration = htons(d);};
 };
 
 /**
