@@ -458,10 +458,10 @@ protected:
 		{return OutgoingDataQueue::getSchedulingTimeout();};
 
 	inline void controlReceptionService(void)
-		{return QueueRTCPManager::controlReceptionService();}
+		{QueueRTCPManager::controlReceptionService();}
 
 	inline void controlTransmissionService(void)
-		{return QueueRTCPManager::controlTransmissionService();}
+		{QueueRTCPManager::controlTransmissionService();}
 
 	inline timeval getRTCPCheckInterval(void)
 		{return QueueRTCPManager::getRTCPCheckInterval();}
