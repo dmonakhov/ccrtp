@@ -20,4 +20,4 @@ ccxxinclude_HEADERS = phone.h
 bin_PROGRAMS = phone
 
 phone_SOURCES = phone.cpp config.cpp server.cpp rtp.cpp
-phone_LDADD = @EXTLIBS@ @GNULIBS@
+phone_LDADD = ../src/libccrtp1.la @EXTLIBS@ @GNULIBS@
