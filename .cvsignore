@@ -12,4 +12,9 @@ libtool
 config.*
 pkginfo
 arch-*
+auto*
+*.pc
+aclocal.m4
+*.list
+configure
 
