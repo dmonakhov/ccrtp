@@ -127,6 +127,7 @@ public:
 				adu = socket->getData(socket->getFirstTimestamp());
 				if ( NULL == adu )
 					Thread::sleep(5);
+				else cout << ".";
 			}while ( (NULL == adu) || (adu->getSize() <= 0) );
 
 			

@@ -321,7 +321,7 @@ protected:
 	 * long as at least one RTP or RTCP packet has been sent
 	 * before. If the number of members in the session is more
 	 * than 50, the algorithm described in section 6.3.7 of
-	 * draft-ietf-avt-rtp-new is applied in order to avoid a flood
+	 * RFC 3550 is applied in order to avoid a flood
 	 * of BYE messages.
 	 *
 	 * @param reason reason to specify in the BYE packet.
@@ -367,8 +367,9 @@ private:
 	 * in the session.
 	 *
 	 * @note This currently follows the rules in section 6 of
-	 *       draft-ietf-avt-rtp-new-10
-	 * @todo make it more flexible as recommended in the draft
+	 *       RFC 3550
+	 * @todo make it more flexible as recommended in the draft. For now,
+	 * we have setMinRTCPInterval.
 	 *
 	 * @return interval for sending RTCP compound packets
 	 **/
@@ -487,7 +488,8 @@ private:
 	 *
 	 * @note MUST be perform at least every RTCP transmission
 	 *       interval
-	 * @todo implement it 
+	 * @todo implement it. It may be dangerous and anyway should
+	 * be optional.
 	 **/
 	void 
 	expireSSRCs();

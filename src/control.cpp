@@ -264,7 +264,6 @@ QueueRTCPManager::timerReconsideration()
 void 
 QueueRTCPManager::expireSSRCs()
 {
-	// TODO
 }
 
 void
@@ -715,8 +714,9 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 
 
 	unsigned char buffer[500];
-	// Build an empty RR as first packet in the compound.
-	// TODO: provide more information if available.
+	// Build an empty RR as first packet in the compound.  
+        // TODO: provide more information if available. Not really
+	// important, since this is the last packet being sent.
 	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(buffer);
 	pkt->fh.version = CCRTP_VERSION;
 	pkt->fh.padding = 0;
@@ -904,7 +904,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 	// fill the padding with 0s
 	packSDES(len);
 
-	// TODO: virtual for sending APP RTCP packets
+	// TODO: virtual for sending APP RTCP packets?
 
 	// actually send the packet.
 	size_t count = sendControlToDestinations(rtcpSendBuffer,len);

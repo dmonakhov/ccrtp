@@ -91,7 +91,6 @@ typedef enum
  * classes, such as QueueRTCPManager.
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
- * @todo Improve the design to better encapsulate RTCP structures.
  **/
 class __EXPORT RTCPCompoundHandler 
 {

@@ -147,7 +147,6 @@ private:
  *
  * A generic outgoing RTP data queue supporting multiple destinations.
  *
- * @todo Add CSRC interface.
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
 class CCXX_CLASS_EXPORT OutgoingDataQueue:

@@ -7,6 +7,11 @@
 	* demo/ccrtptest.cpp: added the class PacketsPattern.
 	
 	* doc/ccrtp.texi: more explanations on headers.
+
+	* src/ccrtp/cqueue.h, src/ccrtp/oqueue.h, src/ccrtp/rtcppkt.h,
+	src/control.cpp: doc cleanup (@todos).
+	
+	* demo/audiorx.cpp: print dots when packets are received.
 	
 2004-01-17  Federico Montesino Pouzols  <fedemp@altern.org>
 	
