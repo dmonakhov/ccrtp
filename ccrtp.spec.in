@@ -20,7 +20,7 @@ packet queues.
 rm -rf $RPM_BUILD_ROOT
 
 %setup -n ccrtp-%{PACKAGE_VERSION}
-./configure --prefix=%{_prefix}
+./configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir}
 
 %build
 uname -a|grep SMP && make -j 2 || make
@@ -28,7 +28,8 @@ uname -a|grep SMP && make -j 2 || make
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
 make prefix=$RPM_BUILD_ROOT/%{_prefix} \
-	mandir=$RPM_BUILD_ROOT/%{_mandir} install
+	mandir=$RPM_BUILD_ROOT/%{_mandir} \ 
+	infodir=$RPM_BUILD_ROOT/%{_infodir} install
 make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 	mandir=$RPM_BUILD_ROOT/%{_mandir} man
 
@@ -37,7 +38,9 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %doc AUTHORS COPYING NEWS README TODO ChangeLog 
 %{_prefix}/lib/libcc*
 %{_prefix}/include/cc++2/cc++/rtp*.h
+%{_prefix}/include/cc++2/cc++/rtp
 %{_mandir}/man3/*.3cc*
+%{_infodir}/info/ccrtp*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
