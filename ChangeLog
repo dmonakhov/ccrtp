@@ -1,3 +1,6 @@
+2004-05-05  David Sugar <dyfet@ostel.com>
+	* reconfig: can use $ACLOCALDIR for extra m4 path.
+
 2004-04-21  David Sugar <dyfet@ostel.com>
 	* all sources; fixed namespace ending on }; for pedonic gcc-3.4
 
