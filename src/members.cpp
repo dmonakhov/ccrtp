@@ -184,7 +184,6 @@ MembershipBookkeeping::endMembers()
 		s = first;
 		first = first->next;
 		try {
-			delete s->getSource();
 			delete s;
 		} catch (...) {}
 	}
