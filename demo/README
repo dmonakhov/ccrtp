@@ -8,4 +8,8 @@ using RTPSocket
 	* rtpduphello: illustrates transmission/reception of RTP packets
 usging RTPDuplex
 	
+	* rtpsend: sends RTP packets
+
+	* rtplisten: waits for RTP packets incoming to a socket
+
 	And soon there will be more...

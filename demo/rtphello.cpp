@@ -34,7 +34,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 using namespace ost;
 #endif
 
@@ -207,7 +207,7 @@ public:
 		TimerPort::setTimer(1000);
 
 		// This is the main loop, where packets are sent.
-		for( int i = 0 ; true ;){
+		for( int i = 0 ; true ;i++ ){
 
 			const uint32 TIMESTAMP_RATE = 
 				socket->getRate(RTP_PAYLOAD_MP2T);
@@ -220,7 +220,7 @@ public:
 				 "Hello, brave gnu world! (no %u)",i);
 			time_t sending_time = time(NULL);
 			// get timestamp to send salute
-			if ( i++ == 0 ){
+			if ( i == 0 ){
 				timestamp = socket->
 					getCurrentTimestamp(RTP_PAYLOAD_MP2T);
 				
@@ -237,7 +237,7 @@ public:
 			strftime(tmstring,30,"%X",
 				 localtime(&sending_time));
 			cout << "Tx (" << ssrc 
-			     << "): sending salute " << "no " << i++ 
+			     << "): sending salute " << "no " << i 
 			     << ", at " << tmstring 
 			     << "..." << endl;
 

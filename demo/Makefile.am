@@ -12,10 +12,15 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
-LIBS = @GNULIBS@
 ccxxincludedir=$(includedir)/cc++
 
-noinst_PROGRAMS = rtphello rtpduphello audiorx audiotx
+noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx
+
+rtpsend_SOURCES = rtpsend.cpp
+rtpsend_LDFLAGS = ../src/libccrtp.la
+
+rtplisten_SOURCES = rtplisten.cpp
+rtplisten_LDFLAGS = ../src/libccrtp.la
 
 rtphello_SOURCES = rtphello.cpp
 rtphello_LDFLAGS = ../src/libccrtp.la
