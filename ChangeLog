@@ -1,3 +1,6 @@
+2005-03-02  David Sugar <dyfet@ostel.com>
+	* libccrtp1.pc.in: updated for cc++ >= 1.3.0
+
 2005-02-28  Federico Montesino Pouzols  <fedemp@altern.org>
 	* configure.ac: require cc++ >= 1.3.0.
 
