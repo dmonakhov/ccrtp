@@ -77,13 +77,9 @@ rm -f config.cache
 
 # fix for some broken...
 
-if test "$ver" = "2.53" ; then
-	if test -z ${AUTOMAKE_SUFFIX} ; then
-		if test -f /usr/bin/automake-1.4 ; then
-			if test -f ltmain.sh ; then
-				cp ltmain.sh autoconf/ltmain.sh
-			fi
-		fi
+if test -f /usr/bin/automake-1.4 ; then
+	if test -f ltmain.sh ; then
+		cp ltmain.sh autoconf/ltmain.sh
 	fi
 fi
 

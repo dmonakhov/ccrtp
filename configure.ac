@@ -45,8 +45,6 @@ AM_PROG_LIBTOOL
 AM_INIT_AUTOMAKE(ccrtp,[$VERSION])
 AM_CONFIG_HEADER(src/config.h)
 
-OST_DEBUG
-
 OST_PROG_COMMON
 OST_PROG_LIBVER
 OST_PROG_LIBRARY(CCXX,[$LT_VERSION])
@@ -61,6 +59,9 @@ else
 	WARN_FLAGS=""
 fi
 AC_SUBST(WARN_FLAGS)
+
+OST_DEBUG
+
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging],[
 	AC_CHECK_HEADER(nana.h, [
