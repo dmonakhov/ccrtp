@@ -83,7 +83,8 @@ public:
 	}
 	
 	~ccRTP_Hello_Rx(){
-		cout << endl << "Destroying receiver -ID: " << (int)ssrc;
+		cout << endl << "Destroying receiver -ID: " << hex
+		     << (int)ssrc;
 		terminate();
 		delete socket;
 		cout << "... " << "destroyed.";
@@ -101,11 +102,11 @@ public:
 		socket->setExpireTimeout(3000000);
 		//socket->UDPTransmit::setTypeOfService(SOCKET_IPTOS_LOWDELAY);
 		if( !socket->addDestination(local_ip,TRANSMITTER_BASE) )
-			cerr << "Rx (" << (int)ssrc 
+			cerr << "Rx (" << hex << (int)ssrc 
 			     << "): could not connect to port." 
 			     << TRANSMITTER_BASE;
 		
-		cout << "Rx (" << (int)ssrc
+		cout << "Rx (" << hex << (int)ssrc
 		     << "): " << local_ip.getHostname() 
 		     <<	" is waiting for salutes in port "
 		     << RECEIVER_BASE << "..." << endl;
@@ -114,7 +115,7 @@ public:
 		socket->startRunning();
 		// Let's check the queues  (you should read the documentation
 		// so that you know what the queues are for).
-		cout << "Rx (" << (int)ssrc 
+		cout << "Rx (" << hex << (int)ssrc 
 		     << "): The queue is " 
 		     << ( socket->isActive() ? "" : "in") 
 		     << "active." << endl;		
@@ -134,7 +135,7 @@ public:
 			time_t receiving_time = time(NULL);
 			char tmstring[30];
 			strftime(tmstring,30,"%X",localtime(&receiving_time));
-			cout << "Rx (" << (int)ssrc 
+			cout << "Rx (" << hex << (int)ssrc 
 			     << "): [receiving at " << tmstring << "]: " 
 			     <<	adu->getData() << endl;
 			delete adu;
@@ -177,7 +178,8 @@ public:
 	}
 
 	~ccRTP_Hello_Tx(){
-		cout << endl << "Destroying transmitter -ID: " << (int)ssrc;
+		cout << endl << "Destroying transmitter -ID: " << hex 
+		     << (int)ssrc;
 		terminate();
 		delete socket;
 		cout << "... " << "destroyed.";
@@ -186,7 +188,8 @@ public:
 	// This method does almost everything.
 	void run(void){    
 		// redefined from Thread.
-		cout << "Tx (" << (int)ssrc << "): " << local_ip.getHostname() 
+		cout << "Tx (" << hex << (int)ssrc << "): " << 
+			local_ip.getHostname() 
 		     <<	" is going to salute perself through " 
 		     << local_ip << "..." << endl;
 		
@@ -194,11 +197,11 @@ public:
 		socket->setSchedulingTimeout(20000);
 		socket->setExpireTimeout(3000000);
 		if( !socket->addDestination(local_ip,RECEIVER_BASE) )
-			cerr << "Tx (" << (int)ssrc 
+			cerr << "Tx (" << hex << (int)ssrc 
 			     << "): could not connect to port." 
 			     << RECEIVER_BASE;
 		
-		cout << "Tx (" << (int)ssrc << 
+		cout << "Tx (" << hex << (int)ssrc << 
 			"): Transmitting salutes to port "
 		     << RECEIVER_BASE << "..." << endl;
 
@@ -211,7 +214,7 @@ public:
 		socket->startRunning();
 		// Let's check the queues  (you should read the documentation
 		// so that you know what the queues are for).
-		cout << "Tx (" << (int)ssrc << "): The queue is "
+		cout << "Tx (" << hex << (int)ssrc << "): The queue is "
 		     << ( socket->isActive()? "" : "in")
 		     << "active." << endl;
 
@@ -239,7 +242,7 @@ public:
 			char tmstring[30];
 			strftime(tmstring,30,"%X",
 				 localtime(&sending_time));
-			cout << "Tx (" << (int)ssrc 
+			cout << "Tx (" << hex << (int)ssrc 
 			     << "): sending salute " << "no " << i 
 			     << ", at " << tmstring 
 			     << "..." << endl;

@@ -61,7 +61,7 @@ public:
 	{
 		RTPSession::onGotSR(source,SR,blocks);
 		cout << "I got an SR RTCP report from sync. source "
-		     << (int)source.getID() << ". From " 
+		     << hex << (int)source.getID() << ". From " 
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -72,7 +72,7 @@ public:
 	{
 		RTPSession::onGotRR(source,RR,blocks);
 		cout << "I got an RR RTCP report from sync. source "
-		     << (int)source.getID() << ". From " 
+		     << hex << (int)source.getID() << ". From " 
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
