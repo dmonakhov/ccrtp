@@ -45,6 +45,7 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %files
 %defattr(-,root,root,0755)
 %{_prefix}/lib/libcc*so*
+%{_prefix}/bin/phone
 
 %files devel
 %defattr(-,root,root,0755)
