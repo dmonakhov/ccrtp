@@ -3,6 +3,10 @@
 
 	* w32/cape{...}: support for CAPE debug project installs
 
+	* src/ccrtp/rtp.h, src/pool.cpp: "startRunning" is also virtual
+	and requires some special handling or it will not link in vs.net
+	when using debug mode options...
+
 2005-02-10  Federico Montesino Pouzols  <fedemp@altern.org>
 	* doc/ccrtp.texi: 'Clossing Sessions' extended and clarified.
 

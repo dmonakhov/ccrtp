@@ -455,12 +455,17 @@ public:
 	~SingleThreadRTPSession()
 	{ terminate(); }
 
+#if defined(_MSC_VER) && _MSC_VER >= 1300 
+	virtual void startRunning();
+#else
 	/**
 	 * Activate stack and start service thread.
 	 **/
 	void
 	startRunning()
 	{ enableStack(); Thread::start(); }
+#endif
+
 
 protected:
 	inline void enableStack(void)
