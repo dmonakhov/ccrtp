@@ -212,6 +212,14 @@ public:
 	setSessionBandwidth(uint32 bw)
 	{ sessionBw = bw; }
 
+	uint32
+	getDefaultSessionBandwidth() const
+	{ return defaultSessionBw; }
+
+	uint32
+	getSessionBandwidth() const
+	{ return sessionBw; }
+
  	/**
  	 * Set the packet timeclock for synchronizing timestamps.
  	 **/
@@ -306,7 +314,8 @@ private:
 	volatile bool dataServiceActive;
 	Tos typeOfService;
 	TimerPort timeclock;
-	/* RTP session control */
+	/* RTP session bandwidth control */
+	static const uint32 defaultSessionBw;
 	uint32 sessionBw;
 };
 

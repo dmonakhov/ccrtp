@@ -618,7 +618,7 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 timeval
 QueueRTCPManager::computeRTCPInterval()
 {	
-	float bwfract = controlBwFract;
+	float bwfract = controlBwFract * getSessionBandwidth();
 	uint32 participants = 0;
 	if ( getSendersCount() > 0 &&
 	     ( getSendersCount() < (getMembersCount() * sendControlBwFract) )) {

@@ -120,9 +120,6 @@ uint16 random16()
 	return r16;
 }
 
-//const size_t RTPDataQueue::defaultMembersHashSize = 
-//MembershipBookkeeping::defaultMembersHashSize;
-
 RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 {
 	if ( NULL == ssrc )
@@ -135,6 +132,7 @@ RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 	gettimeofday(&initialTime,NULL);
 }
 
+const uint32 RTPDataQueue::defaultSessionBw = 64000;
 
 RTPDataQueue::RTPDataQueue(uint32 size)	: 
 	IncomingDataQueue(), OutgoingDataQueue()

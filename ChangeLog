@@ -1,3 +1,15 @@
+2002-10-22 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* doc/Makefile.am, doc/srcmodel.txt, doc/srcmodel.dia,
+	doc/ccrtp.texi: added initial manual.
+	* doc/Doxyfile: added ../demo to EXAMPLE_PATH.
+	
+	* src/cc++/rtp/ioqueue.h: added getDefaultSessionBandwidth and
+	getSessionBandwidth to QueueRTCPManager.
+	* src/queue.cpp: added defaultSessionBw constant.
+	* src/control.cpp computeRTCPInterval now takes into account the
+	session total bandwith.	
+	
 2002-10-21  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* ccRTP has been rewritten. This changelog summarizes the most
