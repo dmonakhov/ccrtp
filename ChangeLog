@@ -1,3 +1,8 @@
+2005-03-24  David Sugar <dyfet@ostel.com>
+
+    * src/queue.cpp: some fix on digest to kill embedded class export
+    and fix for compilers weak (broken) on namespace support.
+
 2005-03-23  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/oqueue.h, src/outqueue.cpp: destinationCounter

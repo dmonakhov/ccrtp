@@ -49,6 +49,7 @@ namespace ost {
 // footprint.
 
 namespace ccMD5 {
+using namespace std;
 
 /**
  * The digest base class is used for implementing and deriving one way
@@ -57,7 +58,7 @@ namespace ccMD5 {
  * @author David Sugar <dyfet@ostel.com>
  * @short base class for hashing services.
  */
-class __EXPORT Digest : protected std::streambuf, public std::ostream
+class Digest : protected streambuf, public ostream
 {
 protected:
 	Digest();
@@ -103,15 +104,15 @@ public:
 };
 
 Digest::Digest() :
-std::streambuf()
+streambuf()
 #ifdef	HAVE_OLD_IOSTREAM
-,std::ostream()
+,ostream()
 #else
-,std::ostream((std::streambuf *)this)
+,ostream((streambuf *)this)
 #endif
 { 
 #ifdef	HAVE_OLD_IOSTREAM
-	init((std::streambuf *)this);
+	init((streambuf *)this);
 #endif
 }
 
@@ -121,7 +122,7 @@ std::streambuf()
  * @author David Sugar <dyfet@ostel.com>
  * @short md5 hash accumulation.
  */
-class __EXPORT MD5Digest : public Digest
+class MD5Digest : public Digest
 {
 private:
 	unsigned long state[4];
