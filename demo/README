@@ -1,0 +1,11 @@
+
+	This directory includes example programs intended for testing
+and illustrating features of ccRTP, the RTP stack of CommonC++.
+
+	* rpthello: illustrates transmission/reception of RTP packets
+using RTPSocket
+
+	* rtpduphello: illustrates transmission/reception of RTP packets
+usging RTPDuplex
+	
+	And soon there will be more...

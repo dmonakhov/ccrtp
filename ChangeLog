@@ -1,0 +1,101 @@
+2001-09-20  David Sugar <dyfet@ostel.com> (from 0.6.0 to 0.6.1)
+	* new virtuals to trap and filter packet queue expiration.
+
+2001-09-02  Federico Montesino <p5087@quintero.fie.us.es> (from 0.5.1 to 0.6.0)
+
+	* configure.in: added check for nana support
+	(configure --with-nana, for testing), stdlib.h and sys/utsname.h
+
+	* src/Makefile.am: updated to make the following:
+
+	* src/rtpext.h: new public header containing the declarations
+	needed to make low level packet filtering and stack extensions.
+
+	* rtp.h: many new methods and changes in the class hierarchy (to
+	add MembershipControl, QueueRTCPManager and the template
+	T_RTPSocket)
+
+	* New files src/members.cpp, src/data.cpp and src/source.cpp with
+	the implementation of MembershipControl, RTPData and RTPSource
+	classes, respectively
+
+	* src/control.cpp: now includes the implementation of
+	QueueRTCPManager.
+
+	* src/socket.cpp: now includes the implementation of UDPIPv4Socket
+	and could include the implementation of other kind of socket
+	classes used to instantiate T_RTPSocket.
+
+	* Rearranged the doxygen tags and configuration (and changes in
+	src/private.h) so that the introductory README, the TODO list and
+	the examples under demo/ are included in the documentation. Added
+	some comments both for API and implementation.
+
+2001-08-22  David Sugar <dyfet@ostel.com> (from 0.5.0 to 0.5.1)
+
+	* expose private packet structures externally.
+	
+2001-06-21  David Sugar <dyfet@ostel.com> (from 0.4.1 to 0.5.0)
+
+	* added const for address handlers.
+	* added queue Purge function.
+	* extended queue i/o services and support for sequence and 
+	  timestamp initialization/signatures.
+	* added millisecond timeclock for stack time synhronization.
+	* added RTCP event messages as virtuals.
+
+2001-04-23  David Sugar <dyfet@ostel.com> (from 0.4.0 to 0.4.1)
+
+	* added virtual handler for timer tick driven code.
+	* added	patches and demo apps from Federico.
+	
+from 0.3.2 to 0.4.0  David Sugar <dyfet@ostel.com>
+
+	* fixed version test.
+	* added virtual handler to process packet "events".
+
+from 0.3.1 to 0.3.2  David Sugar <dyfet@ostel.com>
+
+	* some win32 things.
+	* new common c++ version check.
+
+from 0.3.0 to 0.3.1  David Sugar <dyfet@ostel.com>
+
+	* some header fixups.
+
+from 0.2.2 to 0.3.0  David Sugar <dyfet@ostel.com>
+
+	* merged with Common C++ updates and new Common C++ UDP classes.
+
+from 0.2.1 to 0.2.2  David Sugar <dyfet@ostel.com>
+
+	* use of sequence and marker checks to allow application to
+	determine if assembled multi-sequence packets are "complete" or
+	missing data.
+
+	* reorganized class structure to allow more malleable assembly of
+	different kinds of RTP session classes.
+
+from 0.2.0 to 0.2.1  David Sugar <dyfet@ostel.com>
+
+	* add support to strip "padding" on receiver side.
+	* add packet reassembly of multi-segment packets.
+	* add getPayloadSize capability.
+	* add setPartial to update a pending (multi-channel) frame.
+	* RTPSocket "broken" constructor fixed.
+
+from 0.1.0 to 0.2.0  David Sugar <dyfet@ostel.com>
+
+	* set SO_REUSEADDR for rtcp socket.
+	* added RTCP scheduling points to service thread.
+	* added expiration of outgoing packets which have been "delayed"
+	or "blocked".
+	* handling of sending to blocked or conjested outbound socket
+	queues.
+	* RTPSocket uses non-blocking send for conjuestion test.
+
+from 0.0.1 to 0.1.0  David Sugar <dyfet@ostel.com>
+
+	* restructured class hierarchy to add new RTPQueue so that we have
+	a generic base for creating different RTP socket types.
+	* RTPDuplex added.

@@ -1,0 +1,11 @@
+PKG="OSTscript"
+NAME="OST ccScript embedded scripting engine"
+ARCH="@host_cpu@"
+VERSION="@VERSION@"
+CATEGORY="system"
+EMAIL="dyfet@ostel.com"
+VENDOR="OST"
+PSTAMP="OST"
+CLASSES="none"
+BASEDIR="/opt/OSTscript"
+

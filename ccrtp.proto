@@ -1,0 +1,5 @@
+i pkginfo
+f none /usr/lib/libccrtp-0.1.so.0.0.1=/opt/OSTrtp/lib/libccrtp-0.0.so.0.0.1 0755 bin bin
+s none /usr/lib/libccrtp-0.1.so.0=libccrtp-0.1.so.0.0.1
+s none /usr/lib/libccrtp.so=libccrtp-0.1.so.0.0.1
+f none /usr/include/cc++/rtp.h=/opt/OSTrtp/include/cc++/rtp.h 0644 bin bin

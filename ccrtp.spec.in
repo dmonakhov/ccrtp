@@ -1,0 +1,49 @@
+Summary: ccrtp - a Common C++ class framework for RTP packets
+Name: ccrtp
+Version: @VERSION@
+Release: 2
+Group: Development/Libraries
+Source: ccrtp-%{PACKAGE_VERSION}.tar.gz
+Prefix: %{_prefix}
+Copyright: GPL
+BuildRoot: %{_tmppath}/rtp-root
+Packager: David Sugar <dyfet@ostel.com>
+Requires: CommonC++ >= 1.3.3
+
+%description
+The ccrtp package offers a generic framework for sending and receiving of
+realtime streaming data over UDP packets by the use of send and receive
+packet queues.
+
+%prep
+rm -rf $RPM_BUILD_ROOT
+
+%setup
+./configure --prefix=%{_prefix}
+
+%build
+uname -a|grep SMP && make -j 2 || make
+
+%install
+mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
+make prefix=$RPM_BUILD_ROOT/%{_prefix} \
+	mandir=$RPM_BUILD_ROOT/%{_mandir} install
+make prefix=$RPM_BUILD_ROOT/%{_prefix} \
+	mandir=$RPM_BUILD_ROOT/%{_mandir} man
+
+%files
+%defattr(-,root,root,0755)
+%doc AUTHORS COPYING NEWS README TODO ChangeLog doc/html
+%{_prefix}/lib/libcc*
+%{_prefix}/include/cc++/rtp*.h
+%{_mandir}/man3/*.3cc*
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+/sbin/ldconfig -n /usr/lib
+
+%postun
+/sbin/ldconfig -n /usr/lib
+

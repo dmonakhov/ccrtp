@@ -1,0 +1,13 @@
+Begin3
+Title:          ccrtp
+Version:        VERSION
+Entered-date:   DATE
+Description:	An experimental packet queue based RTP stack for use with
+		Common C++.
+Keywords:       c++ rtp telephony voip		
+Author:         David Sugar <dyfet@ostel.com>
+Maintained-by:  David Sugar <dyfet@ostel.com>
+Primary-Site	www.voxilla.org /pub/ccrtp
+		SIZEk ccrtp-VERSION.tar.gz
+Copying-policy: lgpl
+End

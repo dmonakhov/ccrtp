@@ -1,0 +1,7 @@
+Authors of ccrtp.
+
+See also the files THANKS and ChangeLog.
+
+David Sugar <dyfet@ostel.com> designed and implemented initial ccRTP.
+Frederico Montesino Pouzols <p5087@quintero.fie.us.es> has helped make it
+work.

@@ -1,0 +1,52 @@
+
+- URGENT!!!: Fill the SR, RR and some SDES reports 
+
+	- NTP - Timestamp  synchronization  (for end2end delay)
+
+- Add user interface for RTP header extensions and CSRC specification
+
+- Kitchen: playout delay compensation
+
+- QueueRTCPManager::TimeOutSSRCs()
+
+- RTPQueue::newTalkSpurt() -> M
+
+- thoroughly check multicast support
+
+- provide faster handling of sessions with one or few senders
+
+- Filter PT field (RTQueue::setReceivedPayloadType)
+
+- Add good exception handling
+
+- good suport for RTP muxing - mixers and translators
+
+- for video, timestamp must be determined from the frame number or from
+the system clock.
+
+- QueueRTCPManager::QueueRTCPManager(..): path MTU is always assumed to be 1500
+
+	- path MTU discovery for RTCP (Arrggg, we use UDP!)
+
+- check robust handling of payload change
+
+- Add support for dynamic pts (BT656, H263-1998, MP1S, MP2P, BMPEG) 
+
+- Address the enhanced/best-effort service issue
+
+- queue.cpp: Improve random number generation
+
+- members.cpp: a good hashing!
+
+- Implement encryption support?
+
+- Test ccRTP following RFC 3158: ``RTP Testing Strategies'', 
+
+
+(Experimental things, close everything up here before looking down here)
+
+* Implement SSRC sampling algorithm
+
+* Consider SRTP profile, currently only immature draft
+
+Last change: 2 Sep 2001
