@@ -412,9 +412,6 @@ public:
 	operator!=(const RTPSource &rhs) const
 	{ return !(*this == rhs); }
 
-protected:
-		
-private:
 	/**
 	 * @param ssrc SSRC identifier of the source
 	 */
@@ -433,6 +430,9 @@ private:
 	RTPSource&
 	operator=(const RTPSource &origin);
 
+protected:
+		
+private:
 	/**
 	 * Set the current size of the kitchen (buffer) for this
 	 * packet as the amount of octets accummulated in the incoming
