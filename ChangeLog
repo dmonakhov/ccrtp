@@ -1,3 +1,8 @@
+2004-01-28  David Sugar <dyfet@ostel.com>
+
+	* configure: use ~/.configure as means to hold default configure
+	options when configure invoked without options.
+
 2004-01-24  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtp.h: (TRTPSessionBase and SingleThreadRTPSession):
