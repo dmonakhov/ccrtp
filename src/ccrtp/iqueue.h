@@ -104,7 +104,7 @@ public:
 
 protected:
 	Members() :	
-		members(1), 
+		members(0), 
 		activeSenders(0)
 	{ }
 
@@ -791,7 +791,7 @@ protected:
 	/**
 	 * Get the description of a source by its <code>ssrc<code> identifier.
 	 *
-	 * @param ssrc SSRC identifier, in network order. 
+	 * @param ssrc SSRC identifier, in host order. 
 	 * @param created whether a new source has been created.
 	 * @return Pointer to the SyncSource object identified by
 	 * <code>ssrc<code>.

@@ -69,8 +69,9 @@ ConflictHandler::ConflictingTransportAddress*
 ConflictHandler::searchControlConflict(InetAddress na, tpport_t ctp)
 {
 	ConflictingTransportAddress* result = firstConflict;
-	while ( result->networkAddress != na ||
-		result->controlTransportPort != ctp)
+	while ( result && 
+		(result->networkAddress != na ||
+		 result->controlTransportPort != ctp) )
 		result = result->next;
 	return result;
 }

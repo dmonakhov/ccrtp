@@ -1,3 +1,8 @@
+2003-10-30  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/iqueue.h, src/incqueue.cpp: corrected members counter
+	initialization.
+
 2003-10-21  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (QueueRTCPManager::computeRTCPInterval): fixed
