@@ -279,7 +279,6 @@ private:
 	build(const InetMcastAddress& ia, tpport_t dataPort, 
 	      tpport_t controlPort)
 	{
-		if ( error ) return error;
 		if ( 0 == controlPort ) {
 			dataBasePort = even_port(dataPort); 
 			controlBasePort = dataBasePort + 1;
@@ -289,7 +288,7 @@ private:
 		}
 		dso = new RTPDataChannel(ia,dataBasePort);
 		cso = new RTCPChannel(ia,controlBasePort);
-		Socket::Error error = joinGroup(ia);
+		joinGroup(ia);
 	}
 
 	/**
@@ -303,18 +302,19 @@ private:
 	{ 
 		Socket::Error error  = dso->setMulticast(true);
 		if ( error ) return error;
-		error = dso->joinGroup(ia); 
+		error = dso->join(ia); 
 		if ( error ) return error;
 		error = cso->setMulticast(true);
 		if ( error ) {
-			dso->leaveGroup(ia);
+			dso->drop(ia);
 			return error;
 		}
-		error = cso->joinGroup(ia);
+		error = cso->join(ia);
 		if ( error ) {
-			dso->leaveGroup(ia);
+			dso->drop(ia);
 			return error;
 		}
+		return Socket::errSuccess;
 	}
 
 	/**
