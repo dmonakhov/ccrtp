@@ -149,7 +149,7 @@ typedef struct
 {
 	uint32 ssrc;
 	SenderInfo sinfo;
-	RRBlock blocks [];
+	RRBlock blocks [0];
 }       SendReport;
 
 /**
@@ -161,7 +161,7 @@ typedef struct
 typedef struct 
 {
 	uint32 ssrc;
-	RRBlock blocks [];
+	RRBlock blocks [0];
 }       RecvReport;
 
 /**
@@ -214,7 +214,7 @@ typedef struct {
 	RTCPFixedHeader fh;
 	uint32 ssrc;          ///< SSRC identifier of sender
 	uint8 length;         ///< [optional] length of reason
-	char const reason[];  ///< [optional] reason text (not null terminated)
+	char const reason[0];  ///< [optional] reason text (not null terminated)
 }       BYEHeader;
 
 typedef struct {
