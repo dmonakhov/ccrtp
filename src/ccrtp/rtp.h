@@ -394,7 +394,7 @@ private:
 };
 
 /**
- * @class OneThreadRTPSession
+ * @class SingleThreadRTPSession
  *
  * This template class adds the threading aspect to the RTPSessionBase
  * template in one of the many possible ways. It inherits from a
