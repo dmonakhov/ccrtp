@@ -20,5 +20,5 @@ noinst_HEADERS = server.h
 ccxxinclude_HEADERS = phone.h
 bin_PROGRAMS = phone
 
-phone_SOURCES = phone.cpp config.cpp server.cpp
+phone_SOURCES = phone.cpp config.cpp server.cpp rtp.cpp
 

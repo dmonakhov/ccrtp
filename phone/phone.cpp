@@ -22,6 +22,7 @@
 namespace ost {
 #endif
 
+bool multicast = false;
 bool daemon = false;
 bool drop = false;
 bool answer = false;
@@ -36,16 +37,32 @@ static int initial(int argc, char **argv)
 		{"background", 0, 0, 'D'},
                 {"foreground", 0, 0, 'F'},
                 {"daemon", 0, 0, 'D'},
+		{"multicast", 0, 0, 'm'},
+		{"unicast", 0, 0, 'u'},
                 {"help", 0, 0, 'h'},
                 {"priority", 1, 0, 'p'},
 		{0, 0, 0, 0}};
 		
 	int idx, opt;	
+	char *cp = strchr(argv[0], '/');
+	if(cp)
+		++cp;
+	else
+		cp = argv[0];
+
+	if(*cp == 'm')
+		multicast = true;
 		
-	while(EOF != (opt = getopt_long(argc, argv, "dp:FDh", long_options, &idx)))
+	while(EOF != (opt = getopt_long(argc, argv, "mudp:FDh", long_options, &idx)))
 	{
 		switch(opt)
 		{
+		case 'm':
+			multicast = true;
+			break;
+		case 'u':
+			multicast = false;
+			break;
 		case 'p':
 			keythreads.setValue("priority", optarg);
 			break;	

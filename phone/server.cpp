@@ -24,6 +24,7 @@ namespace ost {
 void server(void)
 {
 	fstream fifo;
+	new RTPAudio;
 
 	int fd;
 	char buf[256];
@@ -69,6 +70,7 @@ void server(void)
 	}
 	fifo.close();
 	slog(SLOG_WARNING) << "fifo exiting..." << endl;
+	delete rtp;
 	exit(0);
 }
 

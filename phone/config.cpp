@@ -41,7 +41,21 @@ Keydata("/phone/threads")
 		setValue("priority", cp);
 }
 
+KeyRTP::KeyRTP() :
+Keydata("/phone/rtp")
+{
+	static KEYDEF defkeys[] = {
+	{"interface", "*"},
+	{"multicast", "*"},
+	{"port", "3128"},
+	{NULL, NULL}};
+
+	Load("~phone/rtp");
+	Load(defkeys);
+}
+
 KeyThreads keythreads;
+KeyRTP keyrtp;
 
 #ifdef	__NAMESPACES__
 };

@@ -32,6 +32,34 @@ namespace ost {
  * @author David Sugar <dyfet@ostel.com>
  * @short Load keythreads priority and session count configuration.
  */
+class KeyRTP : public Keydata
+{
+public:
+        /**
+         * Initialize keythread data.
+         */
+        KeyRTP();
+	
+	/**
+	 * Get unicast address.
+	 */
+	inline InetAddress getInterface(void)
+		{return InetAddress(getLast("interface"));};
+	
+	/**
+	 * Get binding port number.
+	 */
+	inline tpport_t getPort(void)
+		{return (tpport_t) atoi(getLast("port"));};
+};
+
+/**
+ * Load /etc/phone.conf [thread] key value pairs.  Has internal defaults
+ * if section or file is missing.
+ *
+ * @author David Sugar <dyfet@ostel.com>
+ * @short Load keythreads priority and session count configuration.
+ */
 class KeyThreads : public Keydata
 {
 public:
@@ -82,8 +110,24 @@ public:
                 {return getLast("priority");};
 };	
 
+/**
+ * This is the base session stack that will maintain all network audio
+ * activity.
+ *
+ * @author David Sugar <dyfet@ostel.com>
+ * @short RTP stack for network audio. 
+ */
+class RTPAudio : public RTPSocket
+{
+public:
+	RTPAudio();
+};
+
+extern bool multicast;
 extern bool daemon;
 extern KeyThreads keythreads;
+extern KeyRTP keyrtp;
+extern RTPAudio *rtp;
 
 #ifdef	__NAMESPACES__
 };

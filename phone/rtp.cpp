@@ -14,30 +14,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <cc++/file.h>
-#include <cc++/misc.h>
-#include <rtp.h>
-#include "phone.h"
- 
+#include <cc++/slog.h>
+#include "server.h"
+
 #ifdef	__NAMESPACES__
 namespace ost {
 #endif
 
-class RTPUnicast : public RTPAudio
+RTPAudio::RTPAudio() :
+RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 {
-public:
-	RTPUnicast();
-};
+	rtp = this;
+}
 
-class RTPMulticast : public RTPAudio
-{
-public:
-	 RTPMulticast();
-};
-
-void	server(void);
+RTPAudio *rtp;
 
 #ifdef	__NAMESPACES__
 };
 #endif
-
