@@ -36,7 +36,7 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %defattr(-,root,root,0755)
 %doc AUTHORS COPYING NEWS README TODO ChangeLog 
 %{_prefix}/lib/libcc*
-%{_prefix}/include/cc++/rtp*.h
+%{_prefix}/include/cc++2/cc++/rtp*.h
 %{_mandir}/man3/*.3cc*
 
 %clean
