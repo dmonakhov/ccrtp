@@ -1,3 +1,8 @@
+2005-02-11  David Sugar <dyfet@ostel.com>
+	* configure.ac: version bumped to 1.2.2
+
+	* w32/cape{...}: support for CAPE debug project installs
+
 2005-02-10  Federico Montesino Pouzols  <fedemp@altern.org>
 	* doc/ccrtp.texi: 'Clossing Sessions' extended and clarified.
 
