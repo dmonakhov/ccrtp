@@ -25,7 +25,6 @@
 namespace ost {
 #endif
 
-
 /**
  * Load /etc/phone.conf [thread] key value pairs.  Has internal defaults
  * if section or file is missing.

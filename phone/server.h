@@ -23,6 +23,8 @@
 namespace ost {
 #endif
 
+void	server(void);
+
 #ifdef	__NAMESPACES__
 };
 #endif

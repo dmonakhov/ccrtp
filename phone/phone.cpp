@@ -16,12 +16,13 @@
 
 #include "server.h"
 #include <getopt.h>
+#include <sys/wait.h>
 
 #ifdef	__NAMESPACES__
 namespace ost {
 #endif
 
-bool daemon = true;
+bool daemon = false;
 bool drop = false;
 bool answer = false;
 
@@ -93,7 +94,7 @@ extern "C" {
 
 int main(int argc, char **argv)
 {
-	int pid = 0;
+	int pid = 0, wpid = 0;
 	int idx;
 	ofstream fifo;
 	
@@ -106,13 +107,18 @@ int main(int argc, char **argv)
 
 	if(!pid)
 	{
-		pid = fork();
+		::remove(".phonectrl");
+		::mkfifo(".phonectrl", 0660);
+		pid = ::fork();
 		if(!pid)
 		{
-//			server();
+			server();
 			exit(0);
 		}
-		sleep(1);
+		if(daemon)
+			::waitpid(pid, NULL, 0);
+		else
+			wpid = pid;
 	}
 	fifo.open(".phonectrl", ios::out);
 	if(!fifo.is_open())
@@ -132,6 +138,9 @@ int main(int argc, char **argv)
 	}
 		
 	fifo.close();
+
+	if(wpid > 0)
+		::waitpid(wpid, NULL, 0);
 		
 	exit(0);
 }
