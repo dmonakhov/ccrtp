@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2001,2002,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,19 +51,17 @@ OutgoingDataQueueBase::OutgoingDataQueueBase()
 }
 
 DestinationListHandler::DestinationListHandler() :
-	destinationCounter(0), 
-	firstDestination(NULL), lastDestination(NULL),
-	destinationLock()
+	destList(), destinationLock()
 {
 }
 
 DestinationListHandler::~DestinationListHandler()
 {
-	TransportAddress* tmp;
+	TransportAddress* tmp = NULL;
 	writeLockDestinationList();
-	while ( firstDestination ) {
-		tmp = getFirstDestination();
-		firstDestination = firstDestination->getNext();
+	for (std::list<TransportAddress*>::iterator i = destList.begin();
+	     destList.end() != i; i++) {
+		tmp = *i;
 #ifdef	CCXX_EXCEPTIONS
 		try {
 #endif
@@ -81,13 +79,7 @@ DestinationListHandler::addDestinationToList(const InetAddress& ia,
 {	
 	TransportAddress* addr = new TransportAddress(ia,data,control);
 	writeLockDestinationList();
-	if ( firstDestination == NULL )
-		firstDestination = lastDestination = addr;
-	else {
-		lastDestination->setNext(addr);
-		lastDestination = addr;
-	}
-	destinationCounter++;
+	destList.push_back(addr);
 	unlockDestinationList();
 	return true;
 }
@@ -98,27 +90,18 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 						  tpport_t controlPort)
 {
 	bool result = false;
-	TransportAddress* prev = NULL;
 	writeLockDestinationList();
-	TransportAddress* ta = getFirstDestination();
-	while ( NULL != ta ) {
-		if ( ia == ta->getNetworkAddress() &&
-		     dataPort == ta->getDataTransportPort() &&
-		     controlPort == ta->getControlTransportPort() ) {
+	TransportAddress* tmp;
+	for (std::list<TransportAddress*>::iterator i = destList.begin();
+	     destList.end() != i && !result; i++) {
+		tmp = *i;
+		if ( ia == tmp->getNetworkAddress() &&
+		     dataPort == tmp->getDataTransportPort() &&
+		     controlPort == tmp->getControlTransportPort() ) {
 			// matches. -> remove it.
 			result = true;
-			if ( prev )
-				prev->setNext(ta->getNext());
-			else // ( getFirstDestination() == ta ) 
-				firstDestination = firstDestination->getNext();
-			if ( lastDestination == ta )
-				lastDestination = prev;
-			destinationCounter--;
-			delete ta;
-			ta = NULL;
-		} else {
-			prev = ta;
-			ta = ta->getNext();
+			destList.erase(i);
+			delete tmp;
 		}
 	}
 	unlockDestinationList();
@@ -144,6 +127,7 @@ OutgoingDataQueue::OutgoingDataQueue():
 	sendInfo.octetCount = 0;
 	sendInfo.sendSeq = random16();    // random initial sequence number
 	sendInfo.sendCC = 0;    // initially, 0 CSRC identifiers follow the fixed heade
+	sendInfo.paddinglen = 0;          // do not add padding bits.
 	sendInfo.marked = false;
 	sendInfo.complete = true;
 	// the local source is the first contributing source
@@ -349,9 +333,9 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 
 		OutgoingRTPPkt* packet;
 		if ( sendInfo.sendCC )
-			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step);
+			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen);
 		else
-			packet = new OutgoingRTPPkt(data + offset,step);
+			packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen);
 		
 		packet->setPayloadType(getCurrentPayloadType());
 		packet->setSeqNum(sendInfo.sendSeq++);
@@ -394,17 +378,22 @@ OutgoingDataQueue::dispatchDataPacket(void)
 	uint32 rtn = packet->getPayloadSize();
 	lockDestinationList();
 	if ( isSingleDestination() ) {
+		TransportAddress* tmp = destList.front();
+		// if going from multi destinations to single destinations.
+		setDataPeer(tmp->getNetworkAddress(),
+			    tmp->getDataTransportPort());
+
 		sendData(packet->getRawPacket(),
 			 packet->getRawPacketSize());
 	} else {
 		// when no destination has been added, NULL == dest.
-		TransportAddress* dest = getFirstDestination();
-		while ( dest ) {
+		for (std::list<TransportAddress*>::iterator i = 
+			     destList.begin(); destList.end() != i; i++) {
+			TransportAddress* dest = *i;
 			setDataPeer(dest->getNetworkAddress(),
 				    dest->getDataTransportPort());
 			sendData(packet->getRawPacket(),
 				 packet->getRawPacketSize());
-			dest = dest->getNext();
 		}
 	}
 	unlockDestinationList();

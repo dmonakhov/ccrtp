@@ -1,3 +1,27 @@
+2005-03-20  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtppkt.h, src/rtppkt.cpp: added 'padsize' parameter to
+	OutgoingRTPPkt and RTPPacket constructors. RTPPacket::RTPPacket
+	modified for variable padding lengths.
+
+	* src/ccrtp/oqueue.h, src/outqueue.cpp: added setPadding(uint8),
+	modified OutgoingDataQueue::OutgoingDataQueue().
+
+	* src/ccrtp/oqueue.h, src/outqueue.cpp, src/control.cpp: applied
+	the patch from Dan Weber to use std::list instead of the
+	handcrafted destinationList (destinationCounter also replaced with
+	size()). The minimal std::list-like template is still TODO!
+
+	* Some work to remove dependency on libccext by copying the md5
+	code from Common C++ to ccRTP:
+	- src/private.h: do not include <cc++/digest.h>
+	- src/queue.cpp: copy (and minor tweaks) md5 parts of digest.h and md5.cpp from cc++
+	- libccrtp1.pc.in: require libccgnu2 instead of libccext2
+	- src/Makefile: added LIBS= @GNULIBS@ to avoid linking to libccext2
+	- Directory w32/cape/: ccrtp1.vcproj, ccrtp1.dsp, rtphello.vcproj,
+	rtphello.dsp, rtplisten.vcproj, rtplisten.dsp, rtpsend.vcproj,
+	rtpsend.dsp: removed ccext2.lib
+	
 2005-03-02  David Sugar <dyfet@ostel.com>
 	* libccrtp1.pc.in: updated for cc++ >= 1.3.0
 

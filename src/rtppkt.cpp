@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
+// Copyright (C) 1999-2005 Open Source Telecom Corporation.
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ RTPPacket::RTPPacket(const unsigned char* const block, size_t len,
 }
 	
 // constructor commonly used for outgoing packets
-RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
+RTPPacket::RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen) :
 	buffer(NULL),
 	hdrSize((uint32)hdrlen),
 	payloadSize((uint32)plen),
@@ -139,16 +139,16 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
 {
 	total = (uint32)(hdrlen + payloadSize);
 	// compute if there must be padding
-	uint8 padding = total & 0x03;
-	if ( padding ) {
-		padding = 4 - padding;
+	uint8 padding = total % paddinglen;
+	if ( 0 != padding ) {
+		padding = paddinglen - padding;
 		total += padding;
 	}
 	// now we know the actual total length of the packet
 	buffer = new unsigned char[total];
 	*(reinterpret_cast<uint32*>(getHeader())) = 0;
 	getHeader()->version = CCRTP_VERSION;
-	if ( padding ) {
+	if ( 0 != padding ) {
 		memset(buffer + total - padding,0,padding - 1);
 		buffer[total - 1] = padding;
 		getHeader()->padding = 1;
@@ -172,9 +172,9 @@ RTPPacket::endPacket()
 OutgoingRTPPkt::OutgoingRTPPkt(
 	const uint32* const csrcs, uint16 numcsrc, 
         const unsigned char* const hdrext, uint32 hdrextlen,
-	const unsigned char* const data, size_t datalen) :
+	const unsigned char* const data, size_t datalen, uint8 paddinglen= 0) :
 	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) * numcsrc 
-		  + hdrextlen),datalen)
+		  + hdrextlen),datalen,paddinglen)
 {
 	uint32 pointer = (uint32)getSizeOfFixedHeader();
 	// add CSCR identifiers (putting them in network order).
@@ -192,8 +192,9 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 
 OutgoingRTPPkt::OutgoingRTPPkt(
 	const uint32* const csrcs, uint16 numcsrc, 
-	const unsigned char* data, size_t datalen) :
-	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) *numcsrc),datalen)
+	const unsigned char* data, size_t datalen, uint8 paddinglen = 0) :
+	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) *numcsrc),datalen,
+		  paddinglen)
 {
 	uint32 pointer = (uint32)getSizeOfFixedHeader();
 	// add CSCR identifiers (putting them in network order).
@@ -208,8 +209,9 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	setbuffer(data,datalen,pointer);
 }
 
-OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen) :
-	RTPPacket(getSizeOfFixedHeader(),datalen)
+OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen, 
+			       uint8 paddinglen = 0) :
+	RTPPacket(getSizeOfFixedHeader(),datalen,paddinglen)
 {
 	// not needed, as the RTPPacket constructor sets by default
 	// the whole fixed header to 0.

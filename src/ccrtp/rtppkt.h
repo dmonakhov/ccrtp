@@ -98,9 +98,10 @@ public:
 	 *
 	 * @param hdrlen length of the header (including CSRC and extension).
 	 * @param plen payload length.
+	 * @param paddinglen pad packet to a multiple of paddinglen
 	 * @note used in OutgoingRTPPkt.
 	 */
-	RTPPacket(size_t hdrlen, size_t plen);
+	RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen);
 
 	/**
 	 * Get the length of the header, including contributing
@@ -477,6 +478,7 @@ public:
 	 * @param hdrextlen size of whole header extension, in octets.
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
+	 * @param paddinglen pad packet to a multiple of paddinglen.
 	 *
 	 * @note For efficiency purposes, since this constructor is
 	 * valid for all packets but is too complex for the common
@@ -484,7 +486,8 @@ public:
 	 **/
 	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
 		       const unsigned char* const hdrext, uint32 hdrextlen,
-		       const unsigned char* const data, size_t datalen);
+		       const unsigned char* const data, size_t datalen,
+		       uint8 paddinglen);
 
 	/**
 	 * Construct a new packet to be sent, containing several
@@ -497,19 +500,23 @@ public:
 	 * @param numcsrc number of CSRC identifiers in the array.
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
+	 * @param paddinglen pad packet to a multiple of paddinglen.
 	 **/
 	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
-		       const unsigned char* const data, size_t datalen);
+		       const unsigned char* const data, size_t datalen,
+		       uint8 paddinglen);
 		
 	/**
-	 * Construct a new packet (with no contributing sources and no
-	 * header extension) to be sent. A new copy in memory (holding
-	 * the whole packet) is created.
+	 * Construct a new packet (fast variant, with no contributing
+	 * sources and no header extension) to be sent. A new copy in
+	 * memory (holding the whole packet) is created.
 	 *
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
+	 * @param paddinglen pad packet to a multiple of paddinglen.
 	 **/
-	OutgoingRTPPkt(const unsigned char* const data, size_t datalen);
+	OutgoingRTPPkt(const unsigned char* const data, size_t datalen, 
+		       uint8 paddinglen);
 
 	~OutgoingRTPPkt()
 	{ }

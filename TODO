@@ -1,3 +1,5 @@
+- linked list template
+
 - preallocated buffers mode for scheduling queue.
 
 - adaptive jitter buffer schemes

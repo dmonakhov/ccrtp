@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #define CCXX_RTP_OQUEUE_H_
 
 #include <ccrtp/queuebase.h>
+#include <list> // TODO: minimal std::list template
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
@@ -80,7 +81,7 @@ public:
 	{ return (destinationCounter == 1); }
 
 	inline TransportAddress* getFirstDestination() const
-	{ return firstDestination; }
+	{ return destList.front(); }
 
 	inline void lockDestinationList() const
 	{ destinationLock.readLock(); }
@@ -110,14 +111,8 @@ protected:
 	{ 
 		TransportAddress(InetAddress na, tpport_t dtp, tpport_t ctp) :
 			networkAddress(na), dataTransportPort(dtp), 
-			controlTransportPort(ctp), next(NULL)
+			controlTransportPort(ctp)
 		{  }
-
-		inline TransportAddress* getNext()
-		{ return next; }
-
-		inline void setNext(TransportAddress* nc)
-		{ next = nc; }
 
 		inline const InetAddress& getNetworkAddress() const
 		{ return networkAddress; }
@@ -130,8 +125,9 @@ protected:
 
 		InetAddress networkAddress;
 		tpport_t dataTransportPort, controlTransportPort;
-		TransportAddress* next;
 	};
+
+	std::list<TransportAddress*> destList;
 
 private:
 	uint8 destinationCounter;
@@ -207,6 +203,15 @@ public:
 	 **/
 	void
 	putData(uint32 stamp, const unsigned char* data = NULL, size_t len = 0);
+	
+	/**
+	 * Set padding. All outgoing packets will be transparently
+	 * padded to a multiple of paddinglen.
+	 *
+	 * @param paddinglen pad packets to a length multiple of paddinglen.
+	 **/
+	void setPadding(uint8 paddinglen)
+	{ sendInfo.paddinglen = paddinglen; }
 
 	/**
 	 * Set marker bit for the packet in which the next data
@@ -405,6 +410,8 @@ private:
 		uint32 sendSources[16];
 		// how many CSRCs to send.
 		uint16 sendCC;
+		// pad packets to a paddinglen multiple
+		uint8 paddinglen;
 		// This flags tells whether to set the bit M in the
 		// RTP fixed header of the packet in which the next
 		// provided data will be sent.

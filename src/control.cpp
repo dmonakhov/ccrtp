@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2004 Open Source Telecom Corporation.
+// Copyright (C) 1999-2005 Open Source Telecom Corporation.
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1083,12 +1083,12 @@ QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t len)
 		count = sendControl(buffer,len);
 	} else {
 		// when no destination has been added, NULL == dest.
-		TransportAddress* dest = getFirstDestination();
-		while ( dest ) {
+		for (std::list<TransportAddress*>::iterator i = 
+			     destList.begin(); destList.end() != i; i++) {
+			TransportAddress* dest = *i;
 			setControlPeer(dest->getNetworkAddress(),
 				       dest->getControlTransportPort());
 			count += sendControl(buffer,len);
-			dest = dest->getNext();
 		}
 	}
 	unlockDestinationList();

@@ -44,7 +44,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ccext2.lib ccgnu2.lib ws2_32.lib"
+				AdditionalDependencies="ccgnu2.lib ws2_32.lib"
 				OutputFile="Debug/ccrtp1.dll"
 				Version="1.2.2"
 				LinkIncremental="1"
@@ -115,7 +115,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ccext2.lib ccgnu2.lib ws2_32.lib"
+				AdditionalDependencies="ccgnu2.lib ws2_32.lib"
 				ShowProgress="0"
 				OutputFile=".\Release/ccrtp1.dll"
 				Version="1.2.2"

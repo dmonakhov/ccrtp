@@ -88,7 +88,6 @@
 #include <cc++/config.h>
 #include <cc++/thread.h>
 #include <cc++/socket.h>
-#include <cc++/digest.h>
 #include <cc++/process.h>
 #include <cc++/export.h>
 
