@@ -144,9 +144,9 @@ protected:
 	{ }
 
 	inline size_t
-	getNextDataPacketSize() const
+	getNextDataPacketSize()
 	{ 
-		size_t len; ccioctl(UDPReceive::so,FIONREAD,len); return len; 
+		size_t len; ccioctl(UDPReceive::getReceiver(),FIONREAD,len); return len; 
 	}
 
 	/**
