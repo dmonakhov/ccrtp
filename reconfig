@@ -13,7 +13,7 @@
 rm -rf autoconf libtool
 if test ! -d autoconf ; then mkdir autoconf ; fi
 
-libtoolize=`which libtoolize glibtoolize libtoolize13 libtoolize14 libtoolize15 2>/dev/null`
+libtoolize=`which libtoolize glibtoolize libtoolize15 libtoolize14 libtoolize13 2>/dev/null`
 $libtoolize --copy --force
 
 ACLOCALDIRS="-I m4"
