@@ -48,9 +48,11 @@ public:
 		for (;;) {
 			const AppDataUnit* adu;
 			while ( (adu = getData(getFirstTimestamp())) ) {
-				cerr << "I got an app. data unit with "
+				cerr << "I got an app. data unit - "
 				     << adu->getSize()
-				     << " payload octets from "
+				     << " payload octets ("
+				     << "pt " << (int)adu->getType()
+				     << ") from "
 				     << hex << (int)adu->getSource().getID() 
 				     << "@" << dec <<
 					adu->getSource().getNetworkAddress()
