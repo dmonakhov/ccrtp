@@ -172,6 +172,13 @@ private:
 class __EXPORT RTPQueueBase
 {
 public:
+	/**
+	 * Set the payload format in use, for timing and payload type
+	 * identification purposes.
+	 *
+	 * @param pf payload format to use from now on.
+	 * @return whether the payload format has been successfully set.
+	 **/
 	inline bool
 	setPayloadFormat(const PayloadFormat& pf)
 	{ 
@@ -183,6 +190,14 @@ public:
 	inline uint32 getLocalSSRC() const
 	{ return localSSRC; }
 
+	/**
+	 * Get the clock rate in RTP clock units (for instance, 8000
+	 * units per second for PCMU, or 90000 units per second for
+	 * MP2T). This value depends on what payload format has been
+	 * selected using setPayloadFormat().
+	 *
+	 * @return clock rate in RTP clock units.
+	 **/
 	inline uint32 getCurrentRTPClockRate() const
 	{ return currentRTPClockRate; }
 
