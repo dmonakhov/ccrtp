@@ -6,7 +6,6 @@
 /* Version number of package */
 #undef VERSION
 
-#undef	HAVE_GETOPT_LONG
 #undef	HAVE_ENDIAN_H
 #undef	__BYTE_ORDER
 
