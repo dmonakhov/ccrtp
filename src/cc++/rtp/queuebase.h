@@ -221,15 +221,23 @@ class CCXX_CLASS_EXPORT OutgoingDataQueueBase:
 	public virtual RTPQueueBase
 {
 public:
+	inline size_t
+	getDefaultMaxSendSegmentSize()
+	{ return defaultMaxSendSegmentSize;}
+
 	/**
-	 * Set maximum packet segment size before fragmenting sends.
+	 * Set maximum payload segment size before fragmenting sends.
 	 *
-	 * @param size Maximum packet size.
+	 * @param size Maximum payload size.
 	 * @return Whether segment size was successfully set.
 	 **/
-	inline bool
+	inline void
 	setMaxSendSegmentSize(size_t size)
-	{ maxSendSegmentSize = size; return true; }
+	{ maxSendSegmentSize = size; }
+
+	inline size_t
+	getMaxSendSegmentSize()
+	{ return maxSendSegmentSize; }
 
 protected:
 	OutgoingDataQueueBase();
@@ -239,6 +247,7 @@ protected:
 	{ }
 
 private:
+	static const size_t defaultMaxSendSegmentSize;
 	// maximum packet size before fragmenting sends.
 	size_t maxSendSegmentSize;
 };

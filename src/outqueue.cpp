@@ -45,10 +45,12 @@
 namespace ost {
 #endif
 
+const size_t OutgoingDataQueueBase::defaultMaxSendSegmentSize = 65536;
+
 OutgoingDataQueueBase::OutgoingDataQueueBase()
 {
 	// segment data in packets of no more than 65536 octets.
-	setMaxSendSegmentSize(65536);
+	setMaxSendSegmentSize(getDefaultMaxSendSegmentSize());
 }
 
 DestinationListHandler::DestinationListHandler() :
@@ -331,33 +333,42 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 	if ( !data || !datalen )
 		return;
 
-	OutgoingRTPPkt* packet;
-	if ( sendInfo.sendCC )
-		packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data,datalen);
-	else
-		packet = new OutgoingRTPPkt(data,datalen);
+	size_t step = 0, offset = 0;
+	while ( offset < datalen ) {
+		size_t remainder = datalen - offset;
+		step = ( remainder > getMaxSendSegmentSize() ) ?
+			getMaxSendSegmentSize() : remainder;
 
-	packet->setPayloadType(getCurrentPayloadType());
-	packet->setSeqNum(sendInfo.sendSeq++);
-	packet->setTimestamp(stamp + getInitialTimestamp());
-	packet->setSSRCNetwork(htonl(getLocalSSRC()));
-	if ( getMark() ) {
-		packet->setMarker(true); 
-		setMark(false);
-	} else {
-		packet->setMarker(false);
+		OutgoingRTPPkt* packet;
+		if ( sendInfo.sendCC )
+			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step);
+		else
+			packet = new OutgoingRTPPkt(data + offset,step);
+		
+		packet->setPayloadType(getCurrentPayloadType());
+		packet->setSeqNum(sendInfo.sendSeq++);
+		packet->setTimestamp(stamp + getInitialTimestamp());
+		packet->setSSRCNetwork(htonl(getLocalSSRC()));
+		if ( (0 == offset) && getMark() ) {
+			packet->setMarker(true); 
+			setMark(false);
+		} else {
+			packet->setMarker(false);
+		}
+		
+		// insert the packet into the "tail" of the sending queue
+		sendLock.writeLock();
+		OutgoingRTPPktLink *link = 
+			new OutgoingRTPPktLink(packet,sendLast,NULL);
+		if (sendLast)
+			sendLast->setNext(link);
+		else
+			sendFirst = link;
+		sendLast = link;
+		sendLock.unlock();
+
+		offset += step;
 	}
-
-	// insert the packet into the "tail" of the sending queue
-	sendLock.writeLock();
-	OutgoingRTPPktLink *link = 
-		new OutgoingRTPPktLink(packet,sendLast,NULL);
-	if (sendLast)
-		sendLast->setNext(link);
-	else
-		sendFirst = link;
-	sendLast = link;
-	sendLock.unlock();
 }
 
 size_t
