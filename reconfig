@@ -28,7 +28,9 @@ $libtoolize --copy --force
 ACLOCALDIRS="-I m4"
 
 if test ! -z "$ACLOCAL" ; then
-        ACLOCALDIRS="$ACLOCALDIRS -I"${ACLOCAL} ; fi
+        ACLOCALDIRS="$ACLOCALDIRS -I"${ACLOCAL}
+elif test ! -z "$ACLOCAL_FLAGS" ; then
+	ACLOCALDIRS="$ACLOCALDIRS $ACLOCAL_FLAGS" ; fi
 
 if [ -d ~/share/aclocal ] ; then
     ACLOCALDIRS="$ACLOCALDIRS -I ~/share/aclocal"
