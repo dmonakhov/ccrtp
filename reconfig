@@ -13,8 +13,13 @@
 WANT_AUTOCONF_2_5=1
 export WANT_AUTOCONF_2_5
 
+if test -f configure ; then  configured="yes" ; else configured="no" ; fi
+
 rm -rf auto* libtool
-if test ! -d autoconf ; then mkdir autoconf ; fi
+rm -f include/stamp-h*
+
+if test ! -d autoconf ; then
+	mkdir autoconf ; fi
 
 libtoolize="libtoolize"
 for lt in glibtoolize libtoolize15 libtoolize14 libtoolize13 ; do
@@ -27,13 +32,20 @@ for lt in glibtoolize libtoolize15 libtoolize14 libtoolize13 ; do
 done
 $libtoolize --copy --force
 
-
 ACLOCALDIRS="-I m4"
 
 if test ! -z "$ACLOCAL" ; then
-        ACLOCALDIRS="$ACLOCALDIRS -I"${ACLOCAL}
+        ACLOCALDIRS="$ACLOCALDIRS -I "${ACLOCAL} 
 elif test ! -z "$ACLOCAL_FLAGS" ; then
 	ACLOCALDIRS="$ACLOCALDIRS $ACLOCAL_FLAGS" ; fi
+
+if test ! -z "$1" ; then
+	if test -d ${1} ; then
+		ACLOCALDIRS="$ACLOCALDIRS -I "${1}
+	elif test ! -z "$*" ; then
+		ACLOCALDIRS="$ACLOCALDIRS $*"
+	fi
+fi
 
 reconf=""
 if test -f ~/.configure ; then
@@ -48,28 +60,16 @@ elif [ -d /usr/local/share/aclocal ] ; then
     ACLOCALDIRS="$ACLOCALDIRS -I /usr/local/share/aclocal"
 fi
 
-if test ! -z "$1" ; then
-        ver=$1
-else
-        for v in 2.53 2.57 ; do
-                if test -f /usr/bin/autoconf-$v ; then
-                        ver=$v
-                fi
-        done
-fi
-
 aclocal $ACLOCALDIRS
-
-if test -f /usr/bin/autoheader-$ver ; then
-        /usr/bin/autoheader-$ver
-else
-        autoheader
-fi
-
+autoheader
 automake --add-missing --copy
-if test -f /usr/bin/autoconf-$ver ; then
-	/usr/bin/autoconf-$ver
-else
-	autoconf
-fi
+autoconf
 rm -f config.cache
+
+#if test configured == "no" ; then
+#	./configure
+#	make doxy
+#	make manual
+#fi
+
+

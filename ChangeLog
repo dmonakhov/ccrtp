@@ -1,3 +1,7 @@
+2004-11-11  David Sugar <dyfet@ostel.com>
+	* m4/ost_debug.m4 and debug support added.
+	* configure.in moved to configure.ac.
+
 2004-06-01  Federico Montesino Pouzols  <fedemp@altern.org>
 	* src/ccrtp/queuebase.h: doc clarifications.
 
