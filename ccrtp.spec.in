@@ -3,12 +3,13 @@ Name: ccrtp1
 Version: @VERSION@
 Release: 3
 Group: Development/Libraries
-Source: ccrtp-%{PACKAGE_VERSION}.tar.gz
+URL: http://www.gnu.org/software/ccrtp
+Source: ftp://ftp.gnu.org/gnu/ccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
 Prefix: %{_prefix}
 Copyright: GPL
 BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
-Requires: CommonC++ >= 1.9.2
+Requires: commoncpp2 >= 0.99.0
 
 %description
 The ccrtp package offers a generic framework for sending and receiving of
