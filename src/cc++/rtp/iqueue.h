@@ -319,7 +319,7 @@ protected:
 	 * necessary, a good hint may save a lot of unpredictable time
 	 * penalties.
 	 *
-	 * @param initial_size an estimation of how many participants
+	 * @param initialSize an estimation of how many participants
 	 * the session will consist of.
 	 *
 	 */

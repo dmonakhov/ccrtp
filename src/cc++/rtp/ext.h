@@ -116,6 +116,8 @@ protected:
 	/**
 	 * @param buffer where to store the retrieved data
 	 * @param len how many octets to read
+	 * @param na Source network address.
+	 * @param tp Source transport port.
 	 * @return number of octets read
 	 */
 	size_t

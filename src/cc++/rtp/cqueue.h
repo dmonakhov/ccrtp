@@ -277,7 +277,7 @@ protected:
 	 * packets.
 	 *
 	 * @param source Synchronization source of this packet.
-	 * @param data RTCP APP packet struct.
+	 * @param app RTCP APP packet struct.
 	 * @param len Length of the app data packet, including ssrc.
 	 * name and app. specific data.
 	 **/

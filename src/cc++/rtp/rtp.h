@@ -132,7 +132,9 @@ public:
 	 * @param ia Multicast address this socket is to be bound.
 	 * @param dataPort Transport port the data socket is to be bound.
 	 * @param controlPort Transport port the control socket is to be bound.
-	 * */
+	 * @param membersSize Initial size of the membership table.
+	 * @param app Application this session is associated to.
+	 **/
 	TRTPSessionBase(const InetMcastAddress& ia, tpport_t dataPort,
 			tpport_t controlPort, uint32 membersSize,
 			 RTPApplication& app) :
@@ -148,6 +150,8 @@ public:
 	 * @param ia Multicast address this socket is to be bound.
 	 * @param dataPort Transport port the data socket is to be bound.
 	 * @param controlPort Transport port the control socket is to be bound.
+	 * @param membersSize Initial size of the membership table.
+	 * @param app Application this session is associated to.
 	 **/
 	TRTPSessionBase(uint32 ssrc,
 			const InetMcastAddress& ia, tpport_t dataPort,
