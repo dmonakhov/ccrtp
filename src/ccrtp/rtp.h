@@ -173,6 +173,9 @@ public:
 	 endSocket(); 
 	}
 
+	inline RTPDataChannel *getDSO(void)
+		{return dso;};
+
 protected:
 	/**
 	 * @param timeout maximum timeout to wait, in microseconds
@@ -452,34 +455,41 @@ public:
 
 protected:
 	inline void enableStack(void)
-		{RTPDataQueue::enableStack();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+//		{RTPDataQueue::enableStack();}
 
 	inline microtimeout_t getSchedulingTimeout(void)
-		{return OutgoingDataQueue::getSchedulingTimeout();};
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
+//		{return OutgoingDataQueue::getSchedulingTimeout();};
 
 	inline void controlReceptionService(void)
-		{QueueRTCPManager::controlReceptionService();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService;}
+//		{QueueRTCPManager::controlReceptionService();}
 
 	inline void controlTransmissionService(void)
-		{QueueRTCPManager::controlTransmissionService();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
+//		{QueueRTCPManager::controlTransmissionService();}
 
 	inline timeval getRTCPCheckInterval(void)
-		{return QueueRTCPManager::getRTCPCheckInterval();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
+//		{return QueueRTCPManager::getRTCPCheckInterval();}
 
 	inline size_t dispatchDataPacket(void)
-		{return OutgoingDataQueue::dispatchDataPacket();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
+//		{return OutgoingDataQueue::dispatchDataPacket();}
 
 	inline virtual void timerTick(void)
 		{return;}
 
-	inline bool isPendingData(microtimeout_t timeout)
-		{return RTPDataChannel::isPendingRecv(timeout);}
-
-//	virtual bool isPendingData(microtimeout_t timeout) 
-//		{return dso->isPendingRecv(timeout);}; 
+	virtual bool isPendingData(microtimeout_t timeout) 
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}; 
 
 	inline size_t takeInDataPacket(void)
-		{return IncomingDataQueue::takeInDataPacket();}
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
+
+	inline size_t dispatchBYE(const std::string &str)
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
+
 
 	/**
 	 * Single runnable method for this RTP stacks, schedules
@@ -517,7 +527,7 @@ protected:
 				timeout = 0;
 			}
 		}
-		QueueRTCPManager::dispatchBYE("GNU ccRTP stack finishing.");
+		dispatchBYE("GNU ccRTP stack finishing.");
 		sleep(~0);
 	}
 };
