@@ -159,10 +159,14 @@ RTPDataQueue::endQueue(void)
 	dataServiceActive = false;
 
 	// purge both sending and receiving queues.
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		purgeOutgoingQueue();
 		purgeIncomingQueue();
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) { }
+#endif
 }
 
 uint32

@@ -95,12 +95,18 @@ RTCPCompoundHandler::RTCPCompoundHandler(uint16 mtu) :
 
 RTCPCompoundHandler::~RTCPCompoundHandler() 
 { 
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		delete [] rtcpRecvBuffer;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) {}
 	try {
+#endif
 		delete [] rtcpSendBuffer;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) {}
+#endif
 }
 
 bool

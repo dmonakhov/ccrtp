@@ -1,3 +1,9 @@
+2004-03-30  David Sugar <dyfet@ostel.com>
+
+	* src/rtppkt.cpp, src/members.cpp, src/outqueue.cpp, 
+	src/queue.cpp, src/rtcppkt.cpp, src/source.cpp: support source 
+	build where exceptions have been disabled.
+
 2004-03-15  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/source.cpp: (findusername): fixed username initialization,

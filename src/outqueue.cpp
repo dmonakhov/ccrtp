@@ -67,9 +67,13 @@ DestinationListHandler::~DestinationListHandler()
 	while ( firstDestination ) {
 		tmp = getFirstDestination();
 		firstDestination = firstDestination->getNext();
+#ifdef	CCXX_EXCEPTIONS
 		try {
+#endif
 			delete tmp;
+#ifdef	CCXX_EXCEPTIONS
 		} catch (...) {}
+#endif
 	}
 	unlockDestinationList();
 }

@@ -61,12 +61,16 @@ const uint32 MembershipBookkeeping::SyncSourceLink::SEQNUMMOD = (1<<16);
 
 MembershipBookkeeping::SyncSourceLink::~SyncSourceLink()
 { 
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		delete source;
 		delete prevConflict;
 		delete receiverInfo;
 		delete senderInfo;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) { }
+#endif
 }
 	
 void
@@ -185,14 +189,22 @@ MembershipBookkeeping::endMembers()
 	while( first ) {
 		s = first;
 		first = first->next;
+#ifdef	CCXX_EXCEPTIONS
 		try {
+#endif
 			delete s;
+#ifdef	CCXX_EXCEPTIONS
 		} catch (...) {}
+#endif
 	}
 	last = NULL;
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		delete [] sourceLinks;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) {}
+#endif
 }
 
 bool

@@ -170,14 +170,22 @@ RTPApplication::~RTPApplication()
 	while ( NULL != firstPart ) {
 		p = firstPart;
 		firstPart = firstPart->getNext();
+#ifdef	CCXX_EXCEPTIONS
 		try {
+#endif
 			delete p;
+#ifdef	CCXX_EXCEPTIONS
 		} catch (...) {}
+#endif
 	}
 	lastPart = NULL;
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		delete [] participants;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) {}
+#endif
 }
 
 // TODO: it should be implemented using the participant iterators

@@ -165,9 +165,13 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
 void 
 RTPPacket::endPacket()
 {
+#ifdef	CCXX_EXCEPTIONS
 	try {
+#endif
 		delete [] buffer;
+#ifdef	CCXX_EXCEPTIONS
 	} catch (...) { };
+#endif
 }
 
 OutgoingRTPPkt::OutgoingRTPPkt(
