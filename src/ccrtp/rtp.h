@@ -469,8 +469,8 @@ protected:
 	inline virtual void timerTick(void)
 		{return;}
 
-	inline virtual bool isPendingData(microtimeout_t timeout)
-		{return UDPReceive::isPendingReceive(timeout);}
+	virtual bool isPendingData(microtimeout_t timeout) 
+		{return dso->isPendingData();}; 
 
 	inline size_t takeInDataPacket(void)
 		{return IncomingDataQueue::takeInDataPacket();}
