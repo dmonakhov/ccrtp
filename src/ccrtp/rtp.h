@@ -472,8 +472,11 @@ protected:
 	inline virtual void timerTick(void)
 		{return;}
 
-	virtual bool isPendingData(microtimeout_t timeout) 
-		{return dso->isPendingRecv(timeout);}; 
+	inline bool isPendingData(microtimeout_t timeout)
+		{return RTPDataChannel::isPendingRecv(timeout);}
+
+//	virtual bool isPendingData(microtimeout_t timeout) 
+//		{return dso->isPendingRecv(timeout);}; 
 
 	inline size_t takeInDataPacket(void)
 		{return IncomingDataQueue::takeInDataPacket();}
@@ -514,7 +517,7 @@ protected:
 				timeout = 0;
 			}
 		}
-		dispatchBYE("GNU ccRTP stack finishing.");
+		QueueRTCPManager::dispatchBYE("GNU ccRTP stack finishing.");
 		sleep(~0);
 	}
 };
