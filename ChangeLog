@@ -1,5 +1,6 @@
 2003-01-12  Federico Montesino Pouzols  <fedemp@altern.org>
 
+	* doc/fdl.texi, doc/fdlnotice.texi: updated to FDL 1.2.
 	* src/ccrtp/formats.h, src/ccrtp/rtppkt.h, src/ccrtp/rtcppkt.h,
 	src/ccrtp/iqueue.h, src/ccrtp/oqueue.h, src/queue.cpp: fixes for
 	ANSI C++ warnings.
