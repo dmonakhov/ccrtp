@@ -32,6 +32,13 @@ if test ! -z "$ACLOCAL" ; then
 elif test ! -z "$ACLOCAL_FLAGS" ; then
 	ACLOCALDIRS="$ACLOCALDIRS $ACLOCAL_FLAGS" ; fi
 
+reconf=""
+if test -f ~/.configure ; then
+	reconf=`grep ^reconfig: ~/.configure | sed -e s/^reconfig://`
+elif test -f /etc/configure.conf ; then
+	reconf=`grep ^reconfig: /etc/configure.conf | sed -e s/^reconfig://` ; fi
+if test ! -z "$reconf" ; then ACLOCALDIRS="$ACLOCALDIRS $reconf" ; fi
+
 if [ -d ~/share/aclocal ] ; then
     ACLOCALDIRS="$ACLOCALDIRS -I ~/share/aclocal"
 elif [ -d /usr/local/share/aclocal ] ; then
