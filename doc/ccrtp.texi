@@ -134,13 +134,15 @@ ccRTP, Common C++ provides a portable and efficient framework for
 these kind of services.
 
 @acronym{RTP} has been defined as an application level protocol
-framework rather than a protocol. Thus, @acronym{RTP} is hardly ever
-implemented as a layer separated from the application. Consequently,
-@acronym{RTP} applications often must customize the adaptable
-@acronym{RTP} packet layout, timing constraints, session membership
-rules as well as other @acronym{RTP} mechanisms. ccRTP aims to provide
-a framework for the @acronym{RTP} framework, rather than being just an
-@acronym{RTP} packet manipulation library.
+framework rather than a typical Internet transport protocol such as
+TCP and UDP. Thus, @acronym{RTP} is hardly ever implemented as a layer
+separated from the application. Consequently, @acronym{RTP}
+applications often must customize the adaptable @acronym{RTP} packet
+layout and processing rules, timing constraints, session membership
+rules as well as other @acronym{RTP} and @acronym{RTCP}
+mechanisms. ccRTP aims to provide a framework for the @acronym{RTP}
+framework, rather than being just an @acronym{RTP} packet manipulation
+library.
 
 This document is an introductory programmer's manual, for a more
 exhaustive reference see the reference manual distributed with GNU
