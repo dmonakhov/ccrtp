@@ -52,7 +52,7 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %{_prefix}/lib/libcc*a
 %{_prefix}/include/cc++2/cc++/phone.h
 %{_prefix}/include/cc++2/cc++/rtp
-%{_mandir}/man3/*.3cc*
+#%{_mandir}/man3/*.3cc*		conflicts with commonc++ socket.h page
 #%{_infodir}/info/ccrtp*
 
 %clean
