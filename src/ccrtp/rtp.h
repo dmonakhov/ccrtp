@@ -455,7 +455,7 @@ public:
 
 protected:
 	inline void enableStack(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
 //		{RTPDataQueue::enableStack();}
 
 	inline microtimeout_t getSchedulingTimeout(void)
@@ -463,7 +463,7 @@ protected:
 //		{return OutgoingDataQueue::getSchedulingTimeout();};
 
 	inline void controlReceptionService(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService;}
+		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
 //		{QueueRTCPManager::controlReceptionService();}
 
 	inline void controlTransmissionService(void)
