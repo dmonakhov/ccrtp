@@ -43,8 +43,9 @@ public:
 			while ( (adu = getData(getFirstTimestamp())) ) {
 				cerr << "I got an app. data unit with "
 				     << adu->getSize()
-				     << " payload octets." 
-				     << " From " << 
+				     << " payload octets from "
+				     << hex << (int)adu->getSource().getID() 
+				     << "@" << dec <<
 					adu->getSource().getNetworkAddress()
 				     << ":" 
 				     << adu->getSource().getDataTransportPort()
@@ -60,8 +61,9 @@ public:
 	onGotSR(SyncSource& source, SendReport& SR, uint8 blocks)
 	{
 		RTPSession::onGotSR(source,SR,blocks);
-		cout << "I got an SR RTCP report from sync. source "
-		     << hex << (int)source.getID() << ". From "  << dec
+		cout << "I got an SR RTCP report from "
+		     << hex << (int)source.getID() << "@"
+		     << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -71,8 +73,9 @@ public:
 	onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks)
 	{
 		RTPSession::onGotRR(source,RR,blocks);
-		cout << "I got an RR RTCP report from sync. source "
-		     << hex << (int)source.getID() << ". From " << dec
+		cout << "I got an RR RTCP report from "
+		     << hex << (int)source.getID() << "@"
+		     << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -82,8 +85,9 @@ public:
 	onGotSDESChunk(SyncSource& source, SDESChunk& chunk, size_t len)
 	{ 
 		bool result = RTPSession::onGotSDESChunk(source,chunk,len);
-		cout << "I got a SDES chunk from sync. source "
-		     << source.getID() << ". From " << dec
+		cout << "I got a SDES chunk from "
+		     << hex << (int)source.getID() << "@" 
+		     << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 		return result;
@@ -92,8 +96,9 @@ public:
 	void
 	onGotGoodbye(const SyncSource& source, const std::string& reason)
 	{ 
-		cout << "I got a Goodbye packet from sync. source "
-		     << source.getID() << ". From " << dec
+		cout << "I got a Goodbye packet from "
+		     << hex << (int)source.getID() << "@" 
+		     << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 		cout << "   Goodbye reason: \"" << reason << "\"" << endl;
