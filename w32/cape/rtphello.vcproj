@@ -38,11 +38,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ccrtp1.lib ccgnu2.lib ccext2.lib odbc32.lib odbccp32.lib ws2_32.lib"
+				AdditionalDependencies="ccrtp1.lib ccext2.lib ccgnu2.lib odbc32.lib odbccp32.lib ws2_32.lib"
 				OutputFile=".\Debug/rtphello.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="C:\Program Files\GNU Telephony\CAPE Framework\importxp,Debug"
+				AdditionalLibraryDirectories="Debug,C:\Program Files\GNU Telephony\CAPE Framework\importxp"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="..\Debug\rtphello.pdb"
 				SubSystem="1"
@@ -101,11 +101,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib"
+				AdditionalDependencies="ccrtp1.lib ccext2.lib ccgnu2.lib odbc32.lib odbccp32.lib ws2_32.lib"
 				OutputFile=".\Release/rtphello.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="C:\Program Files\GNU Telephony\CAPE Framework\importxp,Release"
+				AdditionalLibraryDirectories="Release,C:\Program Files\GNU Telephony\CAPE Framework\importxp"
 				ProgramDatabaseFile=".\Release/rtphello.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
