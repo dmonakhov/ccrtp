@@ -205,9 +205,10 @@ control functions of @acronym{RTCP}.
 
 The main concept in the ccRTP implementation of @acronym{RTP} sessions
 is the use of packet queues to handle transmission and reception of
-@acronym{RTP} data packets/application data units. In ccRTP, data is
-transmitted putting it into the transmission (outgoing packet) queue,
-and received getting it from the reception (incoming packet) queue.
+@acronym{RTP} data packets/application data units. In ccRTP, a data
+block is transmitted by putting it into the transmission (outgoing
+packet) queue, and received by getting it from the reception (incoming
+packet) queue.
 
 Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 @acronym{RTCP}. Here is a brief list of some features of ccRTP:

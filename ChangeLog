@@ -1,3 +1,11 @@
+2002-11-24 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/queue.cpp, src/control.cpp, src/cc++/rtp/ioqueue.h: use size
+	parameter for IncomingDataQueue constructor.
+	* demo/rtplisten.cpp: added onNewSyncSource redefinition.
+	* src/incqueue, src/controll.cpp: check that onNewSyncSource is
+	called only once for any source.
+	
 2002-11-03 Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (takeInControlPacket): source stats init.

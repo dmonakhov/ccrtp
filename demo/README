@@ -1,13 +1,17 @@
 
 	This directory includes example programs intended for testing
-and illustrating features of ccRTP, the RTP stack of CommonC++.
+and illustrating features of ccRTP:
 
 	* rpthello: illustrates transmission/reception of RTP packets
-using RTPSocket
+	using the RTPSession class.
+
+	* rtpsend: sends RTP/RTCP packets
+
+	* rtplisten: waits for RTP/RTCP incoming packets
 
 	* rtpduphello: illustrates transmission/reception of RTP packets
-usging RTPDuplex
-	
-	* rtpsend: sends RTP packets
+	using RTPDuplex
 
-	* rtplisten: waits for RTP incoming packets
+	* ccrtptest: this is not really a demo program, it performs a
+	number of tests over some core functionality as well as some
+	tricky aspects in order to check that ccRTP works well.

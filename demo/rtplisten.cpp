@@ -56,6 +56,13 @@ public:
 		}
 	}
 
+	// redefined from IncomingDataQueue
+	void onNewSyncSource(const SyncSource& src)
+	{
+		cout << "* New synchronization source: " <<
+		     hex << (int)src.getID() << endl;
+	}
+
 	// redefined from QueueRTCPManager
 	void
 	onGotSR(SyncSource& source, SendReport& SR, uint8 blocks)
