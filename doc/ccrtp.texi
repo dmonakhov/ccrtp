@@ -684,25 +684,66 @@ no @code{SyncSource} objects related. Note that, if the local source
 sends packets to itself during an @acronym{RTP} session, a
 @code{SyncSource} object will be created for it.
 
+The list of sources of synchronization identified in an RTP session
+can be retrived through STL-like iterators of type
+@code{RTPSession::SyncSourcesIterator}, as shown in the following
+example.
+
+@example
+@cartouche
+// rx is an RTPSession object
+RTPSession::SyncSourcesIterator it;
+for (it = rx.begin() ; it != rx.end(); it++) @{
+   const SyncSource &s = *it;
+   cout << s.getID();
+   if ( s.isSender() )
+      cout << "is an active sender";
+   cout << endl;
+@}
+@end cartouche
+@end example
+
+@findex RTPSession::SyncSourcesIterator
+@cindex const iterator
+@cindex iterator
+Note @code{RTPSession::SyncSourcesIterator} is a const iterator.
+
 @findex SyncSource::getParticipant()
+@cindex participant
 When using RTCP, it is possible to associate several synchronization
 source objects to a participant in the multimedia session, which is
 represented through the association between @code{Participant} and
-@code{SyncSource} objects. When RTCP is not being used or the CNAME
-identifier corresponding to a synchronization source has not been
-received yet, the participant associated with a synchronization source
-is not known. In these cases, the method
-@code{SyncSource::getParticipant()} will return a NULL pointer. On the
-contrary, a participant is always related to a synchronization source
-at least. It can also be related to more than one synchronization
-source (for instance, when a participant in a videoconference sends
-two video streams from two different chameras). Note that, if the
-local source sends data and control packets to itself, a
-@code{Participant} object will be created for it.
+@code{SyncSource} objects. The participant object linked to a source
+of synchronization can be retrieved through the
+@code{SyncSource::getParticipant()} method, as the following examples
+shows:
+
+@example
+@cartouche
+   // s is a source of synchronization object (SyncSource)
+   Participant *p = s.getParticipant();
+   cerr << p->getSDESItem(SDESItemTypeCNAME) << endl;
+@end cartouche
+@end example
+
+When RTCP is not being used or the CNAME identifier corresponding to a
+synchronization source has not been received yet, the participant
+associated with a synchronization source is not known. In these cases,
+the method @code{SyncSource::getParticipant()} will return a NULL
+pointer. On the contrary, a participant is always related to a
+synchronization source at least. It can also be related to more than
+one synchronization source (for instance, when a participant in a
+videoconference sends two video streams from two different
+chameras). Note that, if the local source sends data and control
+packets to itself, a @code{Participant} object will be created for it.
+
+Thus, the @code{SyncSource::getParticipant} provides a facility for
+inter-media synchronization.
 
 @findex defaultApplication
 @findex RTPApplication
 @cindex default value
+@cindex CNAME
 The association of @acronym{RTP} sessions and participants with
 @code{RTPApplication} objects makes it possible to implement several
 ``RTP applications'' in the same application or process, each one
@@ -710,11 +751,36 @@ having a separate CNAME space. By default, all @acronym{RTP} sessions
 are associated to an @acronym{RTP} application provided by the global
 method @code{defaultApplication()}. The local CNAME for the default
 application is guessed from the user and machine name, as specified in
-@cite{RFC 3550}. However, other applications may be created through
-the constructor @code{RTPApplication::RTPApplication(const
-std::string& cname)}. @acronym{RTP} sessions are associated with
-applications other than the default via an optional constructor
-parameter.
+@cite{RFC 3550}. 
+
+However, other applications may be created through the constructor
+@code{RTPApplication::RTPApplication(const std::string& cname)}. @acronym{RTP} sessions are associated with applications other
+than the default via an optional constructor parameter.
+
+@findex RTPApplication::ParticipantsIterator
+@cindex const iterator
+@cindex iterator
+Similarly to the list of synchronization sources, the list of
+participants in a session can be retrieved using iterators of type
+@code{RTPApplication::ParticipantsIterator}, see the following
+example, which shows the list of CNAMEs of the participants in the
+default application:
+
+@example
+@cartouche
+   RTPApplication &app = defaultApplication();
+   RTPApplication::ParticipantsIterator ai;
+   for ( ai = app.begin(); ai != app.end(); ai++ ) @{
+      const Participant &p = *ai;
+      cerr << p.getSDESItem(SDESItemTypeCNAME) << endl;
+   @}
+@end cartouche
+@end example
+
+@findex RTPApplication::ParticipantsIterator
+@cindex const iterator
+@cindex iterator
+Note @code{RTPApplication::ParticipantsIterator} is a const iterator.
 
 @emph{TODO: SyncSource states}.
 
@@ -793,10 +859,8 @@ inserted in the reception queue.
 @comment  node-name,  next,  previous,  up
 @subsection RTCP Packets Arrival 
 @cindex RTCP Packet Arrival
-
-Incoming RTCP packets, these are automatically handled by
-ccRTP. However, this does not mean you can't track the reception of
-RTCP packets.
+Incoming RTCP packets are automatically handled by ccRTP. However,
+this does not mean you can't track the reception of RTCP packets.
 
 @itemize
 
@@ -1092,8 +1156,10 @@ other.
 @section Algorithms in the Standard
 @cindex Algoritms in the Standard
 
-Algorithms specified in appendixes from @cite{RFC 3550}. A ``mapping''
-between routines in the RFC and methods/routines in ccRTP is provided.
+The following sections summarizes how the algorithms specified in
+appendixes from @cite{RFC 3550} are implemented in ccRTP. A
+``mapping'' between routines in the RFC and methods/routines in ccRTP
+is provided.
 
 @menu
 * A.1::                @acronym{RTP} Data Header Validity Checks.
@@ -1114,11 +1180,16 @@ between routines in the RFC and methods/routines in ccRTP is provided.
 
 @findex IncomingDataQueue::checkSSRCInIncomingRTPPkt
 @findex QueueRTCPManager::checkSSRCInRTCPPkt
-DONE. @acronym{RTP} data header validity check -> Packet specific part
-(header, length, etc.) in @code{IncomingRTPPkt} constructor
-(extensible with virtual method). Source specific part (number of
-consecutive packets, etc.) in @code{checkSSRCInIncomingRTPPkt} and
-@code{checkSSRCInRTCPPkt} methods.
+ccRTP performs @acronym{RTP} data header validity check in two stages:
+the first stage, performed at the constructor of @code{IncomingRTPPkt}
+(which is extensible with virtual methods) validates the header fields
+independent of the source. The second stage, performed at
+@code{IncomingDataQueue::checkSSRCInIncomingRTPPkt} and
+@code{QueueRTCPManager::checkSSRCInRTCPPkt}, validates those fields
+specific to the source of the packet (number sequence, etc).
+
+Additionally, the following table specifies which methods of ccRTP
+implement the functions init_seq and update_seq from A.1.
 
 @table @code
 
@@ -1135,8 +1206,12 @@ bool RTPQueue::recordReception(SyncSourceLink&, const IncomingRTPPkt&)
 @subsection A.2
 @cindex A.2
 
+@cindex header check
+@cindex header validity
+@cindex RTCP header
 @findex RTCPCompoundHandler::checkCompountRTCPHeader
-DONE.  Code in A.2 corresponds to @code{checkCompountRTCPHeader}.
+The code in A.2 corresponds to
+@code{RTCPCompoundHandler::checkCompountRTCPHeader}.
 
 
 @c -----------------------------------------------------------------------
@@ -1145,7 +1220,7 @@ DONE.  Code in A.2 corresponds to @code{checkCompountRTCPHeader}.
 @cindex A.3
 
 @findex MembershipBookkeeping::SyncSourceLink::computeStats
-Code in A.3 corresponds to @code{computeStats}.
+Code in A.3 corresponds to @code{MembershipBookeeping::computeStats}.
 
 
 @c -----------------------------------------------------------------------
@@ -1154,7 +1229,8 @@ Code in A.3 corresponds to @code{computeStats}.
 @cindex A.4
 
 @findex QueueRTCPManager::packSDES
-Code in A.4 is part of @code{packSDES}.
+Code in A.4 is implemented as part of the method
+@code{QueueRTCPManager::packSDES}.
 
 
 @c -----------------------------------------------------------------------
@@ -1163,7 +1239,9 @@ Code in A.4 is part of @code{packSDES}.
 @cindex A.5
 
 @findex QueueRTCPManager::onGotSDES
-Code in A.5: is part of @code{onGotSDES}.
+Code in A.5 is implemented in the method
+@code{QueueRTCPManager::onGotSDES}, which calls the virtual method
+@code{QueueRTCPManager::onGotSDESChunk} to process each SDES chunk.
 
 
 @c -----------------------------------------------------------------------
@@ -1174,10 +1252,12 @@ Code in A.5: is part of @code{onGotSDES}.
 @cindex Random numbers
 @cindex /dev/urandom
 @cindex MD5
-Uses @file{/dev/urandom} when available. If there is no such device,
-defaults to the MD5 based algorithm given in appendix A.6.
+On POSIX systems, ccRTP uses @file{/dev/urandom} when available. If
+there is no such device, it defaults to the MD5 based algorithm given
+in appendix A.6.
 
-Code in A.6 corresponds to @code{uint32 random32()}.
+Code in A.6 corresponds to @code{uint32 MD5BasedRandom32()}, which is
+called by @code{uint32 random32()} when no random device is available.
 
 
 @c -----------------------------------------------------------------------
