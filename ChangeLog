@@ -1,3 +1,6 @@
+2004-05-19  Federico Montesino Pouzols  <fedemp@altern.org>
+	* src/ccrtp/queuebase.h: doc clarifications.
+
 2004-05-19  David Sugar <dyfet@ostel.com>
 	* ccrtp.spec.in: allow .la files to be included.
 
