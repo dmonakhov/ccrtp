@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="GNUccRTP" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="ccrtp1" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=GNUccRTP - Win32 Debug
+CFG=ccrtp1 - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "GNUccRTP.mak".
+!MESSAGE NMAKE /f "ccrtp1.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "GNUccRTP.mak" CFG="GNUccRTP - Win32 Debug"
+!MESSAGE NMAKE /f "ccrtp1.mak" CFG="ccrtp1 - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "GNUccRTP - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "GNUccRTP - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "ccrtp1 - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "ccrtp1 - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "GNUccRTP - Win32 Release"
+!IF  "$(CFG)" == "ccrtp1 - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -56,7 +56,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib ccgnu2.lib ccext2.lib /nologo /verbose /dll /incremental:yes /machine:I386
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "GNUccRTP - Win32 Debug"
+!ELSEIF  "$(CFG)" == "ccrtp1 - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -80,15 +80,15 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ccgnu2d.dll ccext2d.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /dll /debug /machine:I386 /out:"Debug\GNUccRTPd.dll" /libpath:"Debug"
+# ADD LINK32 ccgnu2d.dll ccext2d.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /dll /debug /machine:I386 /out:"Debug\ccrtp1.dll" /libpath:"Debug"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
 # Begin Target
 
-# Name "GNUccRTP - Win32 Release"
-# Name "GNUccRTP - Win32 Debug"
+# Name "ccrtp1 - Win32 Release"
+# Name "ccrtp1 - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
