@@ -49,7 +49,7 @@
 #ifndef  CCXX_RTPEXT_H
 #   define   CCXX_RTPEXT_H
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 namespace ost {
 #endif
 
@@ -220,15 +220,6 @@ public:
 	inline uint16
 	getSeqNum() const
 	{ return ntohs(getHeader()->sequence); };
-
-	/**
-	 * Obtain the absolute timestamp carried in the packet header.
-	 *
-	 * @return 32-bit timestamp in host order 
-	 */
-	inline uint32
-	getRawTimestamp(void) const
-	{ return ntohl(getHeader()->timestamp); };
 	
 	/**
 	 * Ask whether the packet contains padding bytes at the end
@@ -301,6 +292,15 @@ public:
 	{ return total; };
 
 protected:
+	/**
+	 * Obtain the absolute timestamp carried in the packet header.
+	 *
+	 * @return 32-bit timestamp in host order 
+	 */
+	inline uint32
+	getRawTimestamp(void) const
+	{ return ntohl(getHeader()->timestamp); };
+
 	inline void 
 	setbuffer(const void* src, size_t len, size_t pos)
 	{ memcpy(buffer + pos,src,len); }

@@ -43,8 +43,8 @@ public:
 	/**
 	 * Get unicast address.
 	 */
-	inline InetAddress getInterface(void)
-		{return InetAddress(getLast("interface"));};
+	inline InetHostAddress getInterface(void)
+		{return InetHostAddress(getLast("interface"));};
 	
 	/**
 	 * Get binding port number.

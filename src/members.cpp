@@ -55,7 +55,7 @@ MembershipControl::MembershipControl(uint32 initial_size = 7):
 	first(NULL), last(NULL)
 {
 	for ( uint32 i = 0; i < SOURCE_BUCKETS; i++ )
-		sources[i]=NULL;
+		sources[i] = NULL;
 }
 
 MembershipControl::~MembershipControl()
@@ -93,6 +93,7 @@ MembershipControl::addNewSource(uint32 ssrc)
 		// there was no one in this collision list as yet
 		sources[index] = newsource;
 	} else {
+		bool inserted = false;
 		// The collision list is ordered ascendently
 		RTPSource *prevpos = NULL;
 		while ( pos != NULL ) {
@@ -105,6 +106,8 @@ MembershipControl::addNewSource(uint32 ssrc)
 				if ( prevpos )
 					prevpos->nextcollis = newsource;
 				newsource->nextcollis = pos;
+				sources[index] = newsource;
+				inserted = true;
 				break;
 			} else {
 				// keep on searching
@@ -112,6 +115,11 @@ MembershipControl::addNewSource(uint32 ssrc)
 				pos = pos->nextcollis;
 			}
 		}
+		// insert last in this list
+		if ( !inserted) {
+			newsource->nextcollis = NULL;
+			prevpos->nextcollis = newsource;
+		}				
 	}
 	// then, insert into the list of sources
 	if ( first ) {
@@ -120,6 +128,7 @@ MembershipControl::addNewSource(uint32 ssrc)
 		first = last = newsource;
 	}
 	increaseMembersCount();
+	newsource->setState(RTPSOURCE_STATE_PREVALID);
 	return *newsource;
 }
 
@@ -146,9 +155,27 @@ MembershipControl::getSourceBySSRC(uint32 ssrc, bool create)
 	}
 
 	if ( result == NULL && create ){
-		result = &addNewSource(ssrc);
+		if ( create )
+			result = &addNewSource(ssrc);
+		else
+			result = const_cast<RTPSource *>(&dummysource);
 	}
 	return *result;
+}
+
+bool
+MembershipControl::BYESource(uint32 ssrc) 
+{  
+	bool found = false;
+	// If the source identified by ssrc is in the table, mark it
+	// as leaving the session. If it was not, do nothing.
+	RTPSource &src = getSourceBySSRC(ssrc);
+	if ( src != dummysource ) {
+		found = true;
+		src.setState(RTPSOURCE_STATE_SAYINGBYE);
+		decreaseMembersCount();
+	}
+	return found;
 }
 
 bool
@@ -182,6 +209,42 @@ MembershipControl::removeSource(uint32 ssrc)
 		}
 	}
 	return removed;
+}
+
+const RTPSource&
+MembershipControl::getFirstPlayer()
+{
+	playerslock.EnterMutex();
+
+	playerslock.LeaveMutex();
+	return dummysource;
+}
+
+const RTPSource&
+MembershipControl::getLastPlayer()
+{
+	playerslock.EnterMutex();
+
+	playerslock.LeaveMutex();
+	return dummysource;
+}	
+
+const RTPSource&
+MembershipControl::getNextPlayer()
+{
+	playerslock.EnterMutex();
+
+	playerslock.LeaveMutex();
+	return dummysource;
+}
+
+const RTPSource&
+MembershipControl::getCurrentPlayer()
+{
+	playerslock.EnterMutex();
+
+	playerslock.LeaveMutex();
+	return dummysource;
 }
 
 #ifdef	__NAMESPACES__

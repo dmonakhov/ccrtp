@@ -42,12 +42,12 @@
  * @file rtp.h 
  *
  * @short General purpose interface of ccRTP. 
- */
+ **/
 
 #ifndef	__CCXX_RTP_H__
-#define	__CCXX_RTP_H__
+#define __CCXX_RTP_H__
 
-#ifndef	__CCXX_SOCKET_H__
+#ifndef   __CCXX_SOCKET_H__
 #include <cc++/socket.h>
 #endif
 
@@ -56,7 +56,7 @@ namespace ost {
 #endif
 
 // RTP version
-const uint8 RTP_VERSION = 2;
+const uint8 CCRTP_VERSION = 2;
 
 // Time interval expressed in microseconds
 typedef uint32 microtimeout_t;
@@ -79,7 +79,7 @@ struct ReceiverInfo;
  * some of them are already reserverd. Codes in the range 96-127 are
  * assigned dinamically by means outside of the RTP profile or
  * protocol specification. 
- */
+ **/
 typedef enum
 {
 	RTP_PAYLOAD_PCMU = 0,   ///< ITU-T G.711. $\mu-$law audio (RFC 1890) 
@@ -184,6 +184,17 @@ typedef enum
 	BEST_EFFORT_SERVICE,     ///< Best-effort network service
 	ENHANCED_SERVICE         ///< Enhanced network service
 }       type_of_service_t;
+
+/**
+ * @enum rtpsource_state_t
+ *
+ **/
+typedef enum
+{
+	RTPSOURCE_STATE_PREVALID,
+	RTPSOURCE_STATE_VALID,
+	RTPSOURCE_STATE_SAYINGBYE
+}       rtpsource_state_t;
 
 /**
  * @enum rtp_purge_t rtp.h cc++/rtp.h
@@ -294,10 +305,10 @@ private:
  * <em>destroyed</em> as participants enter, leave or seem to 
  * leave the current session. 
  * 
- * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> */
+ * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> 
+ **/
 class CCXX_CLASS_EXPORT RTPSource
 {
-
 public:
 	bool getHello();
 	bool getGoodbye();
@@ -309,7 +320,7 @@ public:
 	 * Get the transmission rate for this source.
 	 *
 	 * @todo implement with RTCP checking
-	 */
+	 **/
 	uint32 
 	getRate() const;
 
@@ -457,30 +468,30 @@ private:
 	setSDESItem(sdes_item_type_t item, const char* const value);
 
 	/**
-	 * Log the reception of a new packet from this source. Updates
+	 * Log reception of a new RTP packet from this source. Updates
 	 * data such as the packet counter, the expected sequence
 	 * number for the next packet and the time the last packet was
 	 * received at.
 	 *
 	 * @param p packet just created and to be logged 
-	 */
+	 **/
 	void 
 	recordReception(IncomingRTPPkt& p);
 
 	/**
-	 * Log the insertion of a packet from this source into the
+	 * Log insertion of an RTP packet from this source into the
 	 * scheduled queue. Updates the size of this source's
 	 * kitchen. All received packets should be registered with
 	 * recordReception(), but only those actually inserted into
 	 * the queue should be registered via this method.
 	 *
 	 * @param p packet inserted into the queue 
-	 * */
+	 **/
 	void 
 	recordInsertion(IncomingRTPPkt& p);
 
 	/**
-	 * Log the extraction of a packet from this source from the
+	 * Log extraction of a packet from this source from the
 	 * scheduled queue. Updates the size of this source's
 	 * kitchen. 
 	 *
@@ -537,11 +548,17 @@ private:
 	setExpectedSeqNum(uint16 n)
 	{ expectedseqnum = n; }
 
+	inline void
+	setState(rtpsource_state_t st)
+	{ state = st; }
+
 	// SSRC 32 bit identifier carried in RTP and RTCP packets (in
 	// network order)
 	uint32 ssrc;
+	// validity state of this source
+	rtpsource_state_t state;
 	// timestamp of the first packet received from this source
-	uint32 initial_timestamp; 
+	uint32 initial_timestamp;
 	// number of packets received from this source
 	uint32 packet_count;
 	// time the last packet was received at
@@ -584,6 +601,7 @@ private:
 	static const ReceiverInfo* dummyRB;
 	// Data extracted from the SDES items sent by this source
 	char **sdes_items;
+
 	
 	friend class MembershipControl;
 	friend RTPQueue;
@@ -597,9 +615,11 @@ class CCXX_CLASS_EXPORT Members
 public:
 
 	Members() :	
-		members(static_cast<uint32>(-1)), // -1 to counteract dummysource
+		members(static_cast<uint32>(-1)), 
+		// -1 to counteract dummysource
 		active_senders(0)
 	{ };
+
 	/**
 	 *
 	 *
@@ -631,7 +651,6 @@ public:
 	inline void
 	setSendersCount(uint32 n)
 	{ active_senders = n; };
-
 
 	/**
 	 *
@@ -755,6 +774,19 @@ protected:
 	getSourceBySSRC(uint32 ssrc, bool create = false);
 
 	/**
+	 * Mark the source identified by <code>ssrc</code> as having
+	 * sent a BYE packet. It is not deleted until a timeout
+	 * expires, so that in case some packets from this source
+	 * arrive a bit later the source is not inserted again in the
+	 * table of known sources.
+	 *
+	 * @return true if the source had been previously identified.
+	 * false if it was not in the table of known sources.
+	 **/
+	bool
+	BYESource(uint32 ssrc);
+
+	/**
 	 * Remove the description of the source identified by
 	 * <code>ssrc</code>
 	 *
@@ -771,6 +803,18 @@ protected:
 	// an empty RTPSource representing unidentified sources
 	const static RTPSource dummysource;
 
+	const RTPSource&
+	getFirstPlayer();
+
+	const RTPSource&
+	getLastPlayer();
+	
+	const RTPSource&
+	getNextPlayer();
+
+	const RTPSource&
+	getCurrentPlayer();
+
 private:
 
 	MembershipControl(const MembershipControl &o);
@@ -783,6 +827,7 @@ private:
 	RTPSource** sources;
 	// List of sources, ordered from older to newer
 	RTPSource* first, * last;
+	mutable Mutex playerslock;
 };
 
 /**
@@ -818,6 +863,7 @@ public:
 	 */
 	inline void Start(void)
 		{Thread::Start();};
+
 	/**
 	 * Get the application description.
 	 *
@@ -870,7 +916,7 @@ public:
 	 * @param mark mark field in the RTP header
 	 */
 	void 
-	putPacket(uint32 stamp, rtp_payload_t payload, unsigned char* data = NULL, size_t len = 0, bool mark = false);
+	putPacket(uint32 stamp, rtp_payload_t payload, const unsigned char* data = NULL, size_t len = 0, bool mark = false);
 
 	/**
 	 * Attempt to get a cooked packet. If available, thid method
@@ -1090,7 +1136,7 @@ public:
 	/**
 	 * Get the payload type of the first available packet
 	 *
-	 * @param optional source selector
+	 * @param src optional source selector
 	 * @return payload type of the first available packet
 	 */
 	rtp_payload_t
@@ -1258,11 +1304,11 @@ public:
 	 *
 	 * @todo maybe, with the new RTPData, this is unnecessary. Could
 	 * be useful for an application that is trying to figure out 
-	 * wheter to start processing data or wait for misordered packets.
+	 * whether to start processing data or wait for misordered packets.
 	 */
 	inline bool 
-	isComplete(void)
-		{return complete;};
+	isComplete()
+	{ return complete; };
 
 	/**
 	 * Is last packet processed "marked" (used to signal end on
@@ -1341,7 +1387,7 @@ protected:
 	RTPQueue(uint32 ssrc, int pri, uint32 size = 7);
 	
 	/**
-	 * The queue destructor flush the queue and stop all services.
+	 * The queue destructor flushes the queue and stops all services.
 	 */
 	virtual 
 	~RTPQueue(); 
@@ -1453,22 +1499,22 @@ protected:
 	gotPacket(IncomingRTPPkt* packet)
 	{ return true; }
 
-	/**
-	 * A hook to filter packets being sent that have been expired.
-	 *
-	 * @param packet expired from the send queue.
-	 */
+        /**
+        * A hook to filter packets being sent that have been expired.
+        *
+        * @param packet expired from the send queue.
+        */
 	virtual void expireSend(OutgoingRTPPkt *packet)
 		{return;};
 
-	/**
-	 * A hook to filter packets in the receive queue that are
-	 * being expired.
-	 *
-	 * @param packet expired from the recv queue.
-	 */
+       /**
+        * A hook to filter packets in the receive queue that are
+        * being expired.
+        *
+        * @param packet expired from the recv queue.
+        */
 	virtual void expireRecv(IncomingRTPPkt *packet)
-		{return ;};
+	        {return ;};
 
 	/**
 	 * This is used to fetch a packet in the receive queue and to
@@ -1566,7 +1612,7 @@ private:
 	// contributing sources
 	uint32 sendsources[16];
 	// how many CSRCs to send.
-	unsigned sendcc;       
+	uint16 sendcc;       
 	// maximum packet size before fragmenting sends.
 	unsigned segment;      
 	// bit M in RTP fixed header of the last packet
@@ -1729,15 +1775,18 @@ protected:
 	void 
 	Bye(const char* const reason = NULL);
 
-	/**
-	 * A plugin point for sdes contact.
-	 */
-	virtual void
+ 	/**
+ 	 * A plugin point for sdes contact.
+ 	 */
+ 	virtual void 
 	gotHello(RTPSource &src)
 	{ return; }
- 
+
  	/**
  	 * A plugin point for goodbye message.
+	 *
+	 * @param src Source leaving the session
+	 * @param reason Reason the source has provided 
  	 */
  	virtual void 
 	gotGoodbye(RTPSource &src, char *reason)
@@ -1760,9 +1809,25 @@ protected:
 	 * @todo make it more flexible as recommended in the draft
 	 *
 	 * @return interval for sending RTCP compound packets
-	 */
+	 **/
 	virtual timeval 
 	computeRTCPInterval();
+
+	/**
+	 * @param count
+	 *
+	 **/
+	inline void
+	setPrevMembersCount(uint32 count)
+	{ rtcp_pmembers = count; };
+
+	/**
+	 * 
+	 * @return 
+	 **/
+	inline uint32 
+	PrevMembersCount() const
+	{ return rtcp_pmembers; };
 
 private:
 	QueueRTCPManager(const QueueRTCPManager &o);
@@ -1788,7 +1853,7 @@ private:
 	 * @param len length in octets of the last RTCP packet received
 	 */
 	void
-	updateAvgRTCPSize(uint16 len);
+	updateAvgRTCPSize(size_t len);
 
 	/**
 	 * Apply reverse reconsideration adjustment to timing
@@ -1820,7 +1885,7 @@ private:
 	 * @return whether there was a CNAME SDES item
 	 */
 	bool
-	getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len);
+	getSDES_APP(RTCPPacket &pkt, uint32 &pointer, size_t len);
 
 	/**
 	 * Process a BYE packet just received and identified.
@@ -1830,9 +1895,12 @@ private:
 	 *        where the packet is stored 
 	 * @param len total length of the compount RTCP packet the BYE 
 	 *        packet to process is contained
-	 */
+	 *
+	 * @bug if the bye packet contains several SSRCs,
+	 *      eventSourceLeaving is only called for the last one
+	 **/
 	bool
-	getBYE(RTCPPacket &pkt, uint16 &pointer, uint16 len);
+	getBYE(RTCPPacket &pkt, uint32 &pointer, size_t len);
 
 	/**
 	 *
@@ -2014,7 +2082,7 @@ private:
 	uint32 nprevalid_srcs;
 	// number of valid sources
 	uint32 nvalid_srcs;
-	// number of sources having sent a BYE, but not yet deleted
+	// number of sources having sent a BYE, but not yet deleted 
 	uint32 npredeleted_srcs;
 	// number of already deleted sources
 	uint32 ndeleted_srcs;
@@ -2026,31 +2094,32 @@ private:
 
 	// masks for RTCP header validation
 #if	__BYTE_ORDER == __BIG_ENDIAN
-	static const uint16 RTCP_VALID_MASK = (0xc000 | 0x2000  | 0xfe);
-	static const uint16 RTCP_VALID_VALUE = ((RTP_VERSION << 14) | 
-						RTCP_TYPE_SR);
+	static const uint16 RTCP_VALID_MASK;
+	static const uint16 RTCP_VALID_VALUE;
 #else
-	static const uint16 RTCP_VALID_MASK = (0x00c0 | 0x0020 | 0xfe00);
-	static const uint16 RTCP_VALID_VALUE = ((RTP_VERSION << 6) | 
-						(RTCP_TYPE_SR << 8));
+	static const uint16 RTCP_VALID_MASK;
+	static const uint16 RTCP_VALID_VALUE;
 #endif
-	static const uint16 TIMEOUT_MULTIPLIER = 5;
-	static const double RECONSIDERATION_COMPENSATION = 2.718281828 - 1.5;
+	static const uint16 TIMEOUT_MULTIPLIER;
+	static const double RECONSIDERATION_COMPENSATION;
 };
 
 /**
  * @class UDPIPv4Socket 
  *
- * Wrapper for UDPSocket that provides the physical I/O related
- * methods needed by the data or control connection of an RTP stack,
- * based on UDP and IPv4. It should be "straightforward" defining
- * wrappers like this for other underlying protocols, and then
- * instantiating the template T_RTPSocket for them.
+ * Wrapper for one or several sockets that provide the physical I/O
+ * related methods needed by the data or control connection of an RTP
+ * stack, based on UDP and IPv4. It should be "straightforward"
+ * defining wrappers like this for other underlying protocols, and
+ * then instantiating the template T_RTPSocket for them.
+ *
+ * Generally, the socket used to transmit does not have to be the same
+ * as the one used to receive packets.
  *
  * @author Federico Montesino <p5087@quintero.fie.us.es>
- * @short Socket for RTP stack based on UDP and IPv4.
- */
-class CCXX_CLASS_EXPORT UDPIPv4Socket: protected UDPSocket 
+ * @short Socket for RTP stack based on UDP and IPv4.  
+ **/
+class CCXX_CLASS_EXPORT UDPIPv4Socket: private UDPReceive, private UDPTransmit 
 {
 public:
 	/**
@@ -2060,7 +2129,7 @@ public:
 	 * @param port transport port this socket is to be bound
 	 */
 	UDPIPv4Socket(const InetAddress& ia, tpport_t port) : 
-		UDPSocket(ia, port) 
+		UDPReceive(ia, port), UDPTransmit() 
 	{ };
 
 	/**
@@ -2072,40 +2141,55 @@ public:
 	/**
 	 * Connect to a foreign socket.
 	 *
-	 * @param ia network address to connect to
+	 * @param ia host address to connect to
 	 * @param port transport port to connect to
 	 */
 	sockerror_t
-	Connect(const InetAddress& ia, tpport_t port);
+	Connect(const InetHostAddress& ia, tpport_t port)
+	{ return UDPTransmit::Connect(ia,port); };
+
+	/**
+	 * Connect to a foreign socket.
+	 *
+	 * @param ia multicast address to connect to
+	 * @param port transport port to connect to
+	 */
+	sockerror_t
+	Connect(const InetMcastAddress& ia, tpport_t port)
+	{ return UDPTransmit::Connect(ia,port); };
 	
 	/**
 	 *
 	 */
 	inline bool 
 	isPendingPacket(microtimeout_t timeout)
-	{ return isPending(SOCKET_PENDING_INPUT, timeout/1000);};
+	{ return UDPReceive::isInputReady(timeout/1000); };
 	
 	/**
 	 *
 	 */
         inline size_t 
 	writePacket(const unsigned char* const buffer, size_t len)
-	{return ::send(so, buffer, len, MSG_DONTWAIT);};
+	{ return UDPTransmit::Transmit((const char* const)buffer,len); };
 
 	/**
 	 *
 	 */
         inline size_t
 	readPacket(unsigned char *buffer, size_t len)
-	{return ::read(so, buffer, len);};
+	{ return UDPReceive::Receive(buffer,len); };
 
 	/**
 	 *
 	 */
 	inline sockerror_t 
 	setMulticast(bool enable)
-	{ return setMulticast(enable); };
-
+	{ 
+		sockerror_t error = UDPReceive::setMulticast(enable);
+		if (error) return error;
+		else return UDPTransmit::setMulticast(enable); 
+	};
+	
 	/**
 	 * Join a multicast group. 
 	 *
@@ -2114,8 +2198,8 @@ public:
 	 */
 	inline sockerror_t
 	joinGroup(const InetMcastAddress& ia)
-	{ return Join(ia); };
-
+	{ return UDPReceive::Join(ia); };
+	
 	/**
 	 * Leave a multicast group. 
 	 * 
@@ -2124,7 +2208,7 @@ public:
 	 */
 	inline sockerror_t
 	leaveGroup(const InetMcastAddress& ia)
-	{ return Drop(ia); }; 
+	{ return UDPReceive::Drop(ia); }; 
 
 	/**
 	 * Set the value of the TTL field in the packets to send.
@@ -2134,14 +2218,14 @@ public:
 	 */
 	inline sockerror_t
 	setMcastTTL(uint8 ttl)
-	{ setTimeToLive(ttl); };
+	{ return UDPTransmit::setTimeToLive(ttl); };
 
 	/**
 	 * End socket, terminating the socket connection.
 	 */
 	void 
 	endSocket()
-	{ UDPSocket::endSocket(); };
+	{ UDPTransmit::endTransmitter(); UDPReceive::endReceiver(); };
 };
 
 /**
@@ -2157,7 +2241,7 @@ public:
  * @short RTP protocol stack based on Common C++.
  */
 template <typename serviceQueue, typename dataSocket, typename controlSocket>
-class __EXPORT T_RTPSocket  : public serviceQueue
+class CCXX_CLASS_EXPORT T_RTPSocket  : public serviceQueue
 {
 public:
 	/**
@@ -2165,7 +2249,7 @@ public:
 	 * @param port transport port this socket is to be bound
 	 * @param pri service thread base priority relative to it's parent
 	 * */
-	T_RTPSocket(const InetAddress& ia, tpport_t port = 5004, int pri = 0) :
+	T_RTPSocket(const InetHostAddress& ia, tpport_t port = 5004, int pri = 0) :
 		serviceQueue(pri)
 	{
 		base = even_port(port);
@@ -2181,13 +2265,14 @@ public:
 	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0)
 	{
 		base = even_port(port);
-		dso = new dataSocket((InetAddress)ia,even_port(port));
-		cso = new controlSocket((InetAddress)ia,odd_port(port + 1));
+		dso = new dataSocket(ia,even_port(port));
+		cso = new controlSocket(ia,odd_port(port + 1));
 	};
 
 	/**
 	 * Stack destructor.
-	 * */
+	 **/
+	virtual 
 	~T_RTPSocket()
 	{ endSocket(); };
 
@@ -2195,10 +2280,30 @@ public:
 	 * Connect to a foreign host and start the service thread. If
 	 * no port is specified then it is assumed to be the same as
 	 * the locally bound port number.
-	 * */
+	 *
+	 * @param ia
+	 * @param port
+	 **/
 	inline sockerror_t 
 	Connect(const InetHostAddress& ia, tpport_t port = 0)
-	{ return connect(ia,port); };
+	{ 
+		sockerror_t error;
+		if ( !port )
+			port = base;
+		if ( active )
+			active = false;
+		// make both RTP (even) and RTCP (odd) connections
+		error = dso->Connect(ia, even_port(port));
+		if ( error )
+			return error;
+		error = cso->Connect(ia, odd_port(port + 1));
+		if ( error )
+			return error;
+		// Start running the RTP queue service thread
+		active = true;
+		Start();  
+		return SOCKET_SUCCESS;
+	};
 
 	/**
 	 * Connect to a multicast group and start the service
@@ -2207,7 +2312,30 @@ public:
 	 * */
 	inline sockerror_t 
 	Connect(const InetMcastAddress& ia, tpport_t port = 0)
-	{ return connect(ia,port); };
+	{
+		sockerror_t error = dso->setMulticast(true);
+		if (error)
+			return error;
+		error = cso->setMulticast(true);
+		if (error)
+			return error;
+
+		if ( !port )
+			port = base;
+		if ( active )
+			active = false;
+		// make both RTP (even) and RTCP (odd) connections
+		error = dso->Connect(ia, even_port(port));
+		if ( error )
+			return error;
+		error = cso->Connect(ia, odd_port(port + 1));
+		if ( error )
+			return error;
+		// Start running the RTP queue service thread
+		active = true;
+		Start();  
+		return SOCKET_SUCCESS;
+	};
 
 	/**
 	 * Join a multicast group. 
@@ -2244,11 +2372,11 @@ public:
 	inline sockerror_t
 	leaveGroup(const InetMcastAddress& ia)
 	{ 
-		sockerror_t error = dso->setMulticast(true);
+		sockerror_t error = dso->setMulticast(false);
 		if ( error ) return error;
 		error = dso->leaveGroup(ia); 
 		if ( error ) return error;
-		error = cso->setMulticast(true);
+		error = cso->setMulticast(false);
 		if ( error ) return errror;
 		return cso->leaveGroup(ia);
 	};
@@ -2326,35 +2454,6 @@ protected:
 	{ dso->endSocket(); cso->endSocket(); };
 
 private:
-	/**
-	 * Connect to a foriegn RTP socket and start the service
-	 * thread.  If no port is specified then it is assumed to
-	 * be the same as the locally bound port number.
-	 *
-	 * @return failure type.
-	 * @param address of foreign socket.
-	 * @param port number of foreign connection.  */
-	sockerror_t 
-	connect(const InetAddress& ia, tpport_t port = 0)
-	{
-		sockerror_t error;
-		if ( !port )
-			port = base;
-		if ( active )
-			active = false;
-		// make both RTP (even) and RTCP (odd) connections
-		error = dso->Connect(ia, even_port(port));
-		if ( error )
-			return error;
-		error = cso->Connect(ia, odd_port(port + 1));
-		if ( error )
-			return error;
-		// Start running the RTP queue service thread
-		active = true;
-		Start();  
-		return SOCKET_SUCCESS;
-	};
-
 	/**
 	 * Ensure a port number is odd. If it is an even number, return 
 	 * the next lower (odd) port number.
@@ -2466,7 +2565,7 @@ private:
 	tpport_t base;
 };
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 };
 #endif
 

@@ -1,3 +1,46 @@
+2001-11-28  Federico Montesino <p5087@quintero.fie.us.es> (from 0.6.2 to 0.6.3)
+
+	* src/members.cpp: fixed a bug in RTPSource::addNewSource(uint32)
+	(the collision list was wrongly modified when inserting new
+	sources).
+
+	* src/queue.cpp: fixed a serious bug (incomplete initialization)
+	in RTPQueue::RTPQueue(int, uint32) and RTPQueue::initQueue.
+
+	* UDPIPv4Socket now inherits from both UDPReceive and UDPTransmit,
+	instead of only UDPSocket. Inheriting only from UDPSocket is an
+	error I introduced in 0.6.0. This change is necessary to avoid
+	receiving/transmitting collisions, specially when two applications
+	in the same host talk to each other through the same port numbers.
+	
+	* src/socket.cpp: UDPIPv4Socket::Connect(const InetAddress&,
+	tpport_t) removed as a result of the change listed up here.
+	
+	* demo/Makefile.am, demo/rtpsend.cpp and demo/rtplisten.cpp: added
+	new demo apps
+	
+	* COPYING.addendum: added (the same as the Common C++ one)
+
+	* src/rtp.h: rearranged Members class.
+
+	* src/control.cpp: QueueRTCPManager::getOnlyBye() has been filled
+	in.
+	
+	* src/rtp.h, src/control.cpp: static const data members initialization
+	moved from rtp.h to control.cpp to avoid VC++ complaints.
+
+	* src/rtp.h: T_RTPSocket::leaveGroup(const InetMcastAddress&) fixed
+	(now calls to setMulticast(false), instead of setMulticast(true)).
+
+	* src/rtp.h: Template T_RTPSocket updated from __EXPORT to 
+	CCXX_CLASS_EXPORT
+	
+	* src/rtp.h, control.cpp and packet.cpp: RTP_VERSION is now called
+	CCRTP_VERSION to avoid name conflicts with other stacks
+
+	* src/rtp.h and src/queue.h: the "data" parameter of putPacket is
+	now const.
+
 2001-11-27  David Sugar <dyfet@ostel.com> (from 0.7.0 to 0.7.1)
 	* fixed memory leaks in sdes and bye string builds.
 	* added functional virtuals for session control start and stop.
@@ -9,7 +52,7 @@
 2001-10-15  David Sugar <dyfet@ostel.com> (from 0.6.1 to 0.6.2)
         * fixed include files in demo apps.
 
-2001-10-14  E. Stuart Hicks <eshicks@hotmail.com< (from 0.6.1 to 0.6.2)
+2001-10-14  E. Stuart Hicks <eshicks@hotmail.com> (from 0.6.1 to 0.6.2)
 	* minor patch to compile on older gcc releases.
 
 2001-10-07  David Sugar <dyfet@ostel.com> (from 0.6.0 to 0.6.1)
@@ -17,7 +60,7 @@
 
 2001-09-20  David Sugar <dyfet@ostel.com> (from 0.6.0 to 0.6.1)
 	* new virtuals to trap and filter packet queue expiration.
-
+	
 2001-09-02  Federico Montesino <p5087@quintero.fie.us.es> (from 0.5.1 to 0.6.0)
 
 	* configure.in: added check for nana support

@@ -83,10 +83,9 @@
 #   error "Portability problem: you do not have sys/utsname.h"
 #endif
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 namespace ost {
 #endif
-
 
 // This is for the main page in Doxygen documentation
 /**
@@ -100,10 +99,14 @@ namespace ost {
 // This will make doxygen to generate example descriptions
 /**
  * @example rtpduphello.cpp
- */
+ *
+ * A basic example of how to use RTPDuplex
+ **/
 /** 
  * @example rtphello.cpp
- */
+ *
+ * A basic example of how to use RTPPacket
+ **/
 /**
  * @example audio.h
  */
@@ -115,7 +118,15 @@ namespace ost {
  */
 
 #pragma pack(1)
-struct ReceiverInfo
+
+/**
+ * @typedef ReceiverInfo
+ *
+ * Struct for the data contained in a receiver info block. Receiver
+ * info blocks can be found in SR (sender report) or RR (receiver
+ * report) RTCP packets.
+ **/
+ struct ReceiverInfo
 {
 	uint8 flost;
 	uint8 lost_msb;
@@ -124,84 +135,117 @@ struct ReceiverInfo
 	uint32 jitter;
 	uint32 lsr;
 	uint32 dlsr;
-};
+}       ;
 
 /**
  * @typedef RRBlock
- */
+ *
+ * Struct for a receiver info block in a SR (sender report) or an RR
+ * (receiver report) RTCP packet.
+ **/
 typedef struct 
 {
-	uint32 ssrc;
+	uint32 ssrc;                   ///< source identifier
 	ReceiverInfo rinfo;
 }       RRBlock;
 
 /**
- * @struct SenderInfo
- */
-struct SenderInfo
+ * @typedef RecvReport
+ *
+ * @short raw structure of the source and every receiver report in an
+ * SR or RR RTCP packet.  
+ **/
+typedef struct 
+{
+	uint32 ssrc;                    ///< source identifier
+	RRBlock blocks [0];             ///< receiver report blocks
+}       RecvReport;
+
+/**
+ * @typedef SenderInfo
+ *
+ * Struct for the sender info block in a SR (sender report) RTCP packet.
+ **/
+ struct SenderInfo
 {
 	uint32 NTP_msb;
 	uint32 NTP_lsb;
 	uint32 RTPtimestamp;
 	uint32 packet_count;
 	uint32 octet_count;
-};
+}       ;
 
 /**
+ * @typedef SendReport
  *
- */
+ * Struct for SR (sender report) RTCP packets. 
+ **/
 typedef struct 
 {
-	uint32 ssrc;
-	SenderInfo sinfo;
-	RRBlock blocks [0];
+	uint32 ssrc;              ///< source identifier
+	SenderInfo sinfo;         ///< actual sender info
+	RRBlock blocks [0];        ///< possibly several receiver info blocks 
 }       SendReport;
 
 /**
- * @typedef RecvReport
+ * @typedef SDESItem
  *
- * @short raw structure of every receiver report in an SR or RR RTCP
- *        packet. 
- */
-typedef struct 
-{
-	uint32 ssrc;
-	RRBlock blocks [0];
-}       RecvReport;
-
-/**
- *
- */
+ * Struct for an item description from a SDES packet.
+ **/
 typedef struct 
 {
 	uint8 type;
 	uint8 len;
 }       SDESItem;
 
+/**
+ * @typedef SDESChunk
+ *
+ * Struct for a chunk of items
+ **/
 typedef struct 
 {
 	uint32 ssrc;
 	SDESItem item;
 }       SDESChunk;
 
+/**
+ * @typedef BYEPacket
+ *
+ * @short Struct for RTCP BYE (leaving session) packets.
+ **/
 typedef struct 
 {
-	uint32 ssrc;          ///< source leaving
+	uint32 ssrc;          ///< ssrc identifier of source leaving
 	uint8 length;         ///< [optional] length of reason
+	char reason [0];      ///< [optional] reason text (not null terminated)
 }       BYEPacket;
 
+/**
+ * @typedef APPPacket
+ *
+ * @short Struct for RTCP APP (application specific) packets.
+ **/
 typedef struct 
 {
+	uint32 ssrc;          ///< ssrc identifier of source leaving
 	char name [4];
 	char* data;
 }       APPPacket;
 
 /**
- * @struct RTCPPacket
- */
+ * @typedef RTCPPacket 
+ *
+ * @short Struct representing general RTCP packet headers as they are
+ * sent through the network.
+ * 
+ * This struct consists of fixed header always present at the
+ * beginning of any RTCP packet and a union for SR, RR, SDES, BYE and
+ * APP packets.
+ **/
 struct RTCPPacket
 {
-	RTCPFixedHeader fh;
+	RTCPFixedHeader fh;           ///< Fixed RTCP header
 	union 
 	{
 		SendReport SR;
@@ -209,27 +253,12 @@ struct RTCPPacket
 		SDESChunk SDES; 
 		BYEPacket BYE;
 		APPPacket APP;
-	}       info;
-};
+	}       info;                 ///< Union for SR, RR, SDES, BYE and APP
+}       ;
 
-/**
- *
- */
-typedef struct {
-	RTCPFixedHeader fh;
-	uint32 ssrc;          ///< SSRC identifier of sender
-	uint8 length;         ///< [optional] length of reason
-	char const reason[0];  ///< [optional] reason text (not null terminated)
-}       BYEHeader;
-
-typedef struct {
-	RTCPFixedHeader fh;
-	uint32 ssrc;
-	char name[4];
-}       RTCPAPPHeader;
 #pragma pack()
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 };
 #endif
 

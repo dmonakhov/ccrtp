@@ -43,9 +43,21 @@
 //
 #include "private.h"
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 namespace ost {
 #endif
+
+// Beware: certain widespread and broken "C++ compiler" does not allow
+// to initialize static members in the class declaration.
+#if	__BYTE_ORDER == __BIG_ENDIAN
+const uint16 QueueRTCPManager::RTCP_VALID_MASK = (0xc000 | 0x2000  | 0xfe);
+const uint16 QueueRTCPManager::RTCP_VALID_VALUE = ((CCRTP_VERSION << 14) | RTCP_TYPE_SR);
+#else
+const uint16 QueueRTCPManager::RTCP_VALID_MASK = (0x00c0 | 0x0020 | 0xfe00);
+const uint16 QueueRTCPManager::RTCP_VALID_VALUE = ((CCRTP_VERSION << 6) | (RTCP_TYPE_SR << 8));
+#endif
+const uint16 QueueRTCPManager::TIMEOUT_MULTIPLIER = 5;
+const double QueueRTCPManager::RECONSIDERATION_COMPENSATION = 2.718281828 - 1.5;
 
 QueueRTCPManager::QueueRTCPManager(int pri):
 	RTPQueue(pri), 
@@ -71,17 +83,18 @@ QueueRTCPManager::QueueRTCPManager(int pri):
 
 	// Fill in fixed fields that will never change
 	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(rtcpsend_buffer);
-	pkt->fh.version = RTP_VERSION;
+	pkt->fh.version = CCRTP_VERSION;
 	// (handleSSRCCollision will have to take this into account)
 	pkt->info.SR.ssrc = localsrc->getID();
 
 	// initialize RTCP timing
 	rtcp_tp.tv_sec = rtcp_tc.tv_sec = rtcp_tn.tv_sec = 0;
 	rtcp_tp.tv_usec = rtcp_tc.tv_usec = rtcp_tn.tv_usec = 0;
-	rtcp_last_check.tv_sec = rtcp_last_check.tv_usec = 0;
-	rtcp_next_check.tv_sec = rtcp_next_check.tv_usec = 0;
+	// force an initial check for incoming RTCP packets
+	gettimeofday(&rtcp_next_check,NULL);
 	rtcp_check_interval.tv_sec = 0;
 	rtcp_check_interval.tv_usec = 250000;
+	timersub(&rtcp_next_check,&rtcp_check_interval,&rtcp_last_check);
 	rtcp_active = true;
 }
 
@@ -137,7 +150,7 @@ QueueRTCPManager::findCNAME()
 			// TODO: exception			
 		}
 	} else {
-		// FIX: exception
+		// TODO: exception
 	}
 }
 
@@ -147,21 +160,33 @@ QueueRTCPManager::RTCPService(microtimeout_t &wait)
 	if ( !rtcp_active )
 		return;
 
-	// make sure the scheduling timeout is <= 1 second
-	wait = (wait > 1000000)? 1000000 : wait ;
+	microtimeout_t max_wait = rtcp_check_interval.tv_sec * 1000000 +
+		rtcp_check_interval.tv_usec;
+	
+	// make sure the scheduling timeout is <= the check interval
+	// for RTCP packets
+	wait = (wait > max_wait)? max_wait : wait ;
 	
 	// see if there are incoming rtcp packets
 	gettimeofday(&rtcp_tc,NULL);
 	if ( timercmp(&rtcp_tc,&rtcp_next_check,>=) ) {
 		recvControl();
-		rtcp_last_check = rtcp_tc;
-		timeradd(&rtcp_last_check,&rtcp_check_interval,
-			 &rtcp_next_check);
+		// If this do loops more than once, then we have not
+		// been in time. So it skips until the next future
+		// instant.
+		do {
+			timeval tmp = rtcp_next_check;
+			timeradd(&rtcp_last_check,&rtcp_check_interval,
+				 &rtcp_next_check);
+			rtcp_last_check = tmp;
+		} while ( timercmp(&rtcp_tc,&rtcp_next_check,>=));
+
 	}
 	
 	gettimeofday(&rtcp_tc,NULL);
 	if ( timercmp(&rtcp_tc,&rtcp_tn,>=) ) {
 		if ( TimerReconsideration() ) {
+			// update to last received RTCP packets
 			recvControl();
 			rtcp_last_check = rtcp_tc;
 			sendControl();
@@ -173,10 +198,12 @@ QueueRTCPManager::RTCPService(microtimeout_t &wait)
 			// have to recalculate the sending interval
 			timeval T = computeRTCPInterval();
 			timeradd(&rtcp_tc,&T,&rtcp_tn);
+
+			// record current number of members for the
+			// next check.
+			rtcp_pmembers = membersCount();
 		}
 	} 
-	// record current number of members for the next check.
-	rtcp_pmembers = membersCount();
 }
 
 bool
@@ -199,7 +226,7 @@ void
 QueueRTCPManager::TimeOutSSRCs()
 {
 	// setCancel(THREAD_CANCEL_DEFERRED);
-	// TODO
+
 	// setCancel(THREAD_CANCEL_IMMEDIATE);
 }
 
@@ -230,7 +257,7 @@ QueueRTCPManager::recvControl()
 
 	// TODO: treat padding
 
-	uint16 pointer = 0;
+	uint32 pointer = 0;
 	uint16 i = 0;
 	if ( pkt->fh.type == RTCP_TYPE_SR ){
 
@@ -255,9 +282,11 @@ QueueRTCPManager::recvControl()
 		}
 		
 		// Advance to the next packet in the compound
-		pointer += sizeof(RTCPFixedHeader) +
+		/*pointer += sizeof(RTCPFixedHeader) +
 			sizeof(uint32) + sizeof(SenderInfo) +
-			pkt->fh.block_count * sizeof(RRBlock);
+			pkt->fh.block_count * sizeof(RRBlock);*/
+		pointer += (pkt->fh.length << 2);
+
 		pkt = reinterpret_cast<RTCPPacket *>(rtcprecv_buffer +pointer);
 
 	} else if ( pkt->fh.type == RTCP_TYPE_RR ) {
@@ -285,8 +314,10 @@ QueueRTCPManager::recvControl()
 		}
 		
 		// Get the next packet in the compound
-		pointer += sizeof(RTCPFixedHeader) + sizeof(uint32) +  
-			pkt->fh.block_count * sizeof(RRBlock);
+		/*pointer += sizeof(RTCPFixedHeader) + sizeof(uint32) +  
+		  pkt->fh.block_count * sizeof(RRBlock);*/
+		pointer += (pkt->fh.length << 2);
+
 		pkt = reinterpret_cast<RTCPPacket *>(rtcprecv_buffer +pointer);
 	} while (pkt->fh.type == RTCP_TYPE_RR );
 	
@@ -332,7 +363,7 @@ QueueRTCPManager::recvControl()
 }
 
 void
-QueueRTCPManager::updateAvgRTCPSize(uint16 len)
+QueueRTCPManager::updateAvgRTCPSize(size_t len)
 {
 	uint32 newlen = len; 
 	newlen += lower_headers_size;
@@ -340,32 +371,33 @@ QueueRTCPManager::updateAvgRTCPSize(uint16 len)
 }
 
 bool
-QueueRTCPManager::getBYE(RTCPPacket &pkt, uint16 &pointer, uint16 len)
+QueueRTCPManager::getBYE(RTCPPacket &pkt, uint32 &pointer, size_t len)
 {
 	int i = 0;
 	char *reason = NULL;
 	uint16 endpointer = pointer + pkt.fh.block_count * sizeof(uint32);
-	
-	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32)) 
-	     < ntohs(4*pkt.fh.length)){
-			char *reason = new char[rtcprecv_buffer[endpointer] + 1];
-			memcpy(reason,rtcprecv_buffer + endpointer + 1,
-			       rtcprecv_buffer[endpointer]);
-			reason[endpointer] = '\0';
-	}
-	
+
+	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
+	     < (ntohs(pkt.fh.length) << 2) ) {
+		char *reason = new char[rtcprecv_buffer[endpointer] + 1 ];
+		memcpy(reason,rtcprecv_buffer + endpointer + 1,
+		       rtcprecv_buffer[endpointer]);
+		reason[pointer] = '\0';
+	} 
+
 	while ( i < pkt.fh.block_count ){
 		RTPSource &src = getSourceBySSRC(pkt.info.BYE.ssrc);
 		i++;
-		pointer += sizeof(uint32);
+		//pointer += sizeof(uint32);
 		if(src.getGoodbye())
 			gotGoodbye(src, reason);
-		removeSource(pkt.info.BYE.ssrc);
+		removeSource(pkt.info.BYE.ssrc);   // FIX:BYESource
 		// REVERSE RECONSIDERATION
 		ReverseReconsideration();
 	}
-	if(reason)
-		delete reason;
+
+	delete [] reason;
+	pointer += (ntohs(pkt.fh.length) << 2);
 	return true;
 }
 
@@ -375,7 +407,7 @@ QueueRTCPManager::ReverseReconsideration()
 	if ( membersCount() < rtcp_pmembers ) {
 		timeval inc;
 
-		// reconsider rtcp_tn
+		// reconsider rtcp_tn (time for next RTCP packet)
 		microtimeout_t t = (rtcp_tn.tv_sec - rtcp_tc.tv_sec) *
 			1000000 + (rtcp_tn.tv_usec - rtcp_tc.tv_usec);
 		t *= membersCount();
@@ -384,7 +416,7 @@ QueueRTCPManager::ReverseReconsideration()
 		inc.tv_sec = t / 1000000;
 		timeradd(&rtcp_tc,&inc,&rtcp_tn);
 
-		// reconsider tp
+		// reconsider tp (time for previous RTCP packet)
 		t = (rtcp_tc.tv_sec - rtcp_tp.tv_sec) * 1000000 + 
 			(rtcp_tc.tv_usec - rtcp_tp.tv_usec);
 		t *= membersCount();
@@ -397,7 +429,7 @@ QueueRTCPManager::ReverseReconsideration()
 }
 
 bool
-QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
+QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint32 &pointer, size_t len)
 {
 	// Take into account that length fields in SDES items are
 	// 8-bit long, so no ntoh[s|l] is required
@@ -405,7 +437,7 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 
 	if ( pkt.fh.type == RTCP_TYPE_APP ) {
 		// FIX: FILL, call a plug-in
-		pointer += ntohs(pkt.fh.length) * sizeof(uint32);
+		pointer += ntohs((pkt.fh.length << 2)) * sizeof(uint32);
 	} else if ( pkt.fh.type == RTCP_TYPE_SDES ) {
 		// process chunks
 		for ( int i = 0; 
@@ -426,7 +458,6 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					if ( item->type == RTCP_SDES_ITEM_CNAME) {
 						cname_found = true;
 					}
-					delete[] x;
 					
 				} else if ( item->type == RTCP_SDES_ITEM_END) {
 					end = true;
@@ -443,7 +474,7 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					memcpy(x,(const void *)(rtcprecv_buffer + pointer),item->len);
 					x[item->len] = '\0';
 					// FIX: do something with x
-					delete[] x;
+					delete [] x;
 				} else {
 					I( false );
 				}
@@ -468,15 +499,15 @@ QueueRTCPManager::RTCPHeaderCheck(size_t len)
 		return false;
 
 	// this checks that every packet in the compound is tagged
-	// with version == RTP_VERSION, and the length of the compound
+	// with version == CCRTP_VERSION, and the length of the compound
 	// packet matches the addition of the packets lenghts
 	uint32 pointer = 0;
 	RTCPPacket* pkt;
 	do {
 		pkt = reinterpret_cast<RTCPPacket*>
 			(rtcprecv_buffer + pointer);
-		pointer += ntohs(pkt->fh.length);
-	} while ( (pkt->fh.version == RTP_VERSION && pointer < len));
+		pointer += ntohs((pkt->fh.length << 2));
+	} while ( (pkt->fh.version == CCRTP_VERSION && pointer < len));
 	if ( pointer != len )
 		return false;
 
@@ -524,31 +555,34 @@ QueueRTCPManager::computeRTCPInterval()
 void 
 QueueRTCPManager::Bye(const char * const reason)
 {
+	// for this method, see section 6.3.7 in RFC XXXX
 	// never send a BYE packet if never sent an RTP or RTCP packet
 	// before
 	if ( !(RTPSendCount() | RTCPSendCount()) )
 		return;
 
 	if ( membersCount() > 50) {
-		// Usurp the scheduler role to avoid BYE floods.
-		// see section 6.3.7 in RFC ???
+		// Usurp the scheduler role and apply a back-off
+		// algorithm to avoid BYE floods.
+		gettimeofday(&rtcp_tc,NULL);
 		rtcp_tp = rtcp_tc;
 		setMembersCount(1);
-		rtcp_pmembers = 1;
+		setPrevMembersCount(1);
+		rtcp_initial = true;
 		rtcp_we_sent = false;
 		rtcp_avg_size = sizeof(RTCPFixedHeader) + sizeof(uint32) +
 			strlen(reason) + (4 - (strlen(reason) & 0x03));
 		gettimeofday(&rtcp_tc,NULL);
 		timeval T = computeRTCPInterval();
-		timeradd(&rtcp_tc,&T,&rtcp_tn);
+		timeradd(&rtcp_tp,&T,&rtcp_tn);
 		while ( timercmp(&rtcp_tc,&rtcp_tn,<) ) {
 			getOnlyBye();
-			T = computeRTCPInterval();
 			if ( TimerReconsideration() )
 				break;
 			gettimeofday(&rtcp_tc,NULL);
 		}
 	}
+
 	sendBYE(reason);
 	VDL(("Bye sent"));
 } 
@@ -556,21 +590,39 @@ QueueRTCPManager::Bye(const char * const reason)
 void
 QueueRTCPManager::getOnlyBye()
 {
-	// TODO: complete it
+	// This method is kind of simplified recvControl
 	timeval wait;
 	timersub(&rtcp_tn,&rtcp_tc,&wait);
 	microtimeout_t timer = wait.tv_usec/1000 + wait.tv_sec * 1000;
-	if ( isPendingControl(timer) ) 
-		;
-	// TODO: filter all but BYE packets
-	/*if (BYE){
-	  increaseMembers();
-	  // recompute tn
-	  len = readControl
-	  updateAvgRTCPSize(len);
-	  }
-	*/
+	// wait up to rtcp_tn
+	if ( !isPendingControl(timer) ) 
+		return;
 
+	size_t len = 0;
+	do {
+		len = readControl(rtcprecv_buffer,pathMTU);
+		
+		if ( !len )
+			return;
+		// Process a <code>len<code> octets long RTCP compound packet
+		// Check validity of the header fields of the compound packet 
+		if ( !RTCPHeaderCheck(len) )
+			return;
+
+		// TODO: treat padding
+
+		uint32 pointer = 0;
+		RTCPPacket* pkt;
+		do {
+			pkt = reinterpret_cast<RTCPPacket*>
+				(rtcprecv_buffer + pointer);
+
+			if (pkt->fh.type == RTCP_TYPE_BYE )
+				;
+			    
+			pointer += ntohs((pkt->fh.length << 2));
+		} while ( pointer < len );
+	} while ( isPendingControl(0) );
 }
 
 size_t
@@ -686,7 +738,7 @@ QueueRTCPManager::sendBYE(const char * const reason)
 	I( len & 0x03 == 0 );
 	// build the fixed header
 	RTCPPacket *pkt = reinterpret_cast<RTCPPacket*>(rtcpsend_buffer);
-	pkt->fh.version = RTP_VERSION;
+	pkt->fh.version = CCRTP_VERSION;
 	pkt->fh.padding = (padlen > 0);
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCP_TYPE_BYE;
@@ -714,7 +766,7 @@ QueueRTCPManager::packSDES(uint16 &len)
 	uint16 prevlen = len;
 
 	RTCPPacket *pkt = (RTCPPacket *)(rtcpsend_buffer + len);
-	pkt->fh.version = RTP_VERSION;
+	pkt->fh.version = CCRTP_VERSION;
 	pkt->fh.padding = 0;
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCP_TYPE_SDES;
@@ -760,7 +812,7 @@ QueueRTCPManager::tryAnotherRR(RTCPPacket *&pkt, uint16 &len, uint16 &blocks)
 			result = true;
 			// Header for this packet packet
 			pkt = (RTCPPacket *)(rtcpsend_buffer + len);
-			pkt->fh.version = RTP_VERSION;
+			pkt->fh.version = CCRTP_VERSION;
 			pkt->fh.padding = 0;
 			blocks = 1;
 			pkt->fh.type = RTCP_TYPE_RR;

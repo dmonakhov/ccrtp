@@ -48,7 +48,7 @@
 namespace ost {
 #endif
 
-// constructor commonly used for outgoing packets
+// constructor commonly used for incoming packets
 RTPPacket::RTPPacket(const unsigned char* const block, size_t len, 
 		     bool duplicate = false):
 	total(len),
@@ -81,8 +81,8 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
 	payload_size(plen),
 	duplicated(false)
 {
-	uint8 padding;
-	total = hdrlen + plen;
+	uint8 padding = 0;
+	total = hdrlen + payload_size;
 	if ( total & 0x03 ) {
 		padding = 4 - (total & 0x03);
 		total += padding;
@@ -97,7 +97,7 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
 	else
 		const_cast<RTPFixedHeader*>(getHeader())->padding = 0;
 
-	const_cast<RTPFixedHeader*>(getHeader())->version = 2;
+	const_cast<RTPFixedHeader*>(getHeader())->version = CCRTP_VERSION;
 }
 
 void 
@@ -145,8 +145,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, uint32 datalen) :
 	RTPPacket(sizeof(RTPFixedHeader),datalen),
 	next(NULL), prev(NULL)
 {
-	uint32 pointer = sizeof(RTPFixedHeader);
-	setbuffer(data,datalen,pointer);
+	setbuffer(data,datalen,sizeof(RTPFixedHeader));
 
 	const_cast<RTPFixedHeader*>(getHeader())->cc = 0;
 	const_cast<RTPFixedHeader*>(getHeader())->extension = 0;
@@ -164,7 +163,7 @@ IncomingRTPPkt::IncomingRTPPkt(RTPQueue &queue, const unsigned char* const block
 {
 	// first, perform validity check
 	// check protocol version
-	if ( getHeader()->version != RTP_VERSION ) {
+	if ( getHeader()->version != CCRTP_VERSION ) {
 		valid = false;
 		return;
 	}	

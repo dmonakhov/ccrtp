@@ -103,13 +103,14 @@ RTPSource::endSource()
 	try {
 		delete sdes_items;
 	} catch (...) { };
+	
+	flag = false;
 }
 
 RTPSource::RTPSource(const RTPSource &origin)
 {
 	// for now, it makes no sense
 	// TODO: assign a lot of things
-	flag = false;
 }
 
 uint32 
@@ -129,8 +130,7 @@ RTPSource::recordReception(IncomingRTPPkt& p)
 
 	if ( packet_count == 1 ) {
 		// ooops, it's the first packet from this source
-		setInitialTimestamp(p.getTimestamp());
-		p.cached_timestamp = 0;
+		setInitialTimestamp(p.getRawTimestamp());
 	}
 	// we record the last time a packet from this source was
 	// received, this has statistical interest and is needed to

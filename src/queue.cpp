@@ -38,13 +38,12 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-
 //
 // RTPQueue class implementation
 //
 #include "private.h"
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 namespace ost {
 #endif
 
@@ -118,22 +117,7 @@ RTPQueue::RTPQueue(int pri, uint32 size) :
 } 
 
 RTPQueue::RTPQueue(uint32 ssrc, int pri, uint32 size):
-	Thread(pri), MembershipControl(size),
-	active(false),
-	sendcount(0),
-	octetcount(0),
-	current_rate(80000),                  // assume a default rate
-	type_of_service(BEST_EFFORT_SERVICE), // assume a best effort network
-	sessionbw(0),
-	sendfirst(NULL), sendlast(NULL), recvfirst(NULL), recvlast(NULL),
-	sendseq(random16()), 	              // random initial sequence number
-	sendcc(0),     // initially, 0 CSRC identifiers follow the fixed header
-	segment(8000),	// segment data in packets of no more than 8000 octets
-	marked(false), complete(true),
-	timeout(8000),   // schedule at 8 ms
-	expired(40000),  // packets unsent will expire after 40 ms
-	e2edelay(20000000), // maximun end to end delay: 20 seconds 
-	kitchensize(0)  // kitchen is octets long
+	Thread(pri), MembershipControl(size)
 {
 	initQueue(ssrc);
 }
@@ -142,6 +126,24 @@ RTPQueue::RTPQueue(uint32 ssrc, int pri, uint32 size):
 void 
 RTPQueue::initQueue(uint32 localssrc)
 {
+	active = false;
+	sendcount = 0;
+	octetcount = 0;
+	current_rate = 80000;                  // assume a default rate
+	type_of_service = BEST_EFFORT_SERVICE; // assume a best effort network
+	sessionbw = 0;
+	sendfirst = sendlast = NULL; 
+	recvfirst = recvlast = NULL;
+	sendseq = random16(); 	              // random initial sequence number
+	sendcc = 0;    // initially, 0 CSRC identifiers follow the fixed header
+	segment = 8000; // segment data in packets of no more than 8000 octets
+	marked = false;
+	complete = true;
+	timeout = 8000;   // schedule at 8 ms
+	expired = 40000;  // packets unsent will expire after 40 ms
+	e2edelay = 15000000; // maximun end to end delay: 15 seconds 
+	kitchensize = 0;  // kitchen is octets long
+
 	// assume unicast initially
 	sessioncast = CAST_UCAST;
 	// the local source is the first contributing source
@@ -165,9 +167,9 @@ RTPQueue::~RTPQueue()
 void 
 RTPQueue::endQueue(void)
 {
-	Terminate();
 	// stop running the service thread
 	active = false;
+	Terminate();
 	// purge both sending and receiving queues
 	Purge(RTP_PURGE_BOTH);
 }
@@ -345,7 +347,7 @@ RTPQueue::getTimeout(void)
 		// after an overflowed one will be wrongly
 		// corrected. Nevertheless, this may only corrupt a
 		// handful of those packets every more than 13 hours
-		// (if timestamp started at 0).
+		// (if timestamp started from 0).
 		if ( now.tv_sec - send.tv_sec > 5000){
 			uint32 nsec = (~static_cast<uint32>(0)) / rate;
 			uint32 nusec = (~static_cast<uint32>(0)) % rate *
@@ -369,7 +371,7 @@ RTPQueue::getTimeout(void)
 
 		// This tries to solve the aforementioned problem
 		// about disordered packets coming after an overflowed
-		// one.
+		// one. Now we apply the reverse idea.
 		if ( send.tv_usec - now.tv_usec > 20000 ){
 			uint32 nsec = (~static_cast<uint32>(0)) / rate;
 			uint32 nusec = (~static_cast<uint32>(0)) % rate *
@@ -382,27 +384,30 @@ RTPQueue::getTimeout(void)
 			}
 		}
 	
-		// This sets a maximum timeout of 1 hour.
+		// A: This sets a maximum timeout of 1 hour.
 		if ( send.tv_sec - now.tv_sec > 3600 ){
 			return 3600000000ul;
 		}
 		int32 diff = (send.tv_sec - now.tv_sec) * 1000000ul;
 		diff += (send.tv_usec - now.tv_usec);
+
+		// B: wait <code>diff</code> usecs more before sending
 		if ( diff >= 0 ){
 			return static_cast<microtimeout_t>(diff);
 		}
-		// the packet must be sent right now
+
+		// C: the packet must be sent right now
 		if ( (diff < 0) && 
 		     static_cast<microtimeout_t>(-diff) <= expired ){
 			return 0;
 		}
 
-		// the packet has expired -> delete
+		// D: the packet has expired -> delete
 		setCancel(THREAD_CANCEL_DEFERRED);
 		sendlock.EnterMutex();
 		OutgoingRTPPkt* packet = sendfirst;
 		sendfirst = sendfirst->next;
-		expireSend(packet);		// new virtual to notify
+		expireSend(packet);             // new virtual to notify
 		delete packet;
 		if ( sendfirst )
 			sendfirst->prev = NULL;
@@ -476,7 +481,7 @@ RTPQueue::setGlobalKitchenSize(uint32 s)
 }
 
 void 
-RTPQueue::putPacket(uint32 stamp, rtp_payload_t payload, unsigned char *data, size_t datalen, bool mark)
+RTPQueue::putPacket(uint32 stamp, rtp_payload_t payload, const unsigned char *data, size_t datalen, bool mark)
 {
 	if ( !data || !datalen )
 		return;
@@ -494,7 +499,6 @@ RTPQueue::putPacket(uint32 stamp, rtp_payload_t payload, unsigned char *data, si
 	packet->setMarker(mark);
 	
 	// insert the packet into the "tail" of the sending queue
-	// TODOOO: 
 	sendlock.EnterMutex();
 	packet->prev = sendlast;
 	if (sendlast)
@@ -592,15 +596,13 @@ RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 			// ------			
 			list->srcnext = packet;
 			packet->srcprev = list;
-			/*
+			
 			  // insert into the global queue (giving
 			  // priority compared to packets from other sources)
-			list->next->prev = packet;
-			packet->next = list->next;
-			list->next = packet;
-			packet->prev = list;
-			*/
-			// insert into the global queue
+			  //list->next->prev = packet;
+			  //packet->next = list->next;
+			  //list->next = packet;
+			  //packet->prev = list;
 		}
 	} else {
 		// An ordered packet
@@ -715,7 +717,7 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 				packet->next->prev = packet->prev;
 			}
 			// now, delete it
-			expireRecv(packet);
+			expireRecv(packet);  // notify packet discard
 			delete packet;
 		}
 		// return the packet, if found
@@ -771,7 +773,7 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 			else 
 				src.last = NULL;
 			// now, delete it
-			expireRecv(packet);
+			expireRecv(packet);  // notify packet discard
 			delete packet;
 		}
 		
@@ -861,7 +863,7 @@ RTPQueue::getPartial(uint32 stamp, unsigned char *data, size_t offset, size_t ma
 		
 size_t 
 RTPQueue::getPacket(uint32 stamp, unsigned char *data, size_t max, 
-		    const RTPSource &src = dummysource)
+		    const RTPSource &src)
 {
 	if ( !data )
 		return 0;
@@ -899,7 +901,7 @@ RTPQueue::getPacket(uint32 stamp, unsigned char *data, size_t max,
 }
 
 const RTPData &
-RTPQueue::getCookedPacket(const RTPSource &src = dummysource)
+RTPQueue::getCookedPacket(const RTPSource &src)
 {
 	RTPData *data = NULL;
 	recvlock.EnterMutex();
@@ -928,7 +930,7 @@ RTPQueue::getCookedPacket(const RTPSource &src = dummysource)
 }
 
 rtp_payload_t
-RTPQueue::getPayloadType(const RTPSource &src = dummysource) const
+RTPQueue::getPayloadType(const RTPSource &src) const
 {
 	recvlock.EnterMutex();
 
@@ -951,7 +953,7 @@ RTPQueue::getPayloadType(const RTPSource &src = dummysource) const
 }
 
 rtp_payload_t 
-RTPQueue::getPayloadType(uint32 stamp, const RTPSource &src = dummysource)
+RTPQueue::getPayloadType(uint32 stamp, const RTPSource &src)
 {
 	rtp_payload_t result;
 
@@ -1013,7 +1015,7 @@ RTPQueue::RTPService(microtimeout_t &wait)
 	}
 }
 
-#ifdef	__NAMESPACES__
+#ifdef  __NAMESPACES__
 };
 #endif
 

@@ -48,19 +48,6 @@
 namespace ost {
 #endif
 
-sockerror_t 
-UDPIPv4Socket::Connect(const InetAddress& ia, tpport_t port)
-{
-	struct sockaddr_in inaddr;
-	inaddr.sin_family = AF_INET;
-	inaddr.sin_addr = getaddress(ia);
-	inaddr.sin_port = htons(port);
-	if(::connect(so, (sockaddr *)&inaddr, 
-		     sizeof(struct sockaddr_in)))
-		return connectError();
-	else
-		return SOCKET_SUCCESS;
-}
 
 #ifdef	__NAMESPACES__
 };
