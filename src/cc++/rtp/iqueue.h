@@ -711,7 +711,7 @@ protected:
 		 * Start a new sequence of received packets.
 		 **/
 		inline void initSequence(uint16 seqnum)
-		{ seqNumAccum = 0; }
+		{ maxSeqNum = seqNumAccum = 0; }
 		
 		/**
 		 * Record the insertion of an RTP packet from this

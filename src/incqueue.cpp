@@ -90,7 +90,7 @@ ConflictHandler::addConflict(const InetAddress& na, tpport_t dtp,
 	}
 }
 
-const uint8 IncomingDataQueue::defaultMinValidPacketSequence = 1;
+const uint8 IncomingDataQueue::defaultMinValidPacketSequence = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketMisorder = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketDropout = 3000;
 
@@ -646,8 +646,11 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 				//This additional check avoids that
 				//the very first packet from a source
 				//be discarded.
-				if ( 0 < srcLink.getObservedPacketCount() )
+				if ( 0 < srcLink.getObservedPacketCount() ) {
 					result = false;
+				} else {
+                                        srcLink.setMaxSeqNum(pkt.getSeqNum());
+                                }
 			}
 		} else {
 			// duplicate or reordered packet
