@@ -102,7 +102,7 @@ QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(rtcpSendBuffer);
 	pkt->fh.version = CCRTP_VERSION;
 	// (SSRCCollision will have to take this into account)
-	pkt->info.SR.ssrc = htonl(getLocalSSRC());
+	pkt->info.SR.ssrc = getLocalSSRCNetwork();
 
 	// allow to start RTCP service once everything is set up
 	controlServiceActive = true;
@@ -329,18 +329,18 @@ QueueRTCPManager::takeInControlPacket()
 	} else {
 		// Ignore RTCP types unknown.
 	}
-	
+
 	// Process all RR reports.
-	do {
+	while ( (RTCPPacket::tRR == pkt->fh.type) ) {
 		sourceLink = getSourceBySSRC(ntohl(pkt->info.RR.ssrc),
-					    source_created);
+					     source_created);
 		if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
 					network_address,transport_port) )
 			onGotRR(*s,pkt->info.RR,pkt->fh.block_count);
 		// Advance to the next packet in the compound
 		pointer += (ntohs(pkt->fh.length)+1) << 2;
 		pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer +pointer);
-	} while ( pkt->fh.type == RTCPPacket::tRR );
+	}
 
 	// SDES, APP and BYE. process first everything but the
 	// BYE packets.
@@ -442,7 +442,7 @@ QueueRTCPManager::onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks)
 	for ( uint8 i = 0; i < blocks; i++) {
 		// this generic RTCP manager ignores reports about
 		// other sources than the local one
-		if ( getLocalSSRC() == htonl(RR.ssrc) ) {
+		if ( getLocalSSRCNetwork() == RR.ssrc ) {
 			getLink(source)->
 				setReceiverInfo
 				(reinterpret_cast<unsigned char*>(&(RR.blocks[i].rinfo)));
@@ -459,29 +459,32 @@ QueueRTCPManager::updateAvgRTCPSize(size_t len)
 }
 
 bool
-QueueRTCPManager::getBYE(RTCPPacket &pkt, size_t &pointer, size_t len)
+QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t len)
 {
-	int i = 0;
+	if ( 0 == pkt.fh.block_count )
+		return false;
+
 	char *reason = NULL;
-	uint16 endpointer = pointer + pkt.fh.block_count * sizeof(uint32);
 
 	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
 	     < (size_t)((ntohs(pkt.fh.length)+1) << 2) ) {
-		char *reason = new char[rtcpRecvBuffer[endpointer] + 1 ];
-		memcpy(reason,rtcpRecvBuffer + endpointer + 1,
-		       rtcpRecvBuffer[endpointer]);
-		reason[pointer] = '\0';
+		uint16 endpointer = pointer + sizeof(RTCPFixedHeader) + 
+			pkt.fh.block_count * sizeof(uint32);
+		uint16 len = rtcpRecvBuffer[endpointer];
+		reason = new char[len + 1];
+		memcpy(reason,rtcpRecvBuffer + endpointer + 1,len);
+		reason[len] = '\0';
 	} 
 
+	int i = 0;
 	while ( i < pkt.fh.block_count ){
 		bool created;
-		SyncSourceLink* srcLink = getSourceBySSRC(pkt.info.BYE.ssrc,
-							  created);
+		SyncSourceLink* srcLink = 
+			getSourceBySSRC(ntohl(pkt.info.BYE.ssrc),created);
 		i++;
 		if( srcLink->getGoodbye() )
-			onGotGoodbye(*(srcLink->getSource()), reason);
-		BYESource(pkt.info.BYE.ssrc);
-		// TODO: mark as leaving and set bye reception time
+			onGotGoodbye(*(srcLink->getSource()),reason);
+		BYESource(ntohl(pkt.info.BYE.ssrc));
 		setState(*(srcLink->getSource()),SyncSource::stateLeaving);
 
 		reverseReconsideration();
@@ -697,7 +700,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 	pkt->fh.padding = 0;
 	pkt->fh.block_count = 0;
 	pkt->fh.type = RTCPPacket::tRR;
-	pkt->info.RR.ssrc= htonl(getLocalSSRC());
+	pkt->info.RR.ssrc= getLocalSSRCNetwork();
 	uint16 len1 = sizeof(RTCPFixedHeader) + sizeof(uint32); // 1st pkt len.
 	pkt->fh.length = htons((len1 >> 2) - 1);
 	uint16 len = len1; // whole compound len.
@@ -708,7 +711,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCPPacket::tBYE;
 	// add the SSRC identifier
-	pkt->info.BYE.ssrc = htonl(getLocalSSRC());
+	pkt->info.BYE.ssrc = getLocalSSRCNetwork();
 	len += sizeof(RTCPFixedHeader) + sizeof(BYEPacket);
 	// add the optional reason
 	if ( reason.c_str() != NULL ){
@@ -759,11 +762,11 @@ QueueRTCPManager::getOnlyBye()
 			if (pkt->fh.type == RTCPPacket::tBYE ) {
 				bool created;
 				SyncSourceLink* srcLink = 
-					getSourceBySSRC(pkt->info.BYE.ssrc,
-							created);
+				getSourceBySSRC(ntohl(pkt->info.BYE.ssrc),
+						created);
 				if( srcLink->getGoodbye() )
 					onGotGoodbye(*(srcLink->getSource()), NULL);
-				BYESource(pkt->info.BYE.ssrc);
+				BYESource(ntohl(pkt->info.BYE.ssrc));
 			}
 			pointer += (ntohs(pkt->fh.length)+1) << 2;
 		}
@@ -796,7 +799,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 		// we have sent rtp packets since last RTCP -> send SR
 		lastSendPacketCount = getSendPacketCount();
 		pkt->fh.type = RTCPPacket::tSR;
-		pkt->info.SR.ssrc = htonl(getLocalSSRC());
+		pkt->info.SR.ssrc = getLocalSSRCNetwork();
 
 		// Fill in sender info block. It would be more
 		// accurate if this were done as late as possible.
@@ -820,7 +823,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 	} else {
 		// RR
 		pkt->fh.type = RTCPPacket::tRR;
-		pkt->info.RR.ssrc = htonl(getLocalSSRC());
+		pkt->info.RR.ssrc = getLocalSSRCNetwork();
 	}
 	
 	// (B) put report blocks
@@ -861,7 +864,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 				pkt->fh.version = CCRTP_VERSION;
 				pkt->fh.padding = 0;
 				pkt->fh.type = RTCPPacket::tRR;
-				pkt->info.RR.ssrc = htonl(getLocalSSRC());
+				pkt->info.RR.ssrc = getLocalSSRCNetwork();
 				// appended a new Header and a report block
 
 				len += sizeof(RTCPFixedHeader)+ sizeof(uint32);
@@ -901,7 +904,7 @@ QueueRTCPManager::packSDES(uint16 &len)
 	pkt->fh.padding = 0;
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCPPacket::tSDES;
-	pkt->info.SDES.ssrc = htonl(getLocalSSRC());
+	pkt->info.SDES.ssrc = getLocalSSRCNetwork();
 	pkt->info.SDES.item.type = SDESItemTypeCNAME;
 	// put CNAME
 	size_t cnameLen = 
@@ -951,7 +954,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 
 	uint8 j = 0;
 	// pack as many report blocks as we can
-	uint32 Nssrc = htonl(getLocalSSRC());
+	uint32 Nssrc = getLocalSSRCNetwork();
 	SyncSourceLink* i = getFirst();
 	for ( ;
 	      ( ( i != NULL ) && 
