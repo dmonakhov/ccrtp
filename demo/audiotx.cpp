@@ -32,6 +32,8 @@
 
 // Some consts common to audiotx and audiorx
 #include <audio.h>
+#include <cstdio>
+#include <cstdlib>
 
 /**
  * @class ccRTP_AudioTransmitter

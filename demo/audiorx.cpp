@@ -31,6 +31,8 @@
 
 // Some consts common to audiorx and audiotx
 #include <audio.h>
+#include <cstdio>
+#include <cstdlib>
 
 
 /**

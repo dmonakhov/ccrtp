@@ -31,6 +31,8 @@
 
 // In order to use ccRTP, the RTP stack of CommonC++, just include...
 #include <cc++/rtp.h>
+#include <cstdio>
+#include <cstdlib>
 
 // base ports
 const int RECEIVER_BASE = 33634;
