@@ -1,3 +1,8 @@
+2003-05-14  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/sources.h: SyncSource::isSender made const.
+	* doc/ccrtp.texi: fixes and additions.
+
 2003-05-10  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* configure.in, acconfig.h, src/queue.cpp: removed the
