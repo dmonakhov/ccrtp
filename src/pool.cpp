@@ -47,14 +47,12 @@ namespace ost {
 using std::list;
 #endif
 
-RTPSessionPool::RTPSessionPool() :
+RTPSessionPool::RTPSessionPool()
 {
 #ifndef WIN32
 	highestSocket = 0;
 	setPoolTimeout(0,3000);
 	FD_ZERO(&recvSocketSet);
-#else
-	return false;
 #endif
 }
 
@@ -103,7 +101,7 @@ RTPSessionPool::removeSession(RTPSessionBase& session)
 	poolLock.unlock();
 	return result;
 #else
-	return 0;
+	return false;
 #endif
 }
 
@@ -116,6 +114,8 @@ RTPSessionPool::getPoolLength() const
 	result = sessionList.size();
 	poolLock.unlock();
 	return result;
+#else
+	return 0;
 #endif
 }
 
