@@ -12,7 +12,7 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
-LIBS = ../src/libccrtp.la @GNULIBS@
+LIBS = ../src/libccrtp1.la @GNULIBS@
 ccxxincludedir=$(includedir)/cc++
 EXTRA_DIST = phone.conf
 

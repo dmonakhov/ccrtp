@@ -182,7 +182,7 @@ private:
 public:
 	RTPAudio();
 
-	void Exit(const char *reason);
+	void exit(const char *reason);
 };
 
 /**
@@ -197,8 +197,8 @@ protected:
 	DevAudio();
 
 public:
-	virtual void Open(void) = 0;	// open device channel
-	virtual void Close(void) = 0;	// close device channel
+	virtual void open(void) = 0;	// open device channel
+	virtual void close(void) = 0;	// close device channel
 };
 
 extern bool multicast;

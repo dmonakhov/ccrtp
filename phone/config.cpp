@@ -23,7 +23,7 @@ namespace ost {
 KeyThreads::KeyThreads() :
 Keydata("/phone/threads")
 {
-	static KEYDEF defkeys[] = {
+	static Keydata::Define defkeys[] = {
 	{"audio", "0"},
 	{"priority", "0"},
 	{"rtp", "0"},
@@ -32,8 +32,8 @@ Keydata("/phone/threads")
 	{"stack", "8"},
 	{NULL, NULL}};
 	
-	Load("~phone/threads");
-	Load(defkeys);
+	load("~phone/threads");
+	load(defkeys);
 
 	const char *cp = getLast("pri");
 	
@@ -44,28 +44,28 @@ Keydata("/phone/threads")
 KeyRTP::KeyRTP() :
 Keydata("/phone/rtp")
 {
-	static KEYDEF defkeys[] = {
+	static Keydata::Define defkeys[] = {
 	{"interface", "*"},
 	{"multicast", "*"},
 	{"port", "3128"},
 	{NULL, NULL}};
 
-	Load("~phone/rtp");
-	Load(defkeys);
+	load("~phone/rtp");
+	load(defkeys);
 }
 
 KeyAudio::KeyAudio() :
 Keydata("/phone/audio")
 {
-	static KEYDEF defkeys[] = {
+	static Keydata::Define defkeys[] = {
 	{"interface", "oss"},
 	{"device", "/dev/audio"},
 	{"mike", "80"},
 	{"speaker", "80"},
 	{NULL, NULL}};
 	
-	Load("~phone/audio");
-	Load(defkeys);
+	load("~phone/audio");
+	load(defkeys);
 }
 
 KeyThreads keythreads;

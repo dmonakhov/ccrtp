@@ -40,11 +40,11 @@ RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 	shutdown = false;
 }
 
-void RTPAudio::Exit(const char *reason)
+void RTPAudio::exit(const char *reason)
 {
 	shutdown = true;
-	Bye(reason);
-	Sleep(500);
+	bye(reason);
+	sleep(500);
 	delete rtp;
 	rtp = NULL;
 }
@@ -53,7 +53,7 @@ void RTPAudio::gotHello(RTPSource &src)
 {
 	RTPEvent *event = RTPEvent::first;
 
-	slog(SLOG_DEBUG) << "hello(" << src.getID() << ") "
+	slog(Slog::levelDebug) << "hello(" << src.getID() << ") "
 		<< src.getCNAME() << endl;
 
 	while(event)
@@ -67,7 +67,7 @@ void RTPAudio::gotGoodbye(RTPSource &src, char *reason)
 {
 	RTPEvent *event = RTPEvent::first;
 
-	slog(SLOG_DEBUG) << "bye(" << src.getID() << ") "
+	slog(Slog::levelDebug) << "bye(" << src.getID() << ") "
 		<< src.getCNAME();
 	if(reason)
 		slog() << "; " << reason;

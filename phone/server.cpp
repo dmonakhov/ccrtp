@@ -15,6 +15,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <cc++/slog.h>
+#include <cc++/process.h>
 #include "server.h"
 
 #ifdef	CCXX_NAMESPACES
@@ -40,19 +41,19 @@ void server(void)
 		close(0);
 		close(1);
 		close(2);
-		pdetach();
+		Process::detach();
 		open("/dev/null", O_RDWR);
 		open("/dev/null", O_RDWR);
 		open("/dev/null", O_RDWR);
-		slog.open("phone", SLOG_DAEMON);
-		slog.level(SLOG_NOTICE);
-		slog(SLOG_NOTICE) << "daemon mode started" << endl;
+		slog.open("phone", Slog::classDaemon);
+		slog.level(Slog::levelNotice);
+		slog(Slog::levelNotice) << "daemon mode started" << endl;
 	}
 	else
 	{
-		slog.open("phone", SLOG_DAEMON);
-		slog.level(SLOG_DEBUG);
-		slog(SLOG_NOTICE) << "server starting..." << endl;
+		slog.open("phone", Slog::classDaemon);
+		slog.level(Slog::levelDebug);
+		slog(Slog::levelNotice) << "server starting..." << endl;
 	}
 	snprintf(buf, 11, "%d", getpid());
 	fd = ::creat(".phonepid", 0660);
@@ -64,11 +65,11 @@ void server(void)
 	fifo.open(".phonectrl", ios::in | ios::out);
 	if(!fifo.is_open())
 	{
-		slog(SLOG_ERROR) << "fifo failed; exiting" << endl;
+		slog(Slog::levelError) << "fifo failed; exiting" << endl;
 		exit(-1);
 	}
 
-	rtp->Start();	// we assume it's always running
+	rtp->start();	// we assume it's always running
 
 	while(!fifo.eof())
 	{
@@ -81,14 +82,14 @@ void server(void)
 			*ep = 0;
 		if(!*cp)
 			continue;	
-		slog(SLOG_DEBUG) << "fifo: " << cp << endl;
+		slog(Slog::levelDebug) << "fifo: " << cp << endl;
 		if(!strnicmp(cp, "exit", 4))
 			break;
 
 	}
-	rtp->Exit(reason);
+	rtp->exit(reason);
 	fifo.close();
-	slog(SLOG_WARNING) << "server exiting..." << endl;
+	slog(Slog::levelWarning) << "server exiting..." << endl;
 	exit(0);
 }
 
