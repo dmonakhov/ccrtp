@@ -37,7 +37,7 @@ public:
 		uint32 timestamp = tstamp? tstamp : 0;
 		
 		cout << "My SSRC identifier is: " 
-		     << hex << getLocalSSRC() << endl;
+		     << hex << (int)getLocalSSRC() << endl;
 
 		defaultApplication().setSDESItem(SDESItemTypeTOOL,
 						 "rtpsend demo app.");

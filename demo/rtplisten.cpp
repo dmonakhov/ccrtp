@@ -30,7 +30,7 @@ public:
 		RTPSocket(ia,port)
 	{
 		cout << "My SSRC identifier is: " 
-		     << hex << getLocalSSRC() << endl;
+		     << hex << (int)getLocalSSRC() << endl;
 
 		defaultApplication().setSDESItem(SDESItemTypeTOOL,
 						 "rtplisten demo app.");
@@ -61,7 +61,7 @@ public:
 	{
 		RTPSession::onGotSR(source,SR,blocks);
 		cout << "I got an SR RTCP report from sync. source "
-		     << source.getID() << ". From " 
+		     << (int)source.getID() << ". From " 
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -72,7 +72,7 @@ public:
 	{
 		RTPSession::onGotRR(source,RR,blocks);
 		cout << "I got an RR RTCP report from sync. source "
-		     << source.getID() << ". From " 
+		     << (int)source.getID() << ". From " 
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -104,6 +104,7 @@ main(int argc, char *argv[])
 
 	InetHostAddress ia(argv[1]);
 	Listener foo(ia,atoi(argv[2]));
+	return 0;
 }
 
 /** EMACS **

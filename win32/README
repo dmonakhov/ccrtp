@@ -1,0 +1,8 @@
+This directory contains special make/project files for Win32
+environments.
+
+	* msvcpp/: contains Visual C++ workspace and project files for
+ccRTP. The library will be compiled as dll under the Release and Debug
+directories.
+
+	* mingw32/: Mingw32 makefile.
