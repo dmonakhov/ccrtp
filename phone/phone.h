@@ -123,6 +123,30 @@ public:
 };	
 
 /**
+ * Process RTP Events for plugins and special purpose classes.
+ *
+ * @author David Sugar <dyfet@ostel.com>
+ * @short RTP event processing.
+ */
+class RTPEvent
+{
+private:
+	friend class RTPAudio;
+
+	static RTPEvent *first;
+	RTPEvent *next;
+
+protected:
+	RTPEvent();
+
+	virtual void gotHello(RTPSource &src)
+		{return;};
+
+	virtual void gotGoodbye(RTPSource &src, char *reason)
+		{return;};
+};
+
+/**
  * This is the base session stack that will maintain all network audio
  * activity.
  *
@@ -135,6 +159,9 @@ private:
 	unsigned groups;	// multicast groups joined
 	bool	unicast;	// indicate if in unicast call
 	bool	shutdown;	// tracks shutdown state
+
+	void gotHello(RTPSource &src);
+	void gotGoodbye(RTPSource &src, char *reason);
 
 public:
 	RTPAudio();

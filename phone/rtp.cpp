@@ -21,6 +21,14 @@
 namespace ost {
 #endif
 
+RTPEvent *RTPEvent::first = NULL;
+
+RTPEvent::RTPEvent()
+{
+	next = first;
+	first = this;
+}
+
 RTPAudio::RTPAudio() :
 RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 {
@@ -39,6 +47,37 @@ void RTPAudio::Exit(const char *reason)
 	Sleep(500);
 	delete rtp;
 	rtp = NULL;
+}
+
+void RTPAudio::gotHello(RTPSource &src)
+{
+	RTPEvent *event = RTPEvent::first;
+
+	slog(SLOG_DEBUG) << "hello(" << src.getID() << ") "
+		<< src.getCNAME() << endl;
+
+	while(event)
+	{
+		event->gotHello(src);
+		event = event->next;
+	}
+}
+
+void RTPAudio::gotGoodbye(RTPSource &src, char *reason)
+{
+	RTPEvent *event = RTPEvent::first;
+
+	slog(SLOG_DEBUG) << "bye(" << src.getID() << ") "
+		<< src.getCNAME();
+	if(reason)
+		slog() << "; " << reason;
+	slog() << endl;
+
+	while(event)
+	{
+		event->gotGoodbye(src, reason);
+		event = event->next;
+	}
 }
 	
 RTPAudio *rtp;

@@ -1733,7 +1733,8 @@ protected:
 	 * A plugin point for sdes contact.
 	 */
 	virtual void
-	gotHello(RTPSource &src);
+	gotHello(RTPSource &src)
+	{ return; }
  
  	/**
  	 * A plugin point for goodbye message.
