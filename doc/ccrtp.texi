@@ -973,6 +973,13 @@ Not yet implemented:
 @cindex RTCP-based feedback
 @item @cite{Extended RTP Profile for RTCP-based Feedback (RTP/AVPF)}.
 
+@cindex AVPF
+@cindex RTCP-based feedback
+@item @cite{Extended RTP Profile for RTCP-based Feedback (RTP/AVPF)}.
+
+@cindex SAVPF
+@item @cite{Extended Secure RTP Profile for RTCP-based Feedback (RTP/SAVPF)}.
+
 @end itemize
 
 
