@@ -1726,14 +1726,14 @@ protected:
  	 * A plugin point for hello message.
  	 */
  	void 
-	gotHello(const char* sdes) 
+	gotHello(RTPSource &src, sdes_item_type_t item, char* sdes) 
 	{ return; }
  
  	/**
  	 * A plugin point for goodbye message.
  	 */
  	void 
-	gotGoodbye(void)
+	gotGoodbye(RTCPPacket &pkg, char *reason)
 	{ return; }
 
 	/**

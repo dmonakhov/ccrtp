@@ -357,7 +357,11 @@ QueueRTCPManager::getBYE(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 			       rtcprecv_buffer[pointer]);
 			reason[pointer] = '\0';
 			// FIX: call some plug-in to get reasons
+			gotGoodbye(pkt, reason);
+			delete[] reason;
 	}
+	else
+		gotGoodbye(pkt, NULL);
 	return true;
 }
 
@@ -418,6 +422,8 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					if ( item->type == RTCP_SDES_ITEM_CNAME) {
 						cname_found = true;
 					}
+					gotHello(src, (sdes_item_type_t)item->type, x);
+					delete[] x;
 					
 				} else if ( item->type == RTCP_SDES_ITEM_END) {
 					end = true;
@@ -434,6 +440,7 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					memcpy(x,(const void *)(rtcprecv_buffer + pointer),item->len);
 					x[item->len] = '\0';
 					// FIX: do something with x
+					delete[] x;
 				} else {
 					I( false );
 				}
