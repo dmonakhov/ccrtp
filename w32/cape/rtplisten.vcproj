@@ -109,7 +109,7 @@
 				OutputFile=".\Debug/rtplisten.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="Debug,C:\Program Files\GNU Telephony\CAPE Framework\importxp"
+				AdditionalLibraryDirectories="Debug,C:\Program Files\GNU Telephony\CAPE Framework\debugxp"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/rtplisten.pdb"
 				SubSystem="1"
