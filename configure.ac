@@ -31,7 +31,7 @@ if test ! -z "$cfg_options" ; then
         exit -1
 fi
 
-VERSION="1.1.1"
+VERSION="1.1.2"
 REQUIRES="1.1.2"
 LT_RELEASE="1.1"
 LT_VERSION="0:1"
