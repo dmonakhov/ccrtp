@@ -257,7 +257,14 @@ protected:
 	
 	inline void
 	endSocket()
-	{ dso->endSocket(); cso->endSocket(); }
+	{ 
+		dso->endSocket();
+		cso->endSocket();
+		if (dso) delete dso;
+		dso = NULL;
+		if (cso) delete cso;
+		cso = NULL;
+	}
 
 private:
 	void 
