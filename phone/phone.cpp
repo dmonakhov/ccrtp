@@ -20,6 +20,7 @@
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
+using namespace std;
 #endif
 
 bool multicast = false;

@@ -19,6 +19,7 @@
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
+using namespace std;
 #endif
 
 RTPEvent *RTPEvent::first = NULL;
