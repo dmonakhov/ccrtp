@@ -10,6 +10,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+rm -f config.cache
+rm -f aclocal.m4
 libtoolize --copy --force
 ACLOCALDIRS="-I m4"
 if [ -d ~/share/aclocal ] ; then
