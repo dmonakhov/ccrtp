@@ -293,15 +293,17 @@ QueueRTCPManager::takeInControlPacket()
 	
 	bool source_created;
 	SyncSourceLink* sourceLink =
-		getSourceBySSRC(ntohl(pkt->info.SR.ssrc),source_created);
+		getSourceBySSRC(pkt->getSSRC(),source_created);
 	SyncSource* s = sourceLink->getSource();
 	if ( source_created ) {
 		// Set control transport address.
 		setControlTransportPort(*s,transport_port);
 		// Network address is assumed to be the same as the control one
 		setNetworkAddress(*s,network_address);
+		sourceLink->initStats();
 		// First packet arrival time.
 		sourceLink->setInitialTime(recvtime);
+		sourceLink->setProbation(getMinValidPacketSequence());
 		onNewSyncSource(*s);
 	} else if ( s->getControlTransportPort() == 0 ) {
 		// Test if RTP data packets had been received but this
@@ -322,7 +324,7 @@ QueueRTCPManager::takeInControlPacket()
 					transport_port) )
 			onGotSR(*s,pkt->info.SR,pkt->fh.block_count);
 		// Advance to the next packet in the compound.
-		pointer += ( ntohs((pkt->fh.length)) + 1) << 2;
+		pointer += pkt->getLength();
 		pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer +pointer);
 	} else if ( RTCPPacket::tXR == pkt->fh.type ) {
 		// TODO: handle XR reports.
@@ -332,13 +334,13 @@ QueueRTCPManager::takeInControlPacket()
 
 	// Process all RR reports.
 	while ( (RTCPPacket::tRR == pkt->fh.type) ) {
-		sourceLink = getSourceBySSRC(ntohl(pkt->info.RR.ssrc),
+		sourceLink = getSourceBySSRC(pkt->getSSRC(),
 					     source_created);
 		if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
 					network_address,transport_port) )
 			onGotRR(*s,pkt->info.RR,pkt->fh.block_count);
 		// Advance to the next packet in the compound
-		pointer += (ntohs(pkt->fh.length)+1) << 2;
+		pointer += pkt->getLength();
 		pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer +pointer);
 	}
 
@@ -348,18 +350,18 @@ QueueRTCPManager::takeInControlPacket()
 	while ( (pkt->fh.type == RTCPPacket::tSDES ||
 		 pkt->fh.type == RTCPPacket::tAPP) ) {
 		I ( cname_found || !pkt->fh.padding );
-		sourceLink = getSourceBySSRC(ntohl(pkt->info.SDES.ssrc),
+		sourceLink = getSourceBySSRC(pkt->getSSRC(),
 					     source_created);
 		if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
 					network_address,
 					transport_port) ) {
 			if ( pkt->fh.type == RTCPPacket::tSDES ) {
 				bool cname = onGotSDES(*s,*pkt);
-				pointer += (ntohs(pkt->fh.length)+1) << 2;
+				pointer += pkt->getLength();
 				cname_found = cname_found? cname_found : cname;
 			} else if ( pkt->fh.type == RTCPPacket::tAPP ) {
-				onGotAPP(*s,pkt->info.APP,ntohs(pkt->fh.length)<<2);
-				pointer += (ntohs(pkt->fh.length)+1) << 2;
+				onGotAPP(*s,pkt->info.APP,pkt->getLength());
+				pointer += pkt->getLength();
 			} else {
 				// error?
 			}
@@ -373,7 +375,7 @@ QueueRTCPManager::takeInControlPacket()
 	// process BYE packets
 	while ( pointer < len ) {
 		if ( pkt->fh.type == RTCPPacket::tBYE ) {
-			sourceLink = getSourceBySSRC(ntohl(pkt->info.BYE.ssrc),
+			sourceLink = getSourceBySSRC(pkt->getSSRC(),
 						     source_created);
 			if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
 						network_address,
@@ -467,7 +469,7 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t len)
 	char *reason = NULL;
 
 	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
-	     < (size_t)((ntohs(pkt.fh.length)+1) << 2) ) {
+	     < pkt.getLength() ) {
 		uint16 endpointer = pointer + sizeof(RTCPFixedHeader) + 
 			pkt.fh.block_count * sizeof(uint32);
 		uint16 len = rtcpRecvBuffer[endpointer];
@@ -480,18 +482,18 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t len)
 	while ( i < pkt.fh.block_count ){
 		bool created;
 		SyncSourceLink* srcLink = 
-			getSourceBySSRC(ntohl(pkt.info.BYE.ssrc),created);
+			getSourceBySSRC(pkt.getSSRC(),created);
 		i++;
 		if( srcLink->getGoodbye() )
 			onGotGoodbye(*(srcLink->getSource()),reason);
-		BYESource(ntohl(pkt.info.BYE.ssrc));
+		BYESource(pkt.getSSRC());
 		setState(*(srcLink->getSource()),SyncSource::stateLeaving);
 
 		reverseReconsideration();
 	}
 
 	delete [] reason;
-	pointer += (ntohs(pkt.fh.length)+1) << 2;
+	pointer += pkt.getLength();
 	return true;
 }
 
@@ -535,14 +537,14 @@ QueueRTCPManager::onGotSDES(SyncSource& source, RTCPPacket& pkt)
 	ptrdiff_t pointer = reinterpret_cast<unsigned char*>(&pkt) - rtcpRecvBuffer;
 	uint16 i = 0;
 	do {
-		size_t len = (ntohs(pkt.fh.length)+1) << 2;;
+		size_t len = pkt.getLength();
 		pointer += sizeof(RTCPFixedHeader);
 		SDESChunk* chunk = (SDESChunk*)(rtcpRecvBuffer + pointer);
 
 		bool source_created = false;
 		// TODO: avoid searching again the source of the first chunk.
 		SyncSourceLink* sourceLink =
-			getSourceBySSRC(ntohl(chunk->ssrc),
+			getSourceBySSRC(chunk->getSSRC(),
 					source_created);
 		// TODO: check that there are no two chunks with the
 		// same SSRC but different CNAME
@@ -762,13 +764,13 @@ QueueRTCPManager::getOnlyBye()
 			if (pkt->fh.type == RTCPPacket::tBYE ) {
 				bool created;
 				SyncSourceLink* srcLink = 
-				getSourceBySSRC(ntohl(pkt->info.BYE.ssrc),
-						created);
+					getSourceBySSRC(pkt->getSSRC(),
+							created);
 				if( srcLink->getGoodbye() )
 					onGotGoodbye(*(srcLink->getSource()), NULL);
-				BYESource(ntohl(pkt->info.BYE.ssrc));
+				BYESource(pkt->getSSRC());
 			}
-			pointer += (ntohs(pkt->fh.length)+1) << 2;
+			pointer += pkt->getLength();
 		}
 	}
 }

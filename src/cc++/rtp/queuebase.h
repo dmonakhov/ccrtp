@@ -184,13 +184,10 @@ protected:
 	RTPQueueBase(uint32 *ssrc = NULL);
 
 	inline void setLocalSSRC(uint32 ssrc)
-	{ localSSRC = ssrc; }
+	{ localSSRC = ssrc; localSSRCNetwork = htonl(ssrc); }
 
 	inline uint32 getLocalSSRCNetwork() const
 	{ return localSSRCNetwork; }
-
-	inline void setLocalSSRCNetwork(uint32 ssrc)
-	{ localSSRCNetwork = ssrc; }
 
 	virtual 
 	~RTPQueueBase()

@@ -1,3 +1,9 @@
+2002-11-03 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/control.cpp: (takeInControlPacket): source stats init.
+	* src/cc++/rtp/rtcppkt.h, src/control.cpp: new methods for
+	RTCPPacket: getLength and getSSRC.
+
 2002-10-31 Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/cc++/rtp/queuebase.h, src/queue.cpp, src/outqueue.cpp,

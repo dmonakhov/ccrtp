@@ -191,6 +191,9 @@ public:
 	 **/
 	struct SDESChunk 
 	{
+		uint32 getSSRC() const
+		{ return (ntohl(ssrc)); }
+
 		uint32 ssrc;      ///< SSRC identifer from sender.
 		SDESItem item;    ///< SDES item from sender.		
 	};
@@ -294,6 +297,21 @@ public:
 			tXR             ///< Extended Report.
 		}       Type;
 		
+		/**
+		 * Get the packet length specified in its header, in
+		 * octets and in host order.
+		 **/
+		uint32 getLength() const
+		{ return ((ntohs(fh.length) + 1) << 2); }
+
+		/**
+		 * Get the SSRC identifier specified in the packet
+		 * header, in host order.
+		 **/
+		uint32 getSSRC()  const			
+		{ return (ntohl(info.RR.ssrc)); } // SSRC is always the first
+						  // word after fh.
+
 		RTCPFixedHeader fh;           ///< Fixed RTCP header.
 
 		// An RTCP packet may be of any of the types defined
