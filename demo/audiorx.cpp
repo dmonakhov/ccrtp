@@ -123,7 +123,6 @@ public:
 		socket->setPayloadFormat(StaticPayloadFormat(sptPCMU));
 		for( int i=0 ; true ; i++ ){
 			const AppDataUnit* adu;
-			int count;			
 			do{
 				adu = socket->getData(socket->getFirstTimestamp());
 				if ( NULL == adu )
