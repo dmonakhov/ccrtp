@@ -39,7 +39,7 @@
 // If you do not wish that, delete this exception notice.  
 
 #include "private.h"
-#include <cc++/rtp/iqueue.h>
+#include <ccrtp/iqueue.h>
 
 #ifdef CCXX_NAMESPACES
 namespace ost {

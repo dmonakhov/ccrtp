@@ -14,7 +14,7 @@ AM_CXXFLAGS= -Wall
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 LIBS=@GNULIBS@
 
-SUBDIRS = cc++
+SUBDIRS = ccrtp
 lib_LTLIBRARIES = libccrtp1.la
 
 libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp \

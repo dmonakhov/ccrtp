@@ -48,7 +48,7 @@
 #define CCXX_RTP_SOURCES_H_
 
 #include <string>
-#include <cc++/rtp/rtcppkt.h>
+#include <ccrtp/rtcppkt.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

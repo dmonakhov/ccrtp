@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
-ccxxincludedir=$(includedir)/cc++2/cc++/rtp
+ccxxincludedir=$(includedir)/ccrtp
 
 ccxxinclude_HEADERS = base.h formats.h rtppkt.h rtcppkt.h sources.h socket.h \
 	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h rtp.h pool.h

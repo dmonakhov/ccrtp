@@ -47,8 +47,8 @@
 #define CCXX_RTP_EXT_H
 
 #include <cc++/socket.h>
-#include <cc++/rtp/ioqueue.h>
-#include <cc++/rtp/socket.h>
+#include <ccrtp/ioqueue.h>
+#include <ccrtp/socket.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {
@@ -145,11 +145,7 @@ protected:
 	inline size_t
 	getNextDataPacketSize() const
 	{ 
-#ifndef WIN32
 		size_t len; ccioctl(UDPReceive::so,FIONREAD,len); return len; 
-#else
-		unsigned long len; ccioctl(UDPReceive::so,FIONREAD,len); return len;
-#endif
 	}
 
 	/**

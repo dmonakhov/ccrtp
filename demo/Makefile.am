@@ -18,10 +18,7 @@ CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
 ccxxincludedir=$(includedir)/cc++
 
 noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx
-#ccrtptest
-
-#ccrtptest_SOURCES = ccrtptest.cpp
-#ccrtptest_LDFLAGS = ../src/libccrtp1.la
+#	ccrtptest
 
 rtpsend_SOURCES = rtpsend.cpp
 rtpsend_LDFLAGS = ../src/libccrtp1.la
@@ -40,3 +37,6 @@ audiorx_LDFLAGS = ../src/libccrtp1.la
 
 audiotx_SOURCES = audiotx.cpp
 audiotx_LDFLAGS = ../src/libccrtp1.la
+
+#ccrtptest_SOURCES = ccrtptest.cpp
+#ccrtptest_LDFLAGS = ../src/libccrtp1.la

@@ -51,7 +51,7 @@
  **/
 
 #include "private.h"
-#include <cc++/rtp/cqueue.h>
+#include <ccrtp/cqueue.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

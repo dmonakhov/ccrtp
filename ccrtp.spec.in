@@ -1,7 +1,7 @@
-Summary: ccrtp - a Common C++ class framework for RTP packets
+Summary: ccrtp - a Common C++ class framework for RTP/RTCP
 Name: ccrtp1
 Version: @VERSION@
-Release: 3
+Release: 1
 Group: Development/Libraries
 URL: http://www.gnu.org/software/ccrtp
 Source: ftp://ftp.gnu.org/gnu/ccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
@@ -17,13 +17,18 @@ Group: Development/Libraries
 Summary: headers and link libraries
 
 %description
-The ccrtp package offers a generic framework for sending and receiving of
-realtime streaming data over UDP packets by the use of send and receive
-packet queues.
+ccRTP is a generic, extensible and efficient C++ framework for
+developing applications based on the Real-Time Transport Protocol
+(RTP) from the IETF. It is based on Common C++ and provides a full
+RTP/RTCP stack for sending and receiving of realtime data by the use
+of send and receive packet queues. ccRTP supports unicast,
+multi-unicast and multicast, manages multiple sources, handles RTCP
+automatically, supports different threading models and is generic as
+for underlying network and transport protocols.
 
 %description devel
 This package holds documentation, header files, and static link libraries
-for building applications that use GNU ccScript.
+for building applications that use GNU ccRTP.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -51,10 +56,10 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %defattr(-,root,root,0755)
 %doc AUTHORS COPYING NEWS README TODO ChangeLog
 %{_prefix}/lib/libcc*a
-%{_prefix}/include/cc++2/cc++/phone.h
-%{_prefix}/include/cc++2/cc++/rtp
+%{_prefix}/include/ccrtp/phone.h
+%{_prefix}/include/ccrtp
 #%{_mandir}/man3/*.3cc*		conflicts with commonc++ socket.h page
-#%{_infodir}/info/ccrtp*
+%{_infodir}/ccrtp*info*
 
 %clean
 rm -rf $RPM_BUILD_ROOT

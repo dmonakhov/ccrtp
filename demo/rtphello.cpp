@@ -32,7 +32,7 @@
 #include <cstdio>
 #include <ctime>
 // In order to use ccRTP, the RTP stack of CommonC++, just include...
-#include <cc++/rtp/rtp.h>
+#include <ccrtp/rtp.h>
 
 #ifdef  CCXX_NAMESPACES
 using namespace ost;

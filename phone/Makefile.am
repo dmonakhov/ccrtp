@@ -13,7 +13,7 @@ LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
 LIBS = ../src/libccrtp1.la @EXTLIBS@ @GNULIBS@
-ccxxincludedir=$(includedir)/cc++2/cc++
+ccxxincludedir=$(includedir)/ccrtp
 EXTRA_DIST = phone.conf
 
 noinst_HEADERS = server.h

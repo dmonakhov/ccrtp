@@ -150,59 +150,59 @@ SOURCE=..\..\src\source.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\base.h"
+SOURCE="..\..\src\ccrtp\base.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\cqueue.h"
+SOURCE="..\..\src\ccrtp\cqueue.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\ext.h"
+SOURCE="..\..\src\ccrtp\ext.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\formats.h"
+SOURCE="..\..\src\ccrtp\formats.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\ioqueue.h"
+SOURCE="..\..\src\ccrtp\ioqueue.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\iqueue.h"
+SOURCE="..\..\src\ccrtp\iqueue.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\oqueue.h"
+SOURCE="..\..\src\ccrtp\oqueue.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\pool.h"
+SOURCE="..\..\src\ccrtp\pool.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\queuebase.h"
+SOURCE="..\..\src\ccrtp\queuebase.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\rtcppkt.h"
+SOURCE="..\..\src\ccrtp\rtcppkt.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\rtp.h"
+SOURCE="..\..\src\ccrtp\rtp.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\rtppkt.h"
+SOURCE="..\..\src\ccrtp\rtppkt.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\socket.h"
+SOURCE="..\..\src\ccrtp\socket.h"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\src\cc++\rtp\sources.h"
+SOURCE="..\..\src\ccrtp\sources.h"
 # End Source File
 # End Group
 # Begin Group "Resource Files"

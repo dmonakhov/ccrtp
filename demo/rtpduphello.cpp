@@ -30,7 +30,7 @@
 #include <cstdlib>
 // In order to use ccRTP, the RTP stack of CommonC++, you only need to
 // include ...
-#include <cc++/rtp/ext.h>
+#include <ccrtp/ext.h>
 
 #ifdef	CCXX_NAMESPACES
 using namespace ost;

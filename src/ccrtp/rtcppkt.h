@@ -41,7 +41,7 @@
 #ifndef	CCXX_RTP_RTCPPKT_H_
 #define CCXX_RTP_RTCPPKT_H_
 
-#include <cc++/rtp/base.h>
+#include <ccrtp/base.h>
 
 #ifdef CCXX_NAMESPACES
 namespace ost {

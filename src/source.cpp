@@ -46,7 +46,7 @@
 
 #include <cc++/process.h>
 #include "private.h"
-#include <cc++/rtp/sources.h>
+#include <ccrtp/sources.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

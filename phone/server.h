@@ -16,7 +16,7 @@
 
 #include <cc++/file.h>
 #include <cc++/misc.h>
-#include <cc++/rtp/rtp.h>
+#include <ccrtp/rtp.h>
 #include "phone.h"
  
 #ifdef	CCXX_NAMESPACES

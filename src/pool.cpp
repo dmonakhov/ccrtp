@@ -40,7 +40,7 @@
 
 #include <algorithm>
 #include "private.h"
-#include <cc++/rtp/pool.h>
+#include <ccrtp/pool.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {

@@ -43,7 +43,7 @@
 //
 
 #include "private.h"
-#include <cc++/rtp/ext.h>
+#include <ccrtp/ext.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {

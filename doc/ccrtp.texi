@@ -8,9 +8,9 @@
 @documentencoding ISO-8859-1
 @c %** end of header
 
-@set EDITION 1.0pre0
-@set VERSION 1.0pre0
-@set UPDATED October 2002
+@set EDITION 1.0pre1
+@set VERSION 1.0pre1
+@set UPDATED November 2002
 
 @dircategory Development
 @direntry
@@ -375,11 +375,11 @@ transmission queue handled by the stack. In general, packet insertion
 and transmission occur at different times, though it is not necessary.
 
 In order to use ccRTP, you must include the main header
-(@file{#include <cc++/rtp/rtp/rtp.h>}.
+(@file{#include <ccrtp/rtp.h>}.
 
-@emph{TODO: comment @file{#include <cc++/rtp/rtppool.h}.}
+@emph{TODO: comment @file{#include <ccrtp/rtppool.h}.}
 
-@emph{TODO: comment @file{#include <cc++/rtp/rtpext.h>}.}
+@emph{TODO: comment @file{#include <ccrtp/rtpext.h>}.}
 
 You must also link in the library, currently @file{ccrtp1}.
 
@@ -903,8 +903,9 @@ written for old releases of ccRTP (0.6.x, 0.7.x and 0.9.x series) to
 the 1.0 series. It is written mostly as a recipe of replacements for
 old constructs.
 
-Replace @code{#include <cc++/rtp/rtp.h>} with @code{#include
-<cc++/rtp/rtp.h>}.
+Replace @code{#include <cc++/rtp.h>} with @code{#include
+<ccrtp/rtp.h>}@footnote{Note that unfortunately ccRTP 1.0pre0 used
+@code{#include <cc++/rtp/rtp.h}, which is now deprecated.}.
 
 Changes that have to do more with Common C++ 2 than with ccRTP:
 

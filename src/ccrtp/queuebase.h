@@ -48,8 +48,8 @@
 #define CCXX_RTP_QUEUEBASE_H_
 
 #include <cc++/pointer.h>
-#include <cc++/rtp/rtppkt.h>
-#include <cc++/rtp/sources.h>
+#include <ccrtp/rtppkt.h>
+#include <ccrtp/sources.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

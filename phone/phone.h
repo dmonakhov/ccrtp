@@ -18,7 +18,7 @@
 #define CCXX_PHONE_H_
  
 #ifndef CCXX_RTP_H_
-#include <cc++/rtp/rtp.h>
+#include <ccrtp/rtp.h>
 #endif
  
 #ifdef	CCXX_NAMESPACES

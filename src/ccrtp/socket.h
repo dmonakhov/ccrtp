@@ -41,15 +41,21 @@
 #ifndef	CCXX_RTP_SOCKET_H_
 #define CCXX_RTP_SOCKET_H_
 
-#include <cc++/rtp/base.h>
+#include <ccrtp/base.h>
 
 #ifndef WIN32
 #include <sys/ioctl.h>
 inline size_t ccioctl(int so, int request, size_t& len) 
 { return ::ioctl(so,request,&len); }
 #else
-inline size_t ccioctl(int so, int request, unsigned long& len )
-{ return ::ioctlsocket(so,request,&len); }
+inline size_t ccioctl(int so, int request, size_t& len )
+{ 
+	unsigned long l; 
+	size_t result;
+	::ioctlsocket(so,request,&l); 
+	len = l; 
+	return result;
+}
 #endif
 
 #ifdef	CCXX_NAMESPACES

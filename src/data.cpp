@@ -44,7 +44,7 @@
  **/
 
 #include "private.h"
-#include <cc++/rtp/queuebase.h>
+#include <ccrtp/queuebase.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

@@ -47,7 +47,7 @@
 #define CCXX_RTP_POOL_H
 
 #include <list>
-#include <cc++/rtp/rtp.h>
+#include <ccrtp/rtp.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {

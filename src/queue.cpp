@@ -40,8 +40,8 @@
 
 #include <cc++/digest.h>
 #include "private.h"
-#include <cc++/rtp/queuebase.h>
-#include <cc++/rtp/ioqueue.h>
+#include <ccrtp/queuebase.h>
+#include <ccrtp/ioqueue.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {

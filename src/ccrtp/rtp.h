@@ -53,8 +53,8 @@
 #ifndef	CCXX_RTP_RTP_H_
 #define CCXX_RTP_RTP_H_
 
-#include <cc++/rtp/cqueue.h>
-#include <cc++/rtp/socket.h>
+#include <ccrtp/cqueue.h>
+#include <ccrtp/socket.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

@@ -24,7 +24,7 @@ STRIP = $(ARCH)strip
 exeext = .exe
 dllext = .dll
 
-CPPFLAGS = -I. -I../../src/ -DHAVE_CONFIG_H -D_GNU_SOURCE
+CPPFLAGS = -I. -I../../src/ -D_GNU_SOURCE
 CXXFLAGS = -include ${prefix}/include/cc++2/cc++/config.h -g -Wall -O2 -mthreads
 LDFLAGS = -L$(prefix)/dll -lccrtp1
 #-lccgnu2 -lccext2 -lws2_32
@@ -42,7 +42,7 @@ all:	$(CCRTP1_DLL_NAME) $(PROGS)
 SHDRS = base.h formats.h rtppkt.h rtcppkt.h sources.h socket.h \
 	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h
 
-HDRS = $(addprefix ../../src/cc++/rtp, $(SHDRS))
+HDRS = $(addprefix ../../src/ccrtp, $(SHDRS))
 
 CCRTP1_OBJS = rtppkt.o rtcppkt.o source.o data.o \
 	incqueue.o outqueue.o queue.o \
@@ -67,9 +67,9 @@ clean:
 	$(PROGS)
 
 install:
-	-mkdir $(prefix)/include/cc++/rtp
+	-mkdir $(prefix)/include/ccrtp
 	-mkdir $(prefix)/dll
-	cp -af $(HDRS) $(prefix)/include/cc++/rtp
+	cp -af $(HDRS) $(prefix)/include/ccrtp
 	cp -af $(CCRTP1_DLL_LIB) $(CCRTP1_DLL_NAME) $(prefix)/dll
 	cp -af $(CCRTP1_DLL_LIB) $(prefix)/lib/libccrtp1dll.a
 	$(STRIP) $(prefix)/dll/$(CCRTP1_DLL_NAME)

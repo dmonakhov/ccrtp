@@ -47,8 +47,8 @@
 #ifndef	CCXX_RTP_IOQUEUE_H_
 #define CCXX_RTP_IOQUEUE_H_
 
-#include <cc++/rtp/iqueue.h>
-#include <cc++/rtp/oqueue.h>
+#include <ccrtp/iqueue.h>
+#include <ccrtp/oqueue.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

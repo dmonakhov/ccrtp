@@ -8,8 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_INIT(src/members.cpp)
-VERSION="1.0pre0"
+AC_INIT(src/ccrtp/rtp.h)
+VERSION="1.0pre1"
 REQUIRES="1.0.0"
 LT_RELEASE="1.0"
 LT_VERSION="0:0"
@@ -40,9 +40,9 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
 AC_SUBST(KDOC_DIR)
-AC_OUTPUT(Makefile src/Makefile src/cc++/Makefile src/cc++/rtp/Makefile 
-config/Makefile m4/Makefile doc/Makefile demo/Makefile phone/Makefile
-win32/Makefile freebsd/Makefile pkginfo ccrtp.spec freebsd/pkg-plist)
+AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile
+config/Makefile m4/Makefile freebsd/Makefile pkginfo freebsd/pkg-plist
+doc/Makefile demo/Makefile phone/Makefile win32/Makefile ccrtp.spec)
 
 if test -d doc/man3 ; then
       ls doc/man3/*.3cc | sed -e 's:^doc/man3/:man/man3/:' >> freebsd/pkg-plist ; fi

@@ -45,7 +45,7 @@
  **/
 
 #include "private.h"
-#include <cc++/rtp/rtcppkt.h>
+#include <ccrtp/rtcppkt.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
