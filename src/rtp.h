@@ -2262,7 +2262,9 @@ public:
 	 * @param port transport port this socket is to be bound
 	 * @param pri service thread base priority relative to it's parent
 	 * */
-	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0)
+	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0): 		
+		serviceQueue(pri)
+
 	{
 		base = even_port(port);
 		dso = new dataSocket(ia,even_port(port));
