@@ -421,12 +421,12 @@ presented here; deeper explanations are provided in next sections.
 @subsection Initiating Sessions
 @cindex Initiating Sessions
 
-@tindex RTPSessio
+@tindex RTPSession
 @cindex multicast
 @cindex join
 Initiating @acronym{RTP} sessions with ccRTP involves the construction
-of an objects of the class @code{RTPSession} and calling some optional
-initialization methods. @code{RTPSesision} constructors take two
+of an object of the class @code{RTPSession} and calling some optional
+initialization methods. @code{RTPSession} constructors take two
 mandatory arguments: local network address and local transport port
 (where incoming packets are expected). There are two constructors, one
 of them takes a host address as first parameter, while the other takes
