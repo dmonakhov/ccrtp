@@ -1,3 +1,6 @@
+2005-01-24  David Sugar <dyfet@ostel.com>
+	* reconfig: getting to work generically and rh7 specific
+
 2005-01-20  David Sugar <dyfet@ostel.com>
 	* libccrtp1.pc[.in], configure.ac: pkgconfig file generated for 
 	libccrtp1

@@ -58,6 +58,12 @@ else
         done
 fi
 
+if test "$ver" = "2.53" -a -z "$AUTOMAKE_SUFFIX" ; then
+	if test -f /usr/bin/automake-1.5 ; then
+		AUTOMAKE_SUFFIX="-1.5"
+	fi
+fi
+
 aclocal${AUTOMAKE_SUFFIX} $ACLOCALDIRS
 
 if test -f /usr/bin/autoheader-$ver ; then
