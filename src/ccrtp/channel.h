@@ -153,12 +153,7 @@ public:
 
 	inline void 
 	setPeer(const InetAddress &ia, tpport_t port)
-	{
-		memset(&peer, 0, sizeof(peer));
-		UDPSocket::peer.sin_family = AF_INET;
-		UDPSocket::peer.sin_addr = getaddress(ia);
-		UDPSocket::peer.sin_port = htons(port);		
-	}
+		{UDPSocket::setPeer((InetHostAddress&)ia, port);}
 
 	inline size_t
 	send(const unsigned char* const buffer, size_t len)
