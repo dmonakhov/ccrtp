@@ -1,3 +1,8 @@
+2003-07-03  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtp.h: (TRTPSessionBase::build, mcast version): fixed
+	multicast bind/join, from Luuk van Dijk.
+
 2003-06-20  David Sugar <dyfet@ostel.com>
 
 	* src/Makefile.am, phone/Makefile.am, demo/Makefile.am: fix

@@ -293,8 +293,8 @@ private:
 			dataBasePort = dataPort;
 			controlBasePort = controlPort;
 		}
-		dso = new RTPDataChannel(ia,dataBasePort);
-		cso = new RTCPChannel(ia,controlBasePort);
+		dso = new RTPDataChannel(InetHostAddress("0.0.0.0"),dataBasePort);
+		cso = new RTCPChannel(InetHostAddress("0.0.0.0"),controlBasePort);
 		joinGroup(ia);
 	}
 
