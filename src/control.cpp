@@ -463,7 +463,7 @@ QueueRTCPManager::getBYE(RTCPPacket &pkt, size_t &pointer, size_t len)
 	uint16 endpointer = pointer + pkt.fh.block_count * sizeof(uint32);
 
 	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
-	     < ((ntohs(pkt.fh.length)+1) << 2) ) {
+	     < (size_t)((ntohs(pkt.fh.length)+1) << 2) ) {
 		char *reason = new char[rtcpRecvBuffer[endpointer] + 1 ];
 		memcpy(reason,rtcpRecvBuffer + endpointer + 1,
 		       rtcpRecvBuffer[endpointer]);
