@@ -12,6 +12,10 @@
 	it compiles even though UDPReceive::getReceiver is not const,
 	which will not be an issue with cc++2 versions newer than 1.0.9.
 
+2003-04-24  David Sugar <dyfet@gnu.org>
+
+	* Some compile checks and 1.0.1 release (corrected timeline).
+
 2003-04-04  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/channel.h: (RTPBaseUDPIPv4Socket::join): call
