@@ -1,4 +1,7 @@
-2005-02-06  David Sugar <dyfet@ostel.com<
+2005-02-07  David Sugar <dyfet@ostel.com>
+	* configure.ac: release 1.2.1
+	
+2005-02-06  David Sugar <dyfet@ostel.com>
 	* cape vs.net projects added.
 
 	* src/control.cpp: some casting fixups for fixed size data types.  fractionLost is a uint8 and so does
