@@ -13,11 +13,8 @@
 rm -rf autoconf libtool
 if test ! -d autoconf ; then mkdir autoconf ; fi
 
-if test -x /usr/bin/glibtoolize ; then
-        glibtoolize --copy --force
-else
-        libtoolize --copy --force
-fi
+libtoolize=`which libtoolize glibtoolize libtoolize13 libtoolize14 libtoolize15`
+$libtoolize --copy --force
 
 ACLOCALDIRS="-I m4"
 if [ -d ~/share/aclocal ] ; then
