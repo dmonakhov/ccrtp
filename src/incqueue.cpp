@@ -452,7 +452,7 @@ IncomingDataQueue::getData(uint32 stamp, const SyncSource* src)
 	if ( NULL != (pl = getWaiting(stamp,src)) )
 	{
 		IncomingRTPPkt* packet = pl->getPacket();
-		size_t len = packet->getPayloadSize();
+//		size_t len = packet->getPayloadSize();
 
 		SyncSource &src = *(pl->getSourceLink()->getSource());
 		result = new AppDataUnit(*packet,src);
