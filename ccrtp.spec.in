@@ -43,8 +43,8 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/ldconfig -n /usr/lib
+/sbin/ldconfig -n @libdir@
 
 %postun
-/sbin/ldconfig -n /usr/lib
+/sbin/ldconfig -n @libdir@
 
