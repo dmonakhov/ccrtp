@@ -85,6 +85,7 @@ main(int argc, char *argv[])
 	     << "\", with timestamp " << argv[4]
 	     << " to " << argv[2] << ":" << argv[3]
 	     << endl;
+	return 0;
 }
 
 /** EMACS **
