@@ -238,6 +238,10 @@ MiscTest : public Test, public Thread, public TimerPort
 
 // class TestMiscellaneous { }
 
+// Things that should be tested:
+// extreme values (0 - big) for putData
+// segmentation (setMaxSendSegmentSize())
+// performance: packets/second (depending on packet size and # of participants)
 int main(int argc, char *argv[])
 {
 	int result = 0;

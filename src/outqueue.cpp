@@ -335,6 +335,8 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 
 	size_t step = 0, offset = 0;
 	while ( offset < datalen ) {
+		// remainder and step take care of segmentation
+		// according to getMaxSendSegmentSize()
 		size_t remainder = datalen - offset;
 		step = ( remainder > getMaxSendSegmentSize() ) ?
 			getMaxSendSegmentSize() : remainder;

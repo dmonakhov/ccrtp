@@ -1,3 +1,15 @@
+2004-01-24  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtp.h: (TRTPSessionBase and SingleThreadRTPSession):
+	added iface optional parameter to multicast RTP session
+	constructors, so that it is possible to specify which interface to
+	add to multicast groups.
+
+	* src/ccrtp/iqueue.h, src/incqueue.cpp: added
+	IncomingDataQueue::getDefaultMembersSize().
+
+	* doc/ccrtp.texi: more docs.
+
 2004-01-18  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/sources.h, src/source.cpp, src/control.cpp: added

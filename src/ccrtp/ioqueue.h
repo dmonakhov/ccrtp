@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -236,7 +236,6 @@ public:
 	{ return timeclock.getElapsed(); }
 	
 protected:
-	//	static const size_t defaultMembersHashSize;
 
 	/**
 	 * Constructor. This will generate a random application SSRC

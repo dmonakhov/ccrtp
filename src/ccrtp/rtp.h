@@ -134,12 +134,14 @@ public:
 	 * @param controlPort Transport port the control socket is to be bound.
 	 * @param membersSize Initial size of the membership table.
 	 * @param app Application this session is associated to.
+	 * @param iface Index (from 0 to n) of network interface to join to
+	 * multicast group.
 	 **/
 	TRTPSessionBase(const InetMcastAddress& ia, tpport_t dataPort,
 			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app) :
+			 RTPApplication& app, uint32 iface) :
 		ServiceQueue(membersSize,app)
-	{ build(ia,dataPort,controlPort); }
+	{ build(ia,dataPort,controlPort,iface); }
 
 	/**
 	 * Builds a session waiting for packets in a multicast
@@ -152,13 +154,15 @@ public:
 	 * @param controlPort Transport port the control socket is to be bound.
 	 * @param membersSize Initial size of the membership table.
 	 * @param app Application this session is associated to.
+	 * @param iface Index (from 0 to n) of network interface to join to
+	 * multicast group.
 	 **/
 	TRTPSessionBase(uint32 ssrc,
 			const InetMcastAddress& ia, tpport_t dataPort,
 			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app) :
+			 RTPApplication& app, uint32 iface) :
 		ServiceQueue(ssrc,membersSize,app)
-	{ build(ia,dataPort,controlPort); }
+	{ build(ia,dataPort,controlPort,iface); }
 
 
 	inline virtual
@@ -284,7 +288,7 @@ private:
 
 	void 
 	build(const InetMcastAddress& ia, tpport_t dataPort, 
-	      tpport_t controlPort)
+	      tpport_t controlPort, uint32 iface)
 	{
 		if ( 0 == controlPort ) {
 			dataBasePort = even_port(dataPort); 
@@ -295,7 +299,7 @@ private:
 		}
 		dso = new RTPDataChannel(InetHostAddress("0.0.0.0"),dataBasePort);
 		cso = new RTCPChannel(InetHostAddress("0.0.0.0"),controlBasePort);
-		joinGroup(ia);
+		joinGroup(ia,iface);
 	}
 
 	/**
@@ -305,18 +309,18 @@ private:
 	 * @return error code from the socket operation
 	 */
 	inline Socket::Error
-	joinGroup(const InetMcastAddress& ia)
+	joinGroup(const InetMcastAddress& ia, uint32 iface)
 	{ 
 		Socket::Error error  = dso->setMulticast(true);
 		if ( error ) return error;
-		error = dso->join(ia); 
+		error = dso->join(ia,iface); 
 		if ( error ) return error;
 		error = cso->setMulticast(true);
 		if ( error ) {
 			dso->drop(ia);
 			return error;
 		}
-		error = cso->join(ia);
+		error = cso->join(ia,iface);
 		if ( error ) {
 			dso->drop(ia);
 			return error;
@@ -426,10 +430,11 @@ public:
 			       int pri = 0,
 			       uint32 memberssize = 
 			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication()): 
+			       RTPApplication& app = defaultApplication(),
+			       uint32 iface = 0): 
 		Thread(pri),
 		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app)
+	(ia,dataPort,controlPort,memberssize,app,iface)
 	{ }
 
 	~SingleThreadRTPSession()

@@ -144,7 +144,10 @@ public:
 	{ return payloadType; }
 
 	/**
-	 * Get RTP clock rate for this payload format.
+	 * Get RTP clock rate for this payload format. Note this
+	 * method provides the RTP clock rate (for the timestamp in
+	 * RTP data packets headers), which is not necessarily the
+	 * same as the codec clock rate.
 	 *
 	 * @return RTP clock rate in Hz.
 	 **/

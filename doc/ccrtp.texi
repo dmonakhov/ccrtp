@@ -193,8 +193,8 @@ The main concept in the ccRTP implementation of @acronym{RTP} sessions
 is the use of packet queues to handle transmission and reception of
 @acronym{RTP} data packets/application data units. In ccRTP, a data
 block is transmitted by putting it into the transmission (outgoing
-packet) queue, and received by getting it from the reception (incoming
-packet) queue.
+packets) queue, and received by getting it from the reception
+(incoming packets) queue.
 
 Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 @acronym{RTCP}. Here is a brief list of some features of ccRTP:
@@ -272,7 +272,7 @@ respectively.
 
 @cindex demo program
 In the next sections, two basic examples are presented. These examples
-are intended to provide a concrete idea of how the code of a ccRTP
+are intended to provide a concrete idea of what the code of a ccRTP
 based application looks like, they are not complete or compilable
 programs. You can find some real examples under the demo directory in
 the source distribution of ccRTP.
@@ -291,8 +291,8 @@ the source distribution of ccRTP.
 The following snippet illustrates the required steps to send an
 application data unit over @acronym{RTP}.
 
-@example
 @cartouche
+@example
 RTPSession s(InetHostAddress("127.0.0.1"),8000);  // @r{bind reception socket}
 
 // @r{Initialization}
@@ -303,8 +303,8 @@ s.startRunning(); // @r{start running the packet queue scheduler}
 
 // @r{Send data}
 s.putData(0,buffer,bufferLen); // @r{buffer holds bufferLen payload octets}
-@end cartouche
 @end example
+@end cartouche
 
 
 @c -----------------------------------------------------------------------
@@ -315,8 +315,8 @@ s.putData(0,buffer,bufferLen); // @r{buffer holds bufferLen payload octets}
 The required actions to receive an application data unit over RTP are
 listed in the following code snippet.
 
-@example
 @cartouche
+@example
 RTPSession s(InetHostAddress("127.0.0.1"),9000);  // @r{bind reception socket.}
 
 // @r{Initialization.}
@@ -333,8 +333,8 @@ if ( adu != NULL )
    // adu->getData() @r{provides a const uint8 pointer to a data buffer.}
    // adu->getSize() @r{provides the number of octets in the buffer.}
    // @r{see other methods in the class AppDataUnit, such as} getSource().
-@end cartouche
 @end example
+@end cartouche
 
 
 @c -----------------------------------------------------------------------
@@ -696,8 +696,8 @@ can be retrived through STL-like iterators of type
 @code{RTPSession::SyncSourcesIterator}, as shown in the following
 example.
 
-@example
 @cartouche
+@example
 // rx is an RTPSession object
 RTPSession::SyncSourcesIterator it;
 for (it = rx.begin() ; it != rx.end(); it++) @{
@@ -707,8 +707,8 @@ for (it = rx.begin() ; it != rx.end(); it++) @{
       cout << "is an active sender";
    cout << endl;
 @}
-@end cartouche
 @end example
+@end cartouche
 
 @findex RTPSession::SyncSourcesIterator
 @cindex const iterator
@@ -725,13 +725,13 @@ of synchronization can be retrieved through the
 @code{SyncSource::getParticipant()} method, as the following examples
 shows:
 
-@example
 @cartouche
+@example
    // s is a source of synchronization object (SyncSource)
    Participant *p = s.getParticipant();
    cerr << p->getSDESItem(SDESItemTypeCNAME) << endl;
-@end cartouche
 @end example
+@end cartouche
 
 When RTCP is not being used or the CNAME identifier corresponding to a
 synchronization source has not been received yet, the participant
@@ -773,16 +773,16 @@ participants in a session can be retrieved using iterators of type
 example, which shows the list of CNAMEs of the participants in the
 default application:
 
-@example
 @cartouche
+@example
    RTPApplication &app = defaultApplication();
    RTPApplication::ParticipantsIterator ai;
    for ( ai = app.begin(); ai != app.end(); ai++ ) @{
       const Participant &p = *ai;
       cerr << p.getSDESItem(SDESItemTypeCNAME) << endl;
    @}
-@end cartouche
 @end example
+@end cartouche
 
 @findex RTPApplication::ParticipantsIterator
 @cindex const iterator
@@ -945,9 +945,9 @@ more than one of these events.
 
 @itemize
 
-@item @cite{RTP: A Transport Protocol for Real-Time Applications (RFC 1889/RFC 3550)}.
+@item @cite{RTP: A Transport Protocol for Real-Time Applications (RFC 3550, which supersedes RFC 1889)}.
 
-@item @cite{RTP Profile for Audio and Video Conferences with Minimal Control (RFC 1890/RFC 3551)}.
+@item @cite{RTP Profile for Audio and Video Conferences with Minimal Control (RFC 3551, which supersedes RFC 1890)}.
 
 @item @cite{MIME Type Registration of RTP Payload Formats (RFC 3555)}.
 

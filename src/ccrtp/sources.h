@@ -497,7 +497,7 @@ private:
 
 /**
  * Get the RTPApplication object for the "default" application (the
- * only one used be common applications -those that only implement one
+ * only one used by common applications -those that only implement one
  * "RTP application"). Note that this application object differs from
  * all the others that may be defined in that it is automatically
  * constructed by the ccRTP stack and its CNAME is automatically

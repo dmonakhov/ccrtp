@@ -133,8 +133,8 @@ public:
 	{ return UDPSocket::setMulticast(enable); }
 
 	inline Socket::Error
-	join(const InetMcastAddress& ia)
-	{ return Socket::join(ia); }
+	join(const InetMcastAddress& ia, uint32 iface)
+	{ return UDPSocket::join(ia,iface); }
 
 	inline Socket::Error
 	drop(const InetMcastAddress& ia)
@@ -227,8 +227,8 @@ public:
 	{ return recvSocket->setMulticast(enable); }
 
 	inline Socket::Error
-	join(const InetMcastAddress& ia)
-	{ return recvSocket->join(ia); }
+	join(const InetMcastAddress& ia, uint32 iface)
+	{ return recvSocket->join(ia,iface); }
 
 	inline Socket::Error
 	drop(const InetMcastAddress& ia)

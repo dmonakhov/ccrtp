@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -94,6 +94,8 @@ ConflictHandler::addConflict(const InetAddress& na, tpport_t dtp,
 const uint8 IncomingDataQueue::defaultMinValidPacketSequence = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketMisorder = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketDropout = 3000;
+const size_t IncomingDataQueue::defaultMembersSize = 
+MembershipBookkeeping::defaultMembersHashSize;
 
 IncomingDataQueue::IncomingDataQueue(uint32 size) :
 	IncomingDataQueueBase(),
