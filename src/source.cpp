@@ -81,7 +81,10 @@ findusername(std::string &username)
 	const char *user = Process::getEnv("LOGNAME");
 	if ( !strcmp(user,"") )
 		user = Process::getEnv("USER");
-	username = user;
+	if ( user )
+		username = user;
+	else
+		username = "";
 }
 
 #else
@@ -96,7 +99,7 @@ findusername(std::string &username)
 		username = n;
 		delete [] n;
 	} else {
-		username = "unidentified";
+		username = "";
 	}
 }
 #endif // #ifndef WIN32

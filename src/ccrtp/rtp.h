@@ -457,7 +457,7 @@ protected:
 	{
 		microtimeout_t timeout = 0;
 		while ( ServiceQueue::isActive() ) {
-			if ( !timeout ){
+			if ( timeout < 1000 ){ // !(timeout/1000)
 				timeout = getSchedulingTimeout();
 			}
 			setCancel(cancelDeferred);
@@ -470,7 +470,7 @@ protected:
 			// <= the check interval for RTCP
 			// packets
 			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( !timeout ) {
+			if ( timeout < 1000 ) { // !(timeout/1000)
 				setCancel(cancelDeferred);
 				dispatchDataPacket();
 				setCancel(cancelImmediate);
