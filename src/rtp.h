@@ -299,6 +299,9 @@ class CCXX_CLASS_EXPORT RTPSource
 {
 
 public:
+	bool getHello();
+	bool getGoodbye();
+
 	uint32 getID() const
 	{ return ssrc; };
 
@@ -551,6 +554,10 @@ private:
 	uint32 currentkitchen;
 	// the expected sequence number of the next packet to be received.
 	uint16 expectedseqnum;  
+
+	// this flag assures we only call one gotHello and one gotGoodbye
+	// for this src.
+	bool flag;
 
 	// before becoming valid, multiple packets from this source, 
 	// or an SDES RTCP containing its CNAME should be received.

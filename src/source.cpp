@@ -63,12 +63,31 @@ RTPSource::RTPSource(uint32 ssrc):
 	initial_timestamp = 0;
 	last_time.tv_sec = last_time.tv_usec = 0;
 	expectedseqnum = 0; 
+	flag = false;
 }
 
 RTPSource::~RTPSource()
 {
 	endSource();
 }
+
+bool RTPSource::getHello(void)
+{
+	if(flag)
+		return false;
+
+	flag = true;
+	return true;
+}
+
+bool RTPSource::getGoodbye(void)
+{
+	if(!flag)
+		return false;
+
+	flag = false;
+	return true;
+}	
 
 void
 RTPSource::endSource()
@@ -90,6 +109,7 @@ RTPSource::RTPSource(const RTPSource &origin)
 {
 	// for now, it makes no sense
 	// TODO: assign a lot of things
+	flag = false;
 }
 
 uint32 

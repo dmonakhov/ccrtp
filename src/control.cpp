@@ -358,7 +358,8 @@ QueueRTCPManager::getBYE(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 		RTPSource &src = getSourceBySSRC(pkt.info.BYE.ssrc);
 		i++;
 		pointer += sizeof(uint32);
-		gotGoodbye(src, reason);
+		if(src.getGoodbye())
+			gotGoodbye(src, reason);
 		removeSource(pkt.info.BYE.ssrc);
 		// REVERSE RECONSIDERATION
 		ReverseReconsideration();
@@ -447,7 +448,8 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					I( false );
 				}
 			}
-			gotHello(src);
+			if(src.getHello())
+				gotHello(src);
 		}
 	}
 
