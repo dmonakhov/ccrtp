@@ -10,6 +10,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+rm -rf autoconf libtool
+if test ! -d autoconf ; then mkdir autoconf ; fi
+
 if test -x /usr/bin/glibtoolize ; then
         glibtoolize --copy --force
 else
@@ -24,16 +27,23 @@ elif [ -d /usr/local/share/aclocal ] ; then
 fi
 
 if test ! -z "$1" ; then
-	ver=$1
+        ver=$1
 else
-	ver="2.53"
+        for v in 2.53 2.57 ; do
+                if test -f /usr/bin/autoconf-$v ; then
+                        ver=$v
+                fi
+        done
 fi
+
 aclocal $ACLOCALDIRS
+
 if test -f /usr/bin/autoheader-$ver ; then
-	/usr/bin/autoheader-$ver
+        /usr/bin/autoheader-$ver
 else
-	autoheader
+        autoheader
 fi
+
 automake --add-missing --copy
 if test -f /usr/bin/autoconf-$ver ; then
 	/usr/bin/autoconf-$ver
