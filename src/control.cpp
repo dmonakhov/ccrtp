@@ -703,7 +703,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 	uint16 len = len1; // whole compound len.
 	// build a BYE packet
 	uint16 padlen = 0;
-        pkt = reinterpret_cast<RTCPPacket*>(buffer);
+        pkt = reinterpret_cast<RTCPPacket*>(buffer + len1);
 	pkt->fh.version = CCRTP_VERSION;
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCPPacket::tBYE;
