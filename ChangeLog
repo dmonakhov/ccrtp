@@ -1,3 +1,7 @@
+2003-04-02  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtp.h: (TRTPSocketBase::endSocket): free cso and dso.
+
 2003-03-24  David Sugar <dyfet@gnu.org>
 
 	* What the heck, it's long overdue...1.0.0 release
