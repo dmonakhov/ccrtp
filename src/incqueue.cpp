@@ -688,9 +688,9 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		if ( delta < 0 )
 			delta = -delta;
 		srcLink.setJitter( srcLink.getJitter() + 
-				   static_cast<int>((1.0f / 16.0f) * 
+				   (1.0f / 16.0f) * 
 				  (static_cast<float>(delta) - 
-				   srcLink.getJitter())) );
+				   srcLink.getJitter()));
 	}
 	return result;
 }

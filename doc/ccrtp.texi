@@ -1244,8 +1244,11 @@ No equivalent.
 @subsection A.8
 @cindex A.8
 
+@cindex jitter
+@cindex interarrival jitter
 @findex IncomingDataQueue::recordReception
-In @code{recordReception}
+Interarrival jitter is estimated as specified in A.8, in
+@code{recordReception}. Jitter is kept as a float.
 
 
 @c -----------------------------------------------------------------------

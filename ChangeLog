@@ -16,6 +16,9 @@
 	processing (QueueRTCPManager::onGotSDESChunk). This bug could
 	cause crashes when iterating through the participants list.
 	
+	* src/incqueue.cpp: fixed jitter computation in
+	IncomingDataQueue::recordReception.
+
 	* doc/ccrtp.texi: updated to new RFCs 355x
 
 	* demo/ccrtptest.cpp, demo/Makefile.am: added a simple test
