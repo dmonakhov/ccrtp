@@ -169,35 +169,35 @@ RTPQueue::endQueue(void)
 {
 	// stop running the service thread
 	active = false;
-	Terminate();
+	terminate();
 	// purge both sending and receiving queues
-	Purge(RTP_PURGE_BOTH);
+	purge(RTP_PURGE_BOTH);
 }
 
 void 
-RTPQueue::Purge(rtp_purge_t flag)
+RTPQueue::purge(rtp_purge_t flag)
 {
 	if (flag == RTP_PURGE_SEND || flag == RTP_PURGE_BOTH)
 	{
 		OutgoingRTPPkt *sendnext;
 		// flush the sending queue (delete outgoing packets
 		// unsent so far)
-		sendlock.EnterMutex();
+		sendlock.enterMutex();
  		while ( sendfirst )
  		{
  			sendnext = sendfirst->next;
  			delete sendfirst;
  			sendfirst = sendnext;
  		}
- 		sendlock.LeaveMutex();
+ 		sendlock.leaveMutex();
  	}
- 
+
  	if (flag == RTP_PURGE_RECV || flag == RTP_PURGE_BOTH)
  	{
 		IncomingRTPPkt *recnext;
 		// flush the reception queue (incoming packets not yet
 		// retrieved)
- 		recvlock.EnterMutex();
+ 		recvlock.enterMutex();
  		while( recvfirst )
  		{
  			recnext = recvfirst->next;
@@ -207,15 +207,15 @@ RTPQueue::Purge(rtp_purge_t flag)
 				getSourceBySSRC(recvfirst->getSSRC());
 			s.first = s.last = NULL;
 
-			
+
  			delete recvfirst;
  			recvfirst = recnext;
  		}
- 		recvlock.LeaveMutex();
+ 		recvlock.leaveMutex();
  	}
-}		
+}
 
-uint32 
+uint32
 RTPQueue::getRate(rtp_payload_t pt) const
 {
 	I( pt < 72 || pt > 76 );
@@ -224,7 +224,7 @@ RTPQueue::getRate(rtp_payload_t pt) const
 			return getRate(recvfirst->getPayloadType());
 		else
 			return 0;
-	} else if ( pt < 96 ) {		
+	} else if ( pt < 96 ) {
 		return payload_rate[pt];
 	} else {
 		// HERE IS WHERE NEW DYNAMIC PTs MUST BE DEALT WITH
@@ -251,36 +251,36 @@ RTPQueue::getRate(rtp_payload_t pt) const
 			return 0;
 		default:
 			//FIX: exception
-			return 0; 
+			return 0;
 		}
 	}
 }
 
-bool 
+bool
 RTPQueue::isWaiting(const RTPSource &src) const
 {
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
 	bool w;
 
-	if ( src == dummysource ) 
+	if ( src == dummysource )
 		w = (recvfirst != NULL);
-	else 
+	else
 		w = (src.first != NULL);
 
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return w;
 }
 
-bool 
+bool
 RTPQueue::isSending(void) const
 {
 	if(sendfirst)
 		return true;
-	
+
 	return false;
 }
 
-uint32 
+uint32
 RTPQueue::getCurrentTimestamp(rtp_payload_t pt) const
 {
 	// translate from current time to timestamp
@@ -296,7 +296,7 @@ RTPQueue::getCurrentTimestamp(rtp_payload_t pt) const
 	return result;
 }
 
-microtimeout_t 
+microtimeout_t
 RTPQueue::getTimeout(void)
 {
 	struct timeval send, now;
@@ -329,7 +329,7 @@ RTPQueue::getTimeout(void)
 		send.tv_usec += overflow_time.tv_usec;
 		if(send.tv_usec >= 1000000l)
 		{
-			++send.tv_sec;	
+			++send.tv_sec;
 			send.tv_usec -= 1000000ul;
 		}
 
@@ -356,14 +356,14 @@ RTPQueue::getTimeout(void)
 				send.tv_sec += nsec;
 				send.tv_usec += nusec;
 				if( send.tv_usec >= 1000000l ) {
-					++send.tv_sec;	
+					++send.tv_sec;
 					send.tv_usec -= 1000000ul;
 				}
 
 				overflow_time.tv_sec += nsec;
 				overflow_time.tv_usec += nusec;
 				if( overflow_time.tv_usec >= 1000000l ) {
-					++overflow_time.tv_sec;	
+					++overflow_time.tv_sec;
 					overflow_time.tv_usec -= 1000000ul;
 				}
 			} while ( now.tv_sec - send.tv_sec > 5000 );
@@ -379,11 +379,11 @@ RTPQueue::getTimeout(void)
 			send.tv_sec -= nsec;
 			send.tv_usec -= nusec;
 			if( send.tv_usec < 0ul ) {
-				--send.tv_sec;	
+				--send.tv_sec;
 				send.tv_usec += 1000000ul;
 			}
 		}
-	
+
 		// A: This sets a maximum timeout of 1 hour.
 		if ( send.tv_sec - now.tv_sec > 3600 ){
 			return 3600000000ul;
@@ -397,14 +397,14 @@ RTPQueue::getTimeout(void)
 		}
 
 		// C: the packet must be sent right now
-		if ( (diff < 0) && 
+		if ( (diff < 0) &&
 		     static_cast<microtimeout_t>(-diff) <= expired ){
 			return 0;
 		}
 
 		// D: the packet has expired -> delete
-		setCancel(THREAD_CANCEL_DEFERRED);
-		sendlock.EnterMutex();
+		setCancel(cancelDeferred);
+		sendlock.enterMutex();
 		OutgoingRTPPkt* packet = sendfirst;
 		sendfirst = sendfirst->next;
 		expireSend(packet);             // new virtual to notify
@@ -413,8 +413,8 @@ RTPQueue::getTimeout(void)
 			sendfirst->prev = NULL;
 		else
 			sendlast = NULL;
-		sendlock.LeaveMutex();		
-		setCancel(THREAD_CANCEL_IMMEDIATE);
+		sendlock.leaveMutex();
+		setCancel(cancelImmediate);
 	}
 	I( false );
 	return 0;
@@ -423,15 +423,15 @@ RTPQueue::getTimeout(void)
 uint16
 RTPQueue::getFirstSequence(const RTPSource &src)
 {
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
 
 	// get the first packet
 	IncomingRTPPkt* packet;
-	if ( src == dummysource ) 
+	if ( src == dummysource )
 		packet = recvfirst;
  	else
 		packet = src.first;
-	
+
 	// get the sequence number of the first packet
 	uint16 seq;
 	if ( packet )
@@ -439,22 +439,22 @@ RTPQueue::getFirstSequence(const RTPSource &src)
 	else
 		seq = 0l;
 
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return seq;
 }
 
-uint32 
+uint32
 RTPQueue::getFirstTimestamp(const RTPSource &src)
 {
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
 
 	// get the first packet
 	IncomingRTPPkt* packet;
-	if ( src == dummysource ) 
+	if ( src == dummysource )
 		packet = recvfirst;
  	else
 		packet = src.first;
-	
+
 	// get the timestamp of the first packet
 	uint32 ts;
 	if ( packet )
@@ -462,7 +462,7 @@ RTPQueue::getFirstTimestamp(const RTPSource &src)
 	else
 		ts = 0l;
 
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return ts;
 }
 
@@ -480,7 +480,7 @@ RTPQueue::setGlobalKitchenSize(uint32 s)
 
 }
 
-void 
+void
 RTPQueue::putPacket(uint32 stamp, rtp_payload_t payload, const unsigned char *data, size_t datalen, bool mark)
 {
 	if ( !data || !datalen )
@@ -497,19 +497,19 @@ RTPQueue::putPacket(uint32 stamp, rtp_payload_t payload, const unsigned char *da
 	packet->setTimestamp(stamp + initial_timestamp);
 	packet->setSSRC(localsrc->getID());
 	packet->setMarker(mark);
-	
+
 	// insert the packet into the "tail" of the sending queue
-	sendlock.EnterMutex();
+	sendlock.enterMutex();
 	packet->prev = sendlast;
 	if (sendlast)
 		sendlast->next = packet;
 	else
 		sendfirst = packet;
 	sendlast = packet;
-	sendlock.LeaveMutex();
+	sendlock.leaveMutex();
 }
 
-size_t 
+size_t
 RTPQueue::recvPacket(void)
 {
 	unsigned char *buffer = new unsigned char[RECVBUFFER_SIZE];
@@ -522,9 +522,9 @@ RTPQueue::recvPacket(void)
 		delete buffer;
 		return rtn;
 	}
-	
+
 	// build a packet. It will link itself to its source
-	IncomingRTPPkt* packet = 
+	IncomingRTPPkt* packet =
 		new IncomingRTPPkt(*this,buffer,rtn,recvtime);
 
 	// header validity check
@@ -539,28 +539,28 @@ RTPQueue::recvPacket(void)
 		delete packet;
 		return 0;
 	}
-	
+
 	insertRecvPacket(packet);
 	return rtn;
 }
 
-void 
+void
 RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 {
 	RTPSource &src = packet->getSource();
 	unsigned short seq = packet->getSeqNum();
-	setCancel(THREAD_CANCEL_DEFERRED);
-	recvlock.EnterMutex();
+	setCancel(cancelDeferred);
+	recvlock.enterMutex();
 	IncomingRTPPkt* list = src.last;
 	if ( list && (seq < list->getSeqNum()) ) {
 		// a disordered packet, so look for its place
 		while ( list && (seq < list->getSeqNum()) ){
 			// the packet is duplicated
 			if ( seq == list->getSeqNum() ) {
-				recvlock.LeaveMutex();
+				recvlock.leaveMutex();
 				VDL(("Duplicated disordered packet: seqnum %d, SSRC:",seq,src.getID()));
 				delete packet;
-				setCancel(THREAD_CANCEL_IMMEDIATE);
+				setCancel(cancelImmediate);
 				return;
 			}
 			list = list->srcprev;
@@ -593,10 +593,10 @@ RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 			packet->prev = list->srcnext->prev;
 			list->srcnext->prev = packet;
 			packet->next = list->srcnext;
-			// ------			
+			// ------
 			list->srcnext = packet;
 			packet->srcprev = list;
-			
+
 			  // insert into the global queue (giving
 			  // priority compared to packets from other sources)
 			  //list->next->prev = packet;
@@ -607,7 +607,7 @@ RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 	} else {
 		// An ordered packet
 		if ( !list ) {
-			// the only packet in the source specific queue 
+			// the only packet in the source specific queue
 			src.last = src.first = packet;
 			// the last packet in the global queue
 			if ( recvlast ) {
@@ -623,9 +623,9 @@ RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 			if ( list && (seq == list->getSeqNum()) ) {
 				VDL(("Duplicated packet: seqnum %d, SSRC:",
 				   seq,src.getID()));
-				recvlock.LeaveMutex();
+				recvlock.leaveMutex();
 				delete packet;
-				setCancel(THREAD_CANCEL_IMMEDIATE);
+				setCancel(cancelImmediate);
 				return;
 			}
 			// the last packet in the source specific queue
@@ -640,25 +640,25 @@ RTPQueue::insertRecvPacket(IncomingRTPPkt* packet)
 	}
 	// account the insertion of this packet into the queue
 	src.recordInsertion(*packet);
-	recvlock.LeaveMutex();
-	setCancel(THREAD_CANCEL_IMMEDIATE);
+	recvlock.leaveMutex();
+	setCancel(cancelImmediate);
 }
 
-size_t 
+size_t
 RTPQueue::sendPacket(void)
 {
-	setCancel(THREAD_CANCEL_DEFERRED);
-	sendlock.EnterMutex();
+	setCancel(cancelDeferred);
+	sendlock.enterMutex();
 	OutgoingRTPPkt* packet = sendfirst;
 
 	if ( !packet ){
-		sendlock.LeaveMutex();
+		sendlock.leaveMutex();
 		return 0;
 	}
 
 	int32 rtn = packet->getPayloadSize();
 	if ( rtn )
-		rtn = writeData(packet->getRawPacket(), 
+		rtn = writeData(packet->getRawPacket(),
 				packet->getRawPacketSize());
 
 	// unlink the sent packet from the queue and destroy it. Also
@@ -668,16 +668,16 @@ RTPQueue::sendPacket(void)
 		sendfirst = sendfirst->next;
 		if ( sendfirst ) {
 			sendfirst->prev = NULL;
-		} else { 
+		} else {
 			sendlast = NULL;
 		}
-		// for general accounting and RTCP SR 
+		// for general accounting and RTCP SR
 		sendcount++;
 		octetcount += packet->getPayloadSize();
 		delete packet;
 	}
-	sendlock.LeaveMutex();
-	setCancel(THREAD_CANCEL_IMMEDIATE);
+	sendlock.leaveMutex();
+	setCancel(cancelDeferred);
 	return rtn;
 }
 
@@ -686,7 +686,7 @@ IncomingRTPPkt*
 RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 {
 	IncomingRTPPkt *result;
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
 
 	if ( src != dummysource ) {
 		// we will modify the queue of this source
@@ -695,7 +695,7 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 		IncomingRTPPkt* p = srcm.first;
 		if ( !p ) {
 			result = NULL;
-			recvlock.LeaveMutex();
+			recvlock.leaveMutex();
 			return result;
 		}
 		while ( p && (p->getTimestamp() < stamp) ) {
@@ -735,9 +735,9 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 			// (src.first->getTimestamp == stamp) is true
 			result = srcm.first;
 			// unlink the selected packet from the global queue
-			if ( srcm.first->prev ) 
+			if ( srcm.first->prev )
 				srcm.first->prev->next = srcm.first->next;
-			else 
+			else
 				recvfirst = srcm.first->next;
 			if ( srcm.first->next )
 				srcm.first->next->prev = srcm.first->prev;
@@ -768,15 +768,15 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 			// unlink the packet from the queue of its source
 			RTPSource &src = packet->getSource();
 			src.first = packet->srcnext;
-			if ( packet->srcnext ) 
+			if ( packet->srcnext )
 				packet->srcnext->srcprev = NULL;
-			else 
+			else
 				src.last = NULL;
 			// now, delete it
 			expireRecv(packet);  // notify packet discard
 			delete packet;
 		}
-		
+
 		// return the packet, if found
 		if ( !recvfirst ) {
 			// there are no more packets in the queue
@@ -793,27 +793,27 @@ RTPQueue::getWaiting(uint32 stamp, const RTPSource& src)
 			recvfirst = recvfirst->next;
 			if ( recvfirst )
 				recvfirst->prev = NULL;
-			else 
+			else
 				recvlast = NULL;
 			// unlink the selected packet from the queue
 			// of its source
 			RTPSource &src = result->getSource();
 			src.first = result->srcnext;
-			if ( src.first ) 
+			if ( src.first )
 				src.first->srcprev = NULL;
-			else 
+			else
 				src.last = NULL;
 			// result->prev = result->next = result->srcprev = result->srcnext = NULL;
 		}
 	}
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return result;
 }
 
-size_t 
+size_t
 RTPQueue::setPartial(uint32 stamp, unsigned char *data, size_t offset, size_t max)
 {
-	sendlock.EnterMutex();
+	sendlock.enterMutex();
 	OutgoingRTPPkt* packet = sendfirst;
 	while ( packet )
 	{
@@ -827,7 +827,7 @@ RTPQueue::setPartial(uint32 stamp, unsigned char *data, size_t offset, size_t ma
 	}
 	if ( !packet )
 	{
-		sendlock.LeaveMutex();
+		sendlock.leaveMutex();
 		return 0;
 	}
 
@@ -839,11 +839,11 @@ RTPQueue::setPartial(uint32 stamp, unsigned char *data, size_t offset, size_t ma
 
 	memcpy(const_cast<unsigned char*>(packet->getPayload() + offset),
 	       data, max);
-	sendlock.LeaveMutex();
+	sendlock.leaveMutex();
 	return max;
 }
 
-size_t 
+size_t
 RTPQueue::getPartial(uint32 stamp, unsigned char *data, size_t offset, size_t max)
 {
 	IncomingRTPPkt* packet = getWaiting(stamp);
@@ -860,9 +860,9 @@ RTPQueue::getPartial(uint32 stamp, unsigned char *data, size_t offset, size_t ma
 	memcpy(data, packet->getPayload() + offset, max);
 	return max;
 }
-		
-size_t 
-RTPQueue::getPacket(uint32 stamp, unsigned char *data, size_t max, 
+
+size_t
+RTPQueue::getPacket(uint32 stamp, unsigned char *data, size_t max,
 		    const RTPSource &src)
 {
 	if ( !data )
@@ -904,8 +904,8 @@ const RTPData &
 RTPQueue::getCookedPacket(const RTPSource &src)
 {
 	RTPData *data = NULL;
-	recvlock.EnterMutex();
-	
+	recvlock.enterMutex();
+
 	IncomingRTPPkt* packet;
 	if ( src == dummysource )
 		packet = recvfirst;
@@ -925,16 +925,16 @@ RTPQueue::getCookedPacket(const RTPSource &src)
 			data = new RTPData(*pkt);
 		}
 	}
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return *data;
 }
 
 rtp_payload_t
 RTPQueue::getPayloadType(const RTPSource &src) const
 {
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
 
-	// get first packet 
+	// get first packet
 	IncomingRTPPkt* packet;
 	if ( src == dummysource )
 		packet = recvfirst;
@@ -947,17 +947,17 @@ RTPQueue::getPayloadType(const RTPSource &src) const
 		pt = packet->getPayloadType();
 	else
 		pt = RTP_PAYLOAD_INVALID;
-	
-	recvlock.LeaveMutex();
+
+	recvlock.leaveMutex();
 	return pt;
 }
 
-rtp_payload_t 
+rtp_payload_t
 RTPQueue::getPayloadType(uint32 stamp, const RTPSource &src)
 {
 	rtp_payload_t result;
 
-	recvlock.EnterMutex();
+	recvlock.enterMutex();
   	IncomingRTPPkt* packet;
 
 	if ( src == dummysource ) {
@@ -977,12 +977,12 @@ RTPQueue::getPayloadType(uint32 stamp, const RTPSource &src)
 		// (packet->getTimestamp() == stamp) is true
 		result = packet->getPayloadType();
 	} 
-	recvlock.LeaveMutex();
+	recvlock.leaveMutex();
 	return result;
 }
 
 void
-RTPQueue::Run(void)
+RTPQueue::run(void)
 {
 	microtimeout_t wait = 0;
 
@@ -995,8 +995,8 @@ RTPQueue::Run(void)
 		RTPService(wait);
 	}
 
-	Bye(NULL);
-	Sleep(~0);
+	bye(NULL);
+	sleep(~0);
 }
 
 void

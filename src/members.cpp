@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is 
+// As a special exception to the GNU General Public License, permission is
 // granted for additional uses of the text contained in its release 
 // of ccRTP.
 // 
@@ -214,36 +214,36 @@ MembershipControl::removeSource(uint32 ssrc)
 const RTPSource&
 MembershipControl::getFirstPlayer()
 {
-	playerslock.EnterMutex();
+	playerslock.enterMutex();
 
-	playerslock.LeaveMutex();
+	playerslock.leaveMutex();
 	return dummysource;
 }
 
 const RTPSource&
 MembershipControl::getLastPlayer()
 {
-	playerslock.EnterMutex();
+	playerslock.enterMutex();
 
-	playerslock.LeaveMutex();
+	playerslock.leaveMutex();
 	return dummysource;
-}	
+}
 
 const RTPSource&
 MembershipControl::getNextPlayer()
 {
-	playerslock.EnterMutex();
+	playerslock.enterMutex();
 
-	playerslock.LeaveMutex();
+	playerslock.leaveMutex();
 	return dummysource;
 }
 
 const RTPSource&
 MembershipControl::getCurrentPlayer()
 {
-	playerslock.EnterMutex();
+	playerslock.enterMutex();
 
-	playerslock.LeaveMutex();
+	playerslock.leaveMutex();
 	return dummysource;
 }
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is 
+// As a special exception to the GNU General Public License, permission is
 // granted for additional uses of the text contained in its release 
 // of ccRTP.
 // 
@@ -62,7 +62,7 @@ const double QueueRTCPManager::RECONSIDERATION_COMPENSATION = 2.718281828 - 1.5;
 QueueRTCPManager::QueueRTCPManager(int pri):
 	RTPQueue(pri), 
 	pathMTU(1500),
-	rtcpsend_buffer(new unsigned char[pathMTU]),	
+	rtcpsend_buffer(new unsigned char[pathMTU]),
 	rtcprecv_buffer(new unsigned char[pathMTU]),
 	rtcp_active(false),
 	controlbw(0), sendcontrolbw(0.25),recvcontrolbw(1-sendcontrolbw),
@@ -185,14 +185,14 @@ QueueRTCPManager::RTCPService(microtimeout_t &wait)
 	
 	gettimeofday(&rtcp_tc,NULL);
 	if ( timercmp(&rtcp_tc,&rtcp_tn,>=) ) {
-		if ( TimerReconsideration() ) {
+		if ( timerReconsideration() ) {
 			// update to last received RTCP packets
 			recvControl();
 			rtcp_last_check = rtcp_tc;
 			sendControl();
 			if (rtcp_initial)
 				rtcp_initial = false;
-			TimeOutSSRCs();
+			expireSSRCs();
 			rtcp_tp = rtcp_tc;
 			// we have updated tp and sent a report, so we
 			// have to recalculate the sending interval
@@ -207,7 +207,7 @@ QueueRTCPManager::RTCPService(microtimeout_t &wait)
 }
 
 bool
-QueueRTCPManager::TimerReconsideration()
+QueueRTCPManager::timerReconsideration()
 {
 	bool result = false;
 	// compute again the interval to confirm it under current
@@ -223,7 +223,7 @@ QueueRTCPManager::TimerReconsideration()
 }
 
 void 
-QueueRTCPManager::TimeOutSSRCs()
+QueueRTCPManager::expireSSRCs()
 {
 	// setCancel(THREAD_CANCEL_DEFERRED);
 
@@ -231,11 +231,11 @@ QueueRTCPManager::TimeOutSSRCs()
 }
 
 void
-QueueRTCPManager::recvControl() 
+QueueRTCPManager::recvControl()
 {
 	size_t len = 0;
 	bool ispending = false;
-	
+
 	do {
 	if ( isPendingControl(0) ) {
 		len = readControl(rtcprecv_buffer,pathMTU);
@@ -247,12 +247,12 @@ QueueRTCPManager::recvControl()
 		return;
 
 	// process a <code>len<code> octets long RTCP compound packet
-	// Check validity of the header fields of the compound packet 
+	// Check validity of the header fields of the compound packet
 	if ( !RTCPHeaderCheck(len) )
 		return;
 
 	// First part: The first RTCP packet in a compound packet must
-	// be always a report.  
+	// be always a report.
 	RTCPPacket *pkt = reinterpret_cast<RTCPPacket *>(rtcprecv_buffer);
 
 	// TODO: treat padding
@@ -263,11 +263,11 @@ QueueRTCPManager::recvControl()
 
 		// get the sender info of the SR
 		memcpy(getOrCreateSource(pkt->info.SR.ssrc).sender_info,
-		       &(pkt->info.SR.sinfo),		       
+		       &(pkt->info.SR.sinfo),
 		       sizeof(SenderInfo));
-		// FIX: MembershipControl::updateSourceSenderInfo() 
+		// FIX: MembershipControl::updateSourceSenderInfo()
 
-		// get the report blocks 
+		// get the report blocks
 		while ( i < pkt->fh.block_count ) {
 			// this general RTCP manager ignores reports
 			// concerning other sources than the local one
@@ -280,7 +280,7 @@ QueueRTCPManager::recvControl()
 			}
 			i++;
 		}
-		
+
 		// Advance to the next packet in the compound
 		/*pointer += sizeof(RTCPFixedHeader) +
 			sizeof(uint32) + sizeof(SenderInfo) +
@@ -298,7 +298,7 @@ QueueRTCPManager::recvControl()
 
 	bool valid = false;
 	do {
-		// get the report blocks 
+		// get the report blocks
 		i = 0;
 		while ( i < pkt->fh.block_count ) {
 			// this general RTCP manager ignores reports
@@ -312,9 +312,9 @@ QueueRTCPManager::recvControl()
 			}
 			i++;
 		}
-		
+
 		// Get the next packet in the compound
-		/*pointer += sizeof(RTCPFixedHeader) + sizeof(uint32) +  
+		/*pointer += sizeof(RTCPFixedHeader) + sizeof(uint32) +
 		  pkt->fh.block_count * sizeof(RRBlock);*/
 		pointer += (pkt->fh.length << 2);
 
@@ -393,7 +393,7 @@ QueueRTCPManager::getBYE(RTCPPacket &pkt, uint32 &pointer, size_t len)
 			gotGoodbye(src, reason);
 		removeSource(pkt.info.BYE.ssrc);   // FIX:BYESource
 		// REVERSE RECONSIDERATION
-		ReverseReconsideration();
+		reverseReconsideration();
 	}
 
 	delete [] reason;
@@ -402,7 +402,7 @@ QueueRTCPManager::getBYE(RTCPPacket &pkt, uint32 &pointer, size_t len)
 }
 
 void
-QueueRTCPManager::ReverseReconsideration()
+QueueRTCPManager::reverseReconsideration()
 {
 	if ( membersCount() < rtcp_pmembers ) {
 		timeval inc;
@@ -466,7 +466,7 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint32 &pointer, size_t len)
 				} else if ( item->type == RTCP_SDES_ITEM_PRIV ){
 					uint8 plength = rtcprecv_buffer[pointer + 2];
 					char *x = new char[plength + 1];
-					pointer += 3*sizeof(uint8) + plength + item->len;						
+					pointer += 3*sizeof(uint8) + plength + item->len;
 					memcpy(x,(const void *)(rtcprecv_buffer + pointer),item->len);
 					x[plength] = '\0';
 					// FIX: do something with x
@@ -552,8 +552,8 @@ QueueRTCPManager::computeRTCPInterval()
 	return result;
 }
 
-void 
-QueueRTCPManager::Bye(const char * const reason)
+void
+QueueRTCPManager::bye(const char * const reason)
 {
 	// for this method, see section 6.3.7 in RFC XXXX
 	// never send a BYE packet if never sent an RTP or RTCP packet
@@ -577,7 +577,7 @@ QueueRTCPManager::Bye(const char * const reason)
 		timeradd(&rtcp_tp,&T,&rtcp_tn);
 		while ( timercmp(&rtcp_tc,&rtcp_tn,<) ) {
 			getOnlyBye();
-			if ( TimerReconsideration() )
+			if ( timerReconsideration() )
 				break;
 			gettimeofday(&rtcp_tc,NULL);
 		}
@@ -585,7 +585,7 @@ QueueRTCPManager::Bye(const char * const reason)
 
 	sendBYE(reason);
 	VDL(("Bye sent"));
-} 
+}
 
 void
 QueueRTCPManager::getOnlyBye()
@@ -601,7 +601,7 @@ QueueRTCPManager::getOnlyBye()
 	size_t len = 0;
 	do {
 		len = readControl(rtcprecv_buffer,pathMTU);
-		
+
 		if ( !len )
 			return;
 		// Process a <code>len<code> octets long RTCP compound packet

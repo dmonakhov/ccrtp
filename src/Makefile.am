@@ -12,11 +12,11 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 LIBS=@GNULIBS@
-ccxxincludedir=$(includedir)/cc++
+ccxxincludedir=$(includedir)/cc++2/cc++
 
-lib_LTLIBRARIES = libccrtp.la
+lib_LTLIBRARIES = libccrtp1.la
 
-libccrtp_la_SOURCES = packet.cpp socket.cpp queue.cpp duplex.cpp \
+libccrtp1_la_SOURCES = packet.cpp socket.cpp queue.cpp duplex.cpp \
 		      control.cpp data.cpp members.cpp source.cpp
 
 ccxxinclude_HEADERS = rtp.h rtpext.h

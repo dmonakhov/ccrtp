@@ -272,16 +272,17 @@ protected:
 
 private:
 	// dataCounter holds the reference counter
-	struct dataCounter {
+	class DataCounter {
+	public:
 		uint16 count;
 		const unsigned char* data;
 		const size_t size;
 		rtp_payload_t pt;
-		dataCounter(const unsigned char* data, size_t size, rtp_payload_t pt);
-		~dataCounter();
+		DataCounter(const unsigned char* data, size_t size, rtp_payload_t pt);
+		~DataCounter();
 	};
 
-	mutable dataCounter* datablock;
+	mutable DataCounter* datablock;
 
 
 
@@ -861,8 +862,8 @@ public:
 	/**
 	 * Make Start public.
 	 */
-	inline void Start(void)
-		{Thread::Start();};
+	inline void start(void)
+		{Thread::start();};
 
 	/**
 	 * Get the application description.
@@ -1406,7 +1407,7 @@ protected:
 	 * A plugin point for posting of BYE messages.
 	 */
 	virtual void 
-	Bye(const char* const reason)
+	bye(const char* const reason)
 	{ return; }
 
         /**
@@ -1443,7 +1444,7 @@ protected:
 	 * to be sent, waiting to be picked up from the reception
 	 * queue, or both.  
 	 */
-	void Purge(rtp_purge_t flag);
+	void purge(rtp_purge_t flag);
 
 	/**
 	 * This function is used by the service thread to process
@@ -1570,7 +1571,7 @@ private:
 	 * Runnable method for the service thread.
 	 */
 	void 
-	Run(void);
+	run(void);
 	
 
 	/**
@@ -1773,7 +1774,7 @@ protected:
 	 * ???? is applied in order to avoid a flood of BYE messages.
 	 */
 	void 
-	Bye(const char* const reason = NULL);
+	bye(const char* const reason = NULL);
 
  	/**
  	 * A plugin point for sdes contact.
@@ -1861,14 +1862,14 @@ private:
 	 * send a BYE. 
 	 */
 	void 
-	ReverseReconsideration();
+	reverseReconsideration();
 
 	/**
 	 *
 	 *
 	 */
 	bool
-	TimerReconsideration();
+	timerReconsideration();
 
 	/**
 	 * Purge sources that do not seem active any more.
@@ -1878,7 +1879,7 @@ private:
 	 * @todo implement it 
 	 * */
 	void 
-	TimeOutSSRCs();
+	expireSSRCs();
 
 	/**
 	 *
@@ -2144,9 +2145,9 @@ public:
 	 * @param ia host address to connect to
 	 * @param port transport port to connect to
 	 */
-	sockerror_t
-	Connect(const InetHostAddress& ia, tpport_t port)
-	{ return UDPTransmit::Connect(ia,port); };
+	Socket::Error
+	connect(const InetHostAddress& ia, tpport_t port)
+	{ return UDPTransmit::connect(ia,port); };
 
 	/**
 	 * Connect to a foreign socket.
@@ -2154,61 +2155,61 @@ public:
 	 * @param ia multicast address to connect to
 	 * @param port transport port to connect to
 	 */
-	sockerror_t
-	Connect(const InetMcastAddress& ia, tpport_t port)
-	{ return UDPTransmit::Connect(ia,port); };
-	
+	Socket::Error
+	connect(const InetMcastAddress& ia, tpport_t port)
+	{ return UDPTransmit::connect(ia,port); };
+
 	/**
 	 *
 	 */
-	inline bool 
+	inline bool
 	isPendingPacket(microtimeout_t timeout)
 	{ return UDPReceive::isInputReady(timeout/1000); };
-	
+
 	/**
 	 *
 	 */
-        inline size_t 
+        inline size_t
 	writePacket(const unsigned char* const buffer, size_t len)
-	{ return UDPTransmit::Transmit((const char* const)buffer,len); };
+	{ return UDPTransmit::transmit((const char* const)buffer,len); };
 
 	/**
 	 *
 	 */
         inline size_t
 	readPacket(unsigned char *buffer, size_t len)
-	{ return UDPReceive::Receive(buffer,len); };
+	{ return UDPReceive::receive(buffer,len); };
 
 	/**
 	 *
 	 */
-	inline sockerror_t 
+	inline Socket::Error
 	setMulticast(bool enable)
-	{ 
-		sockerror_t error = UDPReceive::setMulticast(enable);
+	{
+		Socket::Error error = UDPReceive::setMulticast(enable);
 		if (error) return error;
-		else return UDPTransmit::setMulticast(enable); 
+		else return UDPTransmit::setMulticast(enable);
 	};
-	
+
 	/**
-	 * Join a multicast group. 
+	 * Join a multicast group.
 	 *
-	 * @param ia multicast group address 
+	 * @param ia multicast group address
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	joinGroup(const InetMcastAddress& ia)
-	{ return UDPReceive::Join(ia); };
-	
+	{ return UDPReceive::join(ia); };
+
 	/**
-	 * Leave a multicast group. 
-	 * 
-	 * @param ia multicast group address  
+	 * Leave a multicast group.
+	 *
+	 * @param ia multicast group address
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	leaveGroup(const InetMcastAddress& ia)
-	{ return UDPReceive::Drop(ia); }; 
+	{ return UDPReceive::drop(ia); };
 
 	/**
 	 * Set the value of the TTL field in the packets to send.
@@ -2216,14 +2217,14 @@ public:
 	 * @param ttl Time To Live
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	setMcastTTL(uint8 ttl)
 	{ return UDPTransmit::setTimeToLive(ttl); };
 
 	/**
 	 * End socket, terminating the socket connection.
 	 */
-	void 
+	void
 	endSocket()
 	{ UDPTransmit::endTransmitter(); UDPReceive::endReceiver(); };
 };
@@ -2256,13 +2257,13 @@ public:
 		dso = new dataSocket(ia,even_port(port));
 		cso = new controlSocket(ia,odd_port(port + 1));
 	};
-	
+
 	/**
 	 * @param bind multicast network address this socket is to be bound
 	 * @param port transport port this socket is to be bound
 	 * @param pri service thread base priority relative to it's parent
 	 * */
-	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0): 		
+	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0):
 		serviceQueue(pri)
 
 	{
@@ -2274,7 +2275,7 @@ public:
 	/**
 	 * Stack destructor.
 	 **/
-	virtual 
+	virtual
 	~T_RTPSocket()
 	{ endSocket(); };
 
@@ -2286,25 +2287,25 @@ public:
 	 * @param ia
 	 * @param port
 	 **/
-	inline sockerror_t 
-	Connect(const InetHostAddress& ia, tpport_t port = 0)
-	{ 
-		sockerror_t error;
+	inline Socket::Error
+	connect(const InetHostAddress& ia, tpport_t port = 0)
+	{
+		Socket::Error error;
 		if ( !port )
 			port = base;
 		if ( active )
 			active = false;
 		// make both RTP (even) and RTCP (odd) connections
-		error = dso->Connect(ia, even_port(port));
+		error = dso->connect(ia, even_port(port));
 		if ( error )
 			return error;
-		error = cso->Connect(ia, odd_port(port + 1));
+		error = cso->connect(ia, odd_port(port + 1));
 		if ( error )
 			return error;
 		// Start running the RTP queue service thread
 		active = true;
-		Start();  
-		return SOCKET_SUCCESS;
+		start();
+		return Socket::errSuccess;
 	};
 
 	/**
@@ -2312,10 +2313,10 @@ public:
 	 * thread. If no port is specified then it is assumed to be
 	 * the same as the locally bound port number.
 	 * */
-	inline sockerror_t 
-	Connect(const InetMcastAddress& ia, tpport_t port = 0)
+	inline Socket::Error
+	connect(const InetMcastAddress& ia, tpport_t port = 0)
 	{
-		sockerror_t error = dso->setMulticast(true);
+		Socket::Error error = dso->setMulticast(true);
 		if (error)
 			return error;
 		error = cso->setMulticast(true);
@@ -2327,16 +2328,16 @@ public:
 		if ( active )
 			active = false;
 		// make both RTP (even) and RTCP (odd) connections
-		error = dso->Connect(ia, even_port(port));
+		error = dso->connect(ia, even_port(port));
 		if ( error )
 			return error;
-		error = cso->Connect(ia, odd_port(port + 1));
+		error = cso->connect(ia, odd_port(port + 1));
 		if ( error )
 			return error;
 		// Start running the RTP queue service thread
 		active = true;
-		Start();  
-		return SOCKET_SUCCESS;
+		start();  
+		return Socket::errSuccess;
 	};
 
 	/**
@@ -2345,10 +2346,10 @@ public:
 	 * @param ia address of the multicast group
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	joinGroup(const InetMcastAddress& ia, tpport_t port = 0)
 	{ 
-		sockerror_t error  = dso->setMulticast(true);
+		Socket::Error error  = dso->setMulticast(true);
 		if ( error ) return error;
 		error = dso->joinGroup(ia); 
 		if ( error ) return error;
@@ -2362,7 +2363,7 @@ public:
 			dso->leaveGroup(ia);
 			return error;
 		}
-		return Connect(ia,port);
+		return connect(ia,port);
 	};
 
 	/**
@@ -2371,12 +2372,12 @@ public:
 	 * @param ia address of the multicast group
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	leaveGroup(const InetMcastAddress& ia)
-	{ 
-		sockerror_t error = dso->setMulticast(false);
+	{
+		Socket::Error error = dso->setMulticast(false);
 		if ( error ) return error;
-		error = dso->leaveGroup(ia); 
+		error = dso->leaveGroup(ia);
 		if ( error ) return error;
 		error = cso->setMulticast(false);
 		if ( error ) return errror;
@@ -2389,23 +2390,23 @@ public:
 	 * @param ttl Time To Live
 	 * @return error code from the socket operation
 	 */
-	inline sockerror_t
+	inline Socket::Error
 	setMcastTTL(uint8 ttl)
-	{ 
-		sockerror_t error = dso->setMulticast(true);
+	{
+		Socket::Error error = dso->setMulticast(true);
 		if ( error ) return error;
-		error = dso->setTimeToLive(ttl); 
+		error = dso->setTimeToLive(ttl);
 		if ( error ) return error;
-		error = cso->setMulticast(true);		
-		if ( error ) return error;		
+		error = cso->setMulticast(true);
+		if ( error ) return error;
 		return cso->setTimeToLive(ttl);
 	};
-	
+
 protected:
 	/**
 	 * @param timeout maximum timeout to wait, in microseconds
 	 */
-	inline bool 
+	inline bool
 	isPendingData(microtimeout_t timeout)
 	{ return dso->isPendingPacket(timeout); };
 
@@ -2413,7 +2414,7 @@ protected:
 	 * @param buffer memory region to read to
 	 * @param len maximum number of octets to read
 	 */
-	inline size_t 
+	inline size_t
 	readData(unsigned char* buffer, size_t len)
 	{ return dso->readPacket(buffer, len); };
 
@@ -2421,7 +2422,7 @@ protected:
 	 * @param buffer memory region to write from
 	 * @param len number of octets to write
 	 */
-	inline size_t 
+	inline size_t
 	writeData(const unsigned char* const buffer, size_t len)
 	{ return dso->writePacket(buffer, len); };
 
@@ -2429,7 +2430,7 @@ protected:
 	 * @param timeout maximum timeout to wait, in microseconds
 	 * @return whether there are packets waiting to be picked
 	 */
-        inline bool 
+        inline bool
 	isPendingControl(microtimeout_t timeout)
 	{ return cso->isPendingPacket(timeout); };
 
@@ -2438,7 +2439,7 @@ protected:
 	 * @param buffer
 	 * @param len
 	 */
-        inline size_t 
+        inline size_t
 	readControl(unsigned char *buffer, size_t len)
 	{ return cso->readPacket(buffer,len); };
 
@@ -2457,7 +2458,7 @@ protected:
 
 private:
 	/**
-	 * Ensure a port number is odd. If it is an even number, return 
+	 * Ensure a port number is odd. If it is an even number, return
 	 * the next lower (odd) port number.
 	 *
 	 * @param port number to filter
@@ -2466,7 +2467,7 @@ private:
 	inline tpport_t
 	odd_port(tpport_t port)
 	{ return (port & 0x01)? (port) : (port - 1); };
-	
+
 	/**
 	 * Ensure a port number is even. If it is an odd number, return
 	 * the next lower (even) port number.
@@ -2474,7 +2475,7 @@ private:
 	 * @param port number to filter
 	 * @return filtered (even) port number
 	 */
-	inline tpport_t 
+	inline tpport_t
 	even_port(tpport_t port)
 	{ return (port & 0x01)? (port - 1) : (port); };
 
@@ -2487,12 +2488,12 @@ private:
  * @typedef RTPSocket rtp.h cc++/rtp.h
  *
  * @short RTP protocol stack with RTCP support, based on IPv4/UDP
- * sockets for both data and control.  
+ * sockets for both data and control.
  */
 typedef T_RTPSocket<QueueRTCPManager,UDPIPv4Socket,UDPIPv4Socket> RTPSocket;
 
 /**
- * @class RTPDuplex rtp.h cc++/rtp.h 
+ * @class RTPDuplex rtp.h cc++/rtp.h
  *
  * A peer associated RTP socket pair for physically connected peer
  * hosts.  This has no RTCP and assumes the receiver is connected
@@ -2507,7 +2508,7 @@ class CCXX_CLASS_EXPORT RTPDuplex : public RTPQueue, protected UDPReceive, publi
 public:
 
 	/**
-	 * @param bind network address this socket is to be bound 
+	 * @param bind network address this socket is to be bound
 	 * @param local transport port this socket is to be bound
 	 * @param remote peer transpor port
 	 * @param pri service thread base priority relative to it's parent
@@ -2521,13 +2522,13 @@ public:
 	~RTPDuplex();
 
 	/**
-	 * @param host peer address 
-	 * @param port peer port. If not specified, the same as the 
+	 * @param host peer address
+	 * @param port peer port. If not specified, the same as the
 	 *        local is used
 	 * @return socket status
 	 */
-	sockerror_t 
-	Connect(const InetHostAddress &host, tpport_t port = 0);
+	Socket::Error 
+	connect(const InetHostAddress &host, tpport_t port = 0);
 
 protected:
 
@@ -2546,16 +2547,16 @@ protected:
 	 */
 	size_t 
 	writeData(const unsigned char *const buffer, size_t len)
-	{ return Transmit((const char *)buffer, len); }
+	{ return UDPTransmit::transmit((const char *)buffer, len); }
 
 	/**
-	 * @param buffer where to store the retrieved data 
+	 * @param buffer where to store the retrieved data
 	 * @param len how many octets to read
 	 * @return number of octets read
 	 */
-	size_t 
+	size_t
 	readData(unsigned char *buffer, size_t len)
-	{ return Receive(buffer, len); }
+	{ return UDPReceive::receive(buffer, len); }
 
 	/**
 	 * @return the associated peer information

@@ -1,5 +1,5 @@
 Summary: ccrtp - a Common C++ class framework for RTP packets
-Name: ccrtp
+Name: ccrtp1
 Version: @VERSION@
 Release: 3
 Group: Development/Libraries

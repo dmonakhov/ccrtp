@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is 
+// As a special exception to the GNU General Public License, permission is
 // granted for additional uses of the text contained in its release 
 // of ccRTP.
 // 
@@ -53,7 +53,7 @@ RTPQueue(pri), UDPReceive(ia, local), UDPTransmit(ia, local + 1)
 {
 	// FIX? Where is remote? Shouldn't we use it for UDPTransmit?
 	base = local;
-} 
+}
 
 RTPDuplex::~RTPDuplex()
 {
@@ -62,25 +62,25 @@ RTPDuplex::~RTPDuplex()
 	endReceiver();
 }
 
-sockerror_t RTPDuplex::Connect(const InetHostAddress &ia, tpport_t port)
+Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 {
-	sockerror_t rtn;
+	Socket::Error rtn;
 
 	if(!port)
 		port = base;
 
-	rtn = UDPTransmit::Connect(ia, port);
+	rtn = UDPTransmit::connect(ia, port);
 
 	if(!rtn)
-		rtn = UDPReceive::Connect(ia, port + 1);
+		rtn = UDPReceive::connect(ia, port + 1);
 	if(rtn)
 		return rtn;
 
 	// Start running the RTP queue service thread
 	active = true;
-	Start();              
+	start();
 
-	return SOCKET_SUCCESS;
+	return Socket::errSuccess;
 }
 
 #ifdef  CCXX_NAMESPACES
