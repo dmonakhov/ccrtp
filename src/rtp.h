@@ -44,10 +44,10 @@
  * @short General purpose interface of ccRTP. 
  **/
 
-#ifndef	__CCXX_RTP_H__
-#define __CCXX_RTP_H__
+#ifndef	CCXX_RTP_H_
+#define CCXX_RTP_H_
 
-#ifndef   __CCXX_SOCKET_H__
+#ifndef   CCXX_SOCKET_H_
 #include <cc++/socket.h>
 #endif
 
