@@ -1,3 +1,10 @@
+2003-06-09  David Sugar <dyfet@ostel.com>
+
+	* m4/ost_endian.m4: updated for modern autoconf/automake systems
+	* acconfig.h: eliminated
+	* configure.in: updated based on modern autoconf issues
+	* Release 1.0.2
+
 2003-05-14  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/sources.h: SyncSource::isSender made const.

@@ -57,7 +57,7 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %doc AUTHORS COPYING NEWS README TODO ChangeLog
 %{_prefix}/lib/libcc*a
 %{_prefix}/include/ccrtp
-#%{_mandir}/man3/*.3cc*		conflicts with commonc++ socket.h page
+%{_mandir}/man3/*.3cc*
 %{_infodir}/ccrtp*info*
 
 %clean

@@ -11,7 +11,7 @@
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in ccrtp.proto \
-	pkginfo.in ccrtp.lsm.in freebsd/Makefile.in freebsd/pkg-* acconfig.h \
+	pkginfo.in ccrtp.lsm.in freebsd/Makefile.in freebsd/pkg-* \
 	COPYING.addendum \
 	ccrtp.kdevprj
 

@@ -21,17 +21,27 @@ dnl distribution terms that you use for the rest of that program.
 
 AC_DEFUN(OST_CC_ENDIAN,[
 	AC_CHECK_HEADER(endian.h,[
-		AC_DEFINE(HAVE_ENDIAN_H)
+		AC_DEFINE(HAVE_ENDIAN_H, [1], [have endian header])
 		],[
 		case "$target_cpu" in
 		alpha* | i?86)
-			AC_DEFINE(__BYTE_ORDER,1234)
+			AC_DEFINE(__BYTE_ORDER, [1234])
 			;;
 		hppa* | m68* | mips* | powerpc* | sparc*)
-			AC_DEFINE(__BYTE_ORDER,4321)
+			AC_DEFINE(__BYTE_ORDER, [4321])
 			;;
 		esac
 	])
+	AH_TEMPLATE(__BYTE_ORDER, [default endian order])
+	AH_BOTTOM([
+#ifdef  HAVE_ENDIAN_H
+#include <endian.h>
+#else
+#define __LITTLE_ENDIAN 1234
+#define __BIG_ENDIAN    4321
+#endif
+	])	
+		
 ])
 
 dnl ACCONFIG TEMPLATE
