@@ -11,7 +11,7 @@
 	* src/ccrtp/cqueue.h, src/ccrtp/oqueue.h, src/ccrtp/rtcppkt.h,
 	src/control.cpp: doc cleanup (@todos).
 	
-	* demo/audiorx.cpp: print dots when packets are received.
+	* demo/audiorx.cpp, demo/rtplisten.cpp: small additions.
 	
 2004-01-17  Federico Montesino Pouzols  <fedemp@altern.org>
 	
