@@ -65,6 +65,7 @@ rm -fr %{buildroot}
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 %{_infodir}/ccrtp*info*
+%{_libdir}/pkgconfig/libcrtp1.pc
 
 %post -p /sbin/ldconfig
 
