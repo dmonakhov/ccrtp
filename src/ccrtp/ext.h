@@ -144,9 +144,10 @@ protected:
 	{ }
 
 	inline size_t
-	getNextDataPacketSize()
-	{ 
-		size_t len; ccioctl(UDPReceive::getReceiver(),FIONREAD,len); return len; 
+	getNextDataPacketSize() const
+	{
+		// the const cast is a trick only needed for cc++2 <= 1.0.10
+		size_t len; ccioctl(const_cast<RTPDuplex*>(this)->UDPReceive::getReceiver(),FIONREAD,len); return len; 
 	}
 
 	/**

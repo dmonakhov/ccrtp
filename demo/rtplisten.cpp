@@ -1,6 +1,6 @@
 // rtplisten
 // Listen for RTP packets.
-// Copyright (C) 2001,2002  Federico Montesino <fedemp@altern.org>
+// Copyright (C) 2001,2002,2003  Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,8 +26,15 @@ using namespace std;
 
 class Listener: RTPSession {
 public:
+	Listener(InetMcastAddress& ima, tpport_t port):
+		RTPSocket(ima,port)
+	{ }
+
 	Listener(InetHostAddress& ia, tpport_t port):
 		RTPSocket(ia,port)
+	{ }
+
+	void listen()
 	{
 		cout << "My SSRC identifier is: " 
 		     << hex << (int)getLocalSSRC() << endl;
@@ -120,12 +127,28 @@ main(int argc, char *argv[])
 	if (argc != 3) { 
 		cerr << "Syntax: " << " ip port" << endl;
 		exit(1);
-	} else {
-		cout << "Press Ctrl-C to finish." << endl;
 	}
 
-	InetHostAddress ia(argv[1]);
-	Listener foo(ia,atoi(argv[2]));
+	InetMcastAddress ima;
+	try {
+		ima = InetMcastAddress(argv[1]);
+	} catch (...) {	}
+
+	Listener *foo;
+	tpport_t port = atoi(argv[2]);
+	if ( ima.isInetAddress() ) {
+		foo = new Listener(ima,port);
+		cout << "Listening on multicast address " << ima << ":" << 
+			port << endl;
+	} else {
+		InetHostAddress ia(argv[1]);
+		foo = new Listener(ia,atoi(argv[2]));
+		cout << "Listening on unicast address " << ia << ":" <<
+			port << endl;
+	}
+	cout << "Press Ctrl-C to finish." << endl;
+	foo->listen();
+	delete foo;
 	return 0;
 }
 
