@@ -1,3 +1,13 @@
+2002-10-24 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/cc++/queuebase.h: added getDefaultMaxSendSegmentSize() and
+	getMaxSendSegmentSize() to OutgoingDataQueueBase.
+	* src/outqueue.cpp: (OutgoingDataQueue::putData) segment data blocks
+	depending on getMaxSendSegmentSize.
+	* doc/ccrtp.texi: extended "Sending Data" subsection.
+	* src/cc++/rtp/iqueue.h: initSequence now inits maxSeqNum and 
+	badSeqNum.
+	
 2002-10-23 Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: BYE packets are now correctly sent with a 
