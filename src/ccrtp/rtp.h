@@ -456,27 +456,21 @@ public:
 protected:
 	inline void enableStack(void)
 		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
-//		{RTPDataQueue::enableStack();}
 
 	inline microtimeout_t getSchedulingTimeout(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
-//		{return OutgoingDataQueue::getSchedulingTimeout();};
 
 	inline void controlReceptionService(void)
 		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
-//		{QueueRTCPManager::controlReceptionService();}
 
 	inline void controlTransmissionService(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
-//		{QueueRTCPManager::controlTransmissionService();}
 
 	inline timeval getRTCPCheckInterval(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
-//		{return QueueRTCPManager::getRTCPCheckInterval();}
 
 	inline size_t dispatchDataPacket(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
-//		{return OutgoingDataQueue::dispatchDataPacket();}
 
 	inline virtual void timerTick(void)
 		{return;}
