@@ -11,7 +11,7 @@
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 AM_CXXFLAGS= @WARN_FLAGS@
-AM_LDFLAGS = $(LT_VERSION) -release $(LT_RELEASE) @GNULIBS@
+RELEASE = $(LT_VERSION) -release $(LT_RELEASE) @GNULIBS@
 
 SUBDIRS = ccrtp
 lib_LTLIBRARIES = libccrtp1.la
@@ -21,5 +21,7 @@ libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp \
 	incqueue.cpp outqueue.cpp queue.cpp \
 	control.cpp members.cpp \
 	socket.cpp duplex.cpp pool.cpp
+
+libccrtp1_la_LDFLAGS = $(RELEASE)
 
 noinst_HEADERS = private.h

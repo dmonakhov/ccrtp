@@ -1,3 +1,7 @@
+2004-04-15  David Sugar <dyfet@ostel.com>
+
+	* src/Makefile.am: changes for unsupported autoconf AM_LDFLAGS.
+
 2004-03-30  David Sugar <dyfet@ostel.com>
 
 	* src/rtppkt.cpp, src/members.cpp, src/outqueue.cpp, 
