@@ -68,6 +68,7 @@ class __EXPORT DestinationListHandler
 {
 protected:
 	struct TransportAddress;
+	unsigned destinationCounter;
 
 public:
 	DestinationListHandler();

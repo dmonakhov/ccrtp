@@ -1,3 +1,13 @@
+2005-03-22  David Sugar <dyfet@ostel.com>
+
+	* configure.ac: bumped version up for next release to 1.3.0, rather 
+	than 1.2.3 since library dependencies are now different.  Also
+	happens to match commoncpp2 1.3.x release versions nicely!
+
+	* src/ccrtp/oqueue.h, src/outqueue.cpp: added appearently
+	missing "destinationCounter" to DestinationList object, init 0,
+	inc on add, sub on remove.
+
 2005-03-20  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtppkt.h, src/rtppkt.cpp: added 'padsize' parameter to

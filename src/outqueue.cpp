@@ -53,6 +53,7 @@ OutgoingDataQueueBase::OutgoingDataQueueBase()
 DestinationListHandler::DestinationListHandler() :
 	destList(), destinationLock()
 {
+	destinationCounter = 0;
 }
 
 DestinationListHandler::~DestinationListHandler()
@@ -79,6 +80,7 @@ DestinationListHandler::addDestinationToList(const InetAddress& ia,
 {	
 	TransportAddress* addr = new TransportAddress(ia,data,control);
 	writeLockDestinationList();
+	++destinationCounter;
 	destList.push_back(addr);
 	unlockDestinationList();
 	return true;
@@ -102,6 +104,7 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 			result = true;
 			destList.erase(i);
 			delete tmp;
+			--destinationCounter;
 		}
 	}
 	unlockDestinationList();
