@@ -17,6 +17,9 @@
 #include "server.h"
 #include <getopt.h>
 #include <sys/wait.h>
+#include <iostream>
+#include <fstream>
+
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
@@ -82,7 +85,7 @@ static int initial(int argc, char **argv)
 	}
 	if(usage)
 	{
-		cerr << "use: phone [options] [parties...]" << endl;
+		std::cerr << "use: phone [options] [parties...]" << std::endl;
 		exit(-1);
 	}
 	return optind;
@@ -114,7 +117,7 @@ int main(int argc, char **argv)
 {
 	int pid = 0, wpid = 0;
 	int idx;
-	ofstream fifo;
+	std::ofstream fifo;
 	
 	chdir(getenv("HOME"));
 	if(canAccess(".phonepid"))
@@ -138,21 +141,21 @@ int main(int argc, char **argv)
 		else
 			wpid = pid;
 	}
-	fifo.open(".phonectrl", ios::out);
+	fifo.open(".phonectrl", std::ios::out);
 	if(!fifo.is_open())
 	{
-		cerr << "phone: cannot get control interface" << endl;
+		std::cerr << "phone: cannot get control interface" << std::endl;
 		exit(-1);
 	}
 	if(idx == argc && drop)
-		fifo << "DROP *" << endl;
+		fifo << "DROP *" << std::endl;
 
 	while(idx < argc)
 	{
 		if(drop)
-			fifo << "DROP " << argv[idx++] << endl;
+			fifo << "DROP " << argv[idx++] << std::endl;
 		else
-			fifo << "JOIN " << argv[idx++] << endl;
+			fifo << "JOIN " << argv[idx++] << std::endl;
 	}
 		
 	fifo.close();

@@ -26,7 +26,7 @@ doxy:
 	(cd doc ; doxygen Doxyman)
 
 man:
-	(cd doc/man3 ; $(INSTALL_DATA) *.3cc $(mandir)/man3 )
+	(cd doc/man3 ; $(INSTALL_DATA) *.3cc $(DESTDIR)/$(mandir)/man3 )
 
 pkg:	
 	$(MAKE) $(AM_MAKEFLAGS) prefix=$(PKGBASE) install

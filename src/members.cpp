@@ -49,7 +49,7 @@ namespace ost {
 
 const RTPSource MembershipControl::dummysource(0);
 
-MembershipControl::MembershipControl(uint32 initial_size = 7):
+MembershipControl::MembershipControl(uint32 initial_size):
 	SOURCE_BUCKETS(initial_size), 
 	sources( new RTPSource* [SOURCE_BUCKETS] ),
 	first(NULL), last(NULL)

@@ -1,3 +1,7 @@
+2002-07-29  David Sugar <dyfet@ostel.com> (from 0.9.1 to 0.9.2)
+
+	* Updated build for Hammer (x86-64) support.
+
 2002-02-18  David Sugar <dyfet@ostel.com> (from 0.7.2 to 0.7.3)
 
 	* Solaris target compile support.

@@ -17,6 +17,8 @@
 #include <cc++/slog.h>
 #include <cc++/process.h>
 #include "server.h"
+#include <iostream>
+#include <fstream>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
@@ -27,7 +29,7 @@ void server(void)
 {	
 	const char *reason = "exiting";
 	char *cp, *ep;
-	fstream fifo;
+	std::fstream fifo;
 	new RTPAudio;
 
 	::signal(SIGPIPE, SIG_IGN);
@@ -48,13 +50,13 @@ void server(void)
 		open("/dev/null", O_RDWR);
 		slog.open("phone", Slog::classDaemon);
 		slog.level(Slog::levelNotice);
-		slog(Slog::levelNotice) << "daemon mode started" << endl;
+		slog(Slog::levelNotice) << "daemon mode started" << std::endl;
 	}
 	else
 	{
 		slog.open("phone", Slog::classDaemon);
 		slog.level(Slog::levelDebug);
-		slog(Slog::levelNotice) << "server starting..." << endl;
+		slog(Slog::levelNotice) << "server starting..." << std::endl;
 	}
 	snprintf(buf, 11, "%d", getpid());
 	fd = ::creat(".phonepid", 0660);
@@ -63,10 +65,10 @@ void server(void)
 		::write(fd, buf, 10);
 		::close(fd);
 	}
-	fifo.open(".phonectrl", ios::in | ios::out);
+	fifo.open(".phonectrl", std::ios::in | std::ios::out);
 	if(!fifo.is_open())
 	{
-		slog(Slog::levelError) << "fifo failed; exiting" << endl;
+		slog(Slog::levelError) << "fifo failed; exiting" << std::endl;
 		exit(-1);
 	}
 
@@ -83,14 +85,14 @@ void server(void)
 			*ep = 0;
 		if(!*cp)
 			continue;	
-		slog(Slog::levelDebug) << "fifo: " << cp << endl;
+		slog(Slog::levelDebug) << "fifo: " << cp << std::endl;
 		if(!strnicmp(cp, "exit", 4))
 			break;
 
 	}
 	rtp->exit(reason);
 	fifo.close();
-	slog(Slog::levelWarning) << "server exiting..." << endl;
+	slog(Slog::levelWarning) << "server exiting..." << std::endl;
 	exit(0);
 }
 

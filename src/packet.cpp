@@ -50,7 +50,7 @@ namespace ost {
 
 // constructor commonly used for incoming packets
 RTPPacket::RTPPacket(const unsigned char* const block, size_t len, 
-		     bool duplicate = false):
+		     bool duplicate):
 	total(len),
 	duplicated(duplicate)
 {

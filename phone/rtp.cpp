@@ -55,7 +55,7 @@ void RTPAudio::gotHello(RTPSource &src)
 	RTPEvent *event = RTPEvent::first;
 
 	slog(Slog::levelDebug) << "hello(" << src.getID() << ") "
-		<< src.getCNAME() << endl;
+		<< src.getCNAME() << std::endl;
 
 	while(event)
 	{
@@ -72,7 +72,7 @@ void RTPAudio::gotGoodbye(RTPSource &src, char *reason)
 		<< src.getCNAME();
 	if(reason)
 		slog() << "; " << reason;
-	slog() << endl;
+	slog() << std::endl;
 
 	while(event)
 	{
