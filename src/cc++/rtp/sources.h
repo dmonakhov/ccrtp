@@ -453,28 +453,30 @@ public:
 	
 	ParticipantsIterator end()
 	{ return ParticipantsIterator(NULL); }
-
 	
 private:
 	friend class ApplicationHandler;
 
 	struct ParticipantLink {
-		ParticipantLink(Participant* p, 
+		ParticipantLink(Participant& p, 
 				ParticipantLink* l) :
-			participant(p), next(l) 
+			participant(&p), next(l) 
 		{ }
-		~ParticipantLink() { }
+		inline ~ParticipantLink() { delete participant; }
 		inline Participant* getParticipant() { return participant; }
+		inline ParticipantLink* getPrev() { return prev; }
 		inline ParticipantLink* getNext() { return next; }
-		Participant *participant;
-		ParticipantLink *next;
+		inline void setPrev(ParticipantLink* l) { prev = l; }
+		inline void setNext(ParticipantLink* l) { next = l; }
+		Participant* participant;
+		ParticipantLink* next, *prev;
 	};
 
 	void
 	addParticipant(Participant& part);
 
 	void
-	removeParticipant(Participant& part);
+	removeParticipant(ParticipantLink* part);
 
 	/**
 	 * Find out the local CNAME as user@host and store it as part

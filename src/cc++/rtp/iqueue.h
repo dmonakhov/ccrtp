@@ -213,8 +213,9 @@ public:
 	{ app.addParticipant(part); }
 		
 	inline void
-	removeParticipant(RTPApplication& app, Participant& part)
-	{ app.removeParticipant(part); }
+	removeParticipant(RTPApplication& app, 
+			  RTPApplication::ParticipantLink* pl)
+	{ app.removeParticipant(pl); }
 
 protected:
 	ApplicationHandler()

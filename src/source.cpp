@@ -179,13 +179,24 @@ RTPApplication::~RTPApplication()
 void
 RTPApplication::addParticipant(Participant& part)
 {
-// TODO
+	ParticipantLink* pl = new ParticipantLink(part,NULL);
+	if ( NULL == firstPart )
+		firstPart = pl;
+	else
+		lastPart->setNext(pl);
+	lastPart = pl;
 }
 
 void
-RTPApplication::removeParticipant(Participant& part)
+RTPApplication::removeParticipant(ParticipantLink* pl)
 {
-// TODO
+	if ( NULL == pl )
+		return;
+	if ( pl->getPrev() )
+		pl->getPrev()->setNext(pl->getNext());
+	if ( pl->getNext() )
+		pl->getNext()->setPrev(pl->getPrev());
+	delete pl;
 }
 
 void
