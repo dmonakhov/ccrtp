@@ -414,6 +414,7 @@ presented here; deeper explanations are provided in next sections.
 * Sending Data::                 Sending @acronym{RTP} data packets.
 * Receiving Data::               Receiving @acronym{RTP} data packets.
 * Closing Sessions::             Extensions to @acronym{RTP} data packets handling.
+* Types of Sessions::            Choosing a threading and socket model.
 @end menu
 
 
@@ -559,6 +560,15 @@ leaving reason string as argument.
 
 Note that when a BYE RTCP packet is received from a remote
 participant, the virtual @code{onGotGoodbye} will be called.
+
+@c -----------------------------------------------------------------------
+@node Types of Sessions
+@subsection Types of Sessions
+@cindex Types of Sessions
+
+@emph{TODO:} explain how to instantiate templates depending on the
+threading model and the number of sockets to use. Also symmetric
+channels/sessions. Describe what's a channel and a session.
 
 
 @c -----------------------------------------------------------------------

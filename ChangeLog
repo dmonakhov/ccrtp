@@ -1,3 +1,10 @@
+2005-01-10  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/control.cpp: (QueueRTCPManager::getBYE) patch from Michel de
+	Boer to avoid calling onGotGoodbye with NULL as value for reason.
+
+	* doc/ccrtp.texi: added note on threads, sockets, and sessions.
+	
 2004-11-28  David Sugar <dyfet@ostel.com>
     * src/private.h: ignore config.h if pure w32 unpack from cvs
     

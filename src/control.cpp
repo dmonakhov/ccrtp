@@ -478,7 +478,10 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t)
 		reason = new char[len + 1];
 		memcpy(reason,rtcpRecvBuffer + endpointer + 1,len);
 		reason[len] = '\0';
-	} 
+	} else { // avoid dangerous conversion of NULL to a C++ string.
+		reason = new char[1];
+		reason[0] = '\0';
+	}
 
 	int i = 0;
 	while ( i < pkt.fh.block_count ){
@@ -787,7 +790,7 @@ QueueRTCPManager::getOnlyBye()
 					getSourceBySSRC(pkt->getSSRC(),
 							created);
 				if( srcLink->getGoodbye() )
-					onGotGoodbye(*(srcLink->getSource()), NULL);
+					onGotGoodbye(*(srcLink->getSource()), "");
 				BYESource(pkt->getSSRC());
 			}
 			pointer += pkt->getLength();
