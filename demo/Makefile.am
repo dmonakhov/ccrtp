@@ -10,11 +10,9 @@
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
-AM_CXXFLAGS= @WARN_FLAGS@
-LDFLAGS = @LDFLAGS@ 
 #ignored for programs
 #$(LT_VERSION) -release $(LT_RELEASE)
-CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
+AM_CXXFLAGS = @WARN_FLAGS@ -I$(top_srcdir)/src
 ccxxincludedir=$(includedir)/cc++
 
 noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx

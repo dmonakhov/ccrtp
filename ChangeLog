@@ -1,3 +1,8 @@
+2003-06-20  David Sugar <dyfet@ostel.com>
+
+	* src/Makefile.am, phone/Makefile.am, demo/Makefile.am: fix
+	for current automake/autoconf systems
+
 2003-06-09  David Sugar <dyfet@ostel.com>
 
 	* m4/ost_endian.m4: updated for modern autoconf/automake systems
