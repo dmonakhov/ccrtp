@@ -41,7 +41,7 @@
 #include "private.h"
 #include <cc++/rtp/iqueue.h>
 
-#ifdef  CCXX_NAMESPACES
+#ifdef CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -94,8 +94,9 @@ const uint8 IncomingDataQueue::defaultMinValidPacketSequence = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketMisorder = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketDropout = 3000;
 
-IncomingDataQueue::IncomingDataQueue() :
-	IncomingDataQueueBase()
+IncomingDataQueue::IncomingDataQueue(uint32 size) :
+	IncomingDataQueueBase(),
+	MembershipBookkeeping(size)
 {
 	recvFirst = recvLast = NULL;
 	sourceExpirationPeriod = 5; // 5 RTCP report intervals
@@ -188,8 +189,8 @@ IncomingDataQueue::takeInDataPacket(void)
 
 	uint32 nextSize = getNextDataPacketSize();
 	unsigned char* buffer = new unsigned char[nextSize];
-	uint32 rtn = recvData(buffer,nextSize,network_address,transport_port);
-	if ( (rtn < 0) || (rtn > getMaxRecvPacketSize()) ){
+	int32 rtn = recvData(buffer,nextSize,network_address,transport_port);
+	if ( (rtn < 0) || ((uint32)rtn > getMaxRecvPacketSize()) ){
 		delete buffer;
 		return rtn;
 	}
@@ -228,7 +229,8 @@ IncomingDataQueue::takeInDataPacket(void)
 		// First packet arrival time.
 		sourceLink->setInitialTime(recvtime);
 		sourceLink->setProbation(getMinValidPacketSequence());
-		onNewSyncSource(*s);
+		if ( sourceLink->getHello() )
+			onNewSyncSource(*s);
 	} else if ( 0 == s->getDataTransportPort() ) {
 		// Test if RTCP packets had been received but this is the
 		// first data packet from this source.
@@ -497,7 +499,7 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 		// to know whether the global queue gets empty
 		bool nonempty = false;
 		for ( int i = 0; i < nold; i++) {
-			IncomingRTPPktLink* l = srcm->getFirst();
+			l = srcm->getFirst();
 			srcm->setFirst(srcm->getFirst()->getSrcNext());;
 			// unlink from the global queue
 			nonempty = false;
@@ -670,19 +672,16 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		// was received, this has statistical interest and is
 		// needed to time out old senders that are no sending
 		// any longer.  
-		// TODO: lastTime = pkt.getRecvTimestamp();
 		
 		// compute the interarrival jitter estimation.
-
-		// TODOOOOO:
 		timeval tarrival;
-		timeval last = srcLink.getLastPacketTime();
+		timeval lastT = srcLink.getLastPacketTime();
 		timeval initial = srcLink.getInitialTime();
-		timersub(&last,&initial,&tarrival);
+		timersub(&lastT,&initial,&tarrival);
 		uint32 arrival = timeval2microtimeout(tarrival)
 			* getCurrentRTPClockRate();
 		uint32 transitTime = arrival - pkt.getTimestamp();
-		uint32 delta = transitTime - 
+		int32 delta = transitTime - 
 			srcLink.getLastPacketTransitTime();
 		srcLink.setLastPacketTransitTime(transitTime);
 		if ( delta < 0 )
@@ -696,7 +695,7 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 }
 
 void
-IncomingDataQueue::recordExtraction(const IncomingRTPPkt& pkt)
+IncomingDataQueue::recordExtraction(const IncomingRTPPkt&)
 {
 }
 

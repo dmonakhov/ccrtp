@@ -135,13 +135,14 @@ RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 const uint32 RTPDataQueue::defaultSessionBw = 64000;
 
 RTPDataQueue::RTPDataQueue(uint32 size)	: 
-	IncomingDataQueue(), OutgoingDataQueue()
+	IncomingDataQueue(size), OutgoingDataQueue()
 {
 	initQueue();
 } 
 
-RTPDataQueue::RTPDataQueue(uint32 ssrc, uint32 size):
-	IncomingDataQueue(), OutgoingDataQueue(), timeclock()
+RTPDataQueue::RTPDataQueue(uint32* ssrc, uint32 size):
+	RTPQueueBase(ssrc),
+	IncomingDataQueue(size), OutgoingDataQueue(), timeclock()
 {
 	initQueue();
 }

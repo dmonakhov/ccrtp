@@ -59,7 +59,7 @@ const SDESItemType QueueRTCPManager::lastSchedulable = SDESItemTypePRIV;
 const microtimeout_t QueueRTCPManager::defaultEnd2EndDelay = 0;
 
 QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
-	RTPDataQueue(),
+	RTPDataQueue(size),
 	RTCPCompoundHandler(RTCPCompoundHandler::defaultPathMTU),
 	queueApplication(app)
 {
@@ -304,7 +304,8 @@ QueueRTCPManager::takeInControlPacket()
 		// First packet arrival time.
 		sourceLink->setInitialTime(recvtime);
 		sourceLink->setProbation(getMinValidPacketSequence());
-		onNewSyncSource(*s);
+		if ( sourceLink->getHello() )
+			onNewSyncSource(*s);
 	} else if ( s->getControlTransportPort() == 0 ) {
 		// Test if RTP data packets had been received but this
 		// is the first control packet from this source.
@@ -432,8 +433,10 @@ QueueRTCPManager::end2EndDelayed(IncomingRTPPktLink& pl)
 }
 
 void
-QueueRTCPManager::onGotSR(SyncSource& source, SendReport& SR, uint8 blocks)
+QueueRTCPManager::onGotSR(SyncSource& source, SendReport& SR, uint8)
 {
+	// We ignore the receiver blocks and just get the sender info
+	// at the beginning of the SR.
 	getLink(source)->setSenderInfo
 		(reinterpret_cast<unsigned char*>(&(SR.sinfo)));
 }
@@ -461,7 +464,7 @@ QueueRTCPManager::updateAvgRTCPSize(size_t len)
 }
 
 bool
-QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t len)
+QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t)
 {
 	if ( 0 == pkt.fh.block_count )
 		return false;

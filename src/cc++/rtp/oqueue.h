@@ -207,7 +207,7 @@ public:
 	 * @param mark Marker bit value for next packet.
 	 **/
 	void setMark(bool mark)
-	{ sendInfo.marked = true; }
+	{ sendInfo.marked = mark; }
 
 	/**
 	 * Get wheter the mark bit will be set in the next packet.
@@ -353,9 +353,9 @@ private:
         /**
 	 * A hook to filter packets being sent that have been expired.
 	 *
-	 * @param packet expired from the send queue.
+	 * @param - expired packet from the send queue.
 	 **/
-	inline virtual void onExpireSend(OutgoingRTPPkt& packet)
+	inline virtual void onExpireSend(OutgoingRTPPkt&)
 	{ }
 
 	virtual void

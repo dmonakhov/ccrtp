@@ -196,10 +196,11 @@ protected:
 	/**
 	 * A plugin point for posting of BYE messages.
 	 *
+	 * @param - reason to leave the RTP session.
 	 * @return number of octets sent.
 	 **/
 	inline virtual size_t
-	dispatchBYE(const std::string& reason)
+	dispatchBYE(const std::string&)
 	{ return 0; }
 
 	inline virtual void

@@ -276,14 +276,14 @@ protected:
 	 * Plug-in for handling of APP (application specific) RTCP
 	 * packets.
 	 *
-	 * @param source Synchronization source of this packet.
-	 * @param app RTCP APP packet struct.
-	 * @param len Length of the app data packet, including ssrc.
+	 * @param - Synchronization source of this packet.
+	 * @param - RTCP APP packet struct.
+	 * @param - Length of the app data packet, including ssrc.
 	 * name and app. specific data.
 	 **/
 	inline virtual void
-	onGotAPP(SyncSource& source, RTCPCompoundHandler::APPPacket& app,
-		 size_t len)
+	onGotAPP(SyncSource&, RTCPCompoundHandler::APPPacket&,
+		 size_t)
 	{ return; }
 
 	inline timeval
@@ -389,10 +389,10 @@ private:
 	/**
 	 * Plug-in for SSRC collision handling. 
 	 *
-	 * @param old previously identified source
+	 * @param - previously identified source.
 	 **/
 	inline virtual void
-	onSSRCCollision(const SyncSource &old)
+	onSSRCCollision(const SyncSource&)
 	{ }
 
 	/**
@@ -406,11 +406,11 @@ private:
 	 * profile-specific extensions (third part of SR reports or
 	 * second part of RR reports).
 	 *
-	 * @param datablock Content of the profile extension.
-	 * @param len Length of the extension, in octets.
+	 * @param - Content of the profile extension.
+	 * @param - Length of the extension, in octets.
 	 **/
 	inline virtual void
-	onGotRRSRExtension(unsigned char *datablock, size_t len)
+	onGotRRSRExtension(unsigned char*, size_t)
 	{ return; }
 
  	/**
@@ -418,12 +418,12 @@ private:
  	 * packet has been received from a valid synchronization
  	 * source.
 	 *
-	 * @param src synchronization source from what a BYE RTCP
+	 * @param - synchronization source from what a BYE RTCP
 	 * packet has been just received.
-	 * @param reason reason string the source has provided.
+	 * @param - reason string the source has provided.
  	 **/
  	inline virtual void
-	onGotGoodbye(const SyncSource& src, const std::string& reason)
+	onGotGoodbye(const SyncSource&, const std::string&)
 	{ return; }
 
 	/**

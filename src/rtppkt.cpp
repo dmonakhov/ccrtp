@@ -220,7 +220,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen) :
 	setbuffer(data,datalen,getSizeOfFixedHeader());
 }
 
-inline void
+void
 OutgoingRTPPkt::setCSRCArray(const uint32* const csrcs, uint16 numcsrc)
 {
 	setbuffer(csrcs, numcsrc * sizeof(uint32),getSizeOfFixedHeader());

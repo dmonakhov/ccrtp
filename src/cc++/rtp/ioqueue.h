@@ -263,7 +263,7 @@ protected:
 	 * @param size an estimation of the number of participants in the 
 	 *        session 
 	 */
-	RTPDataQueue(uint32 ssrc, uint32 size = defaultMembersHashSize);
+	RTPDataQueue(uint32* ssrc, uint32 size = defaultMembersHashSize);
 	
 	/**
 	 * The queue destructor flushes the queue and stops all

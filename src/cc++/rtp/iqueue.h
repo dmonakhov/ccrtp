@@ -712,7 +712,7 @@ protected:
 		 * Start a new sequence of received packets.
 		 **/
 		inline void initSequence(uint16 seqnum)
-		{ maxSeqNum = seqNumAccum = 0; }
+		{ maxSeqNum = seqNumAccum = seqnum; }
 		
 		/**
 		 * Record the insertion of an RTP packet from this
@@ -1028,7 +1028,10 @@ public:
 	{ return maxPacketDropout; }
 
 protected:
-	IncomingDataQueue::IncomingDataQueue();
+	/**
+	 * @param size initial size of the membership table.
+	 **/
+	IncomingDataQueue::IncomingDataQueue(uint32 size);
 
 	virtual ~IncomingDataQueue()
 	{ }
@@ -1123,10 +1126,10 @@ protected:
 	 * Virtual called when a new synchronization source has joined
 	 * the session.
 	 *
-	 * @param newsource new synchronization source
+	 * @param - new synchronization source
 	 **/
 	inline virtual void
-	onNewSyncSource(const SyncSource& newsource)
+	onNewSyncSource(const SyncSource&)
 	{ }
 
 private:
@@ -1143,11 +1146,11 @@ private:
 	 * May be used to perform additional validity checks or to do
 	 * some application specific processing.
 	 *
+	 * @param - packet just received.
 	 * @return true if packet is kept in the incoming packets queue.
-	 * @param packet returned.
 	 **/
 	inline virtual bool
-	onRTPPacketRecv(IncomingRTPPkt& packet)
+	onRTPPacketRecv(IncomingRTPPkt&)
 	{ return true; }
 	
 	/**
@@ -1156,13 +1159,13 @@ private:
 	 * specific processing on expired packets before they are
 	 * deleted.
 	 * 
-	 * @param packet packet expired from the recv queue.
+	 * @param - packet expired from the recv queue.
 	 **/
-	inline virtual void onExpireRecv(IncomingRTPPkt& packet)
+	inline virtual void onExpireRecv(IncomingRTPPkt&)
 	{ return; }
 	
 	inline virtual bool
-	end2EndDelayed(IncomingRTPPktLink& pl)
+	end2EndDelayed(IncomingRTPPktLink&)
 	{ return false; }
 	
        	/**

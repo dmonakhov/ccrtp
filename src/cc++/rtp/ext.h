@@ -126,12 +126,20 @@ protected:
 	{ na = UDPReceive::getPeer(&tp); 
 	return UDPReceive::receive(buffer, len); }
 
+	/**
+	 * @param - peer host network address.
+	 * @param - peer host RTP data transport port.
+	 **/
         inline void
-        setDataPeer(const InetAddress &host, tpport_t port)
+        setDataPeer(const InetAddress&, tpport_t)
 	{ }
 
+	/**
+	 * @param - peer host network address.
+	 * @param - peer host RTCP transport port.
+	 **/
         inline void
-        setControlPeer(const InetAddress &host, tpport_t port)
+        setControlPeer(const InetAddress&, tpport_t)
 	{ }
 
 	inline size_t

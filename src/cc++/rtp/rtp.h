@@ -164,7 +164,7 @@ public:
 	inline virtual
 	~TRTPSessionBase()
 	{ 
-	 dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing");
+	 dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
 	 endSocket(); 
 	}
 

@@ -136,7 +136,7 @@ MembershipBookkeeping::SyncSourceLink::setPrevConflict(InetAddress& addr,
 
 void
 MembershipBookkeeping::SyncSourceLink::
-recordInsertion(const IncomingRTPPktLink& pkt)
+recordInsertion(const IncomingRTPPktLink&)
 {
 }
 
@@ -268,6 +268,7 @@ MembershipBookkeeping::getSourceBySSRC(uint32 ssrc, bool& created)
 		last = result;
 		increaseMembersCount();
 	}
+
 	return result;
 }
 
