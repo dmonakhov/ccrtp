@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2002 Open Source Telecom Corporation.
+# Copyright (C) 2002 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -9,18 +9,4 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
-LT_VERSION=@LT_CCXX_VERSION@
-AM_CXXFLAGS= -Wall
-LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
-LIBS=@GNULIBS@
-
-SUBDIRS = cc++
-lib_LTLIBRARIES = libccrtp1.la
-
-libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp \
-	source.cpp data.cpp \
-	incqueue.cpp outqueue.cpp queue.cpp \
-	control.cpp members.cpp \
-	socket.cpp duplex.cpp pool.cpp
-
-noinst_HEADERS = private.h
+SUBDIRS = rtp

@@ -38,20 +38,105 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// UDPIPv4Socket class implementation
-//
+/** 
+ * @file ext.h 
+ * @short ccRTP Stack extensions.
+ **/
 
-#include "private.h"
-#include <cc++/rtp/socket.h>
+#ifndef CCXX_RTP_EXT_H
+#define CCXX_RTP_EXT_H
 
-#ifdef	CCXX_NAMESPACES
+#include <cc++/socket.h>
+#include <cc++/rtp/ioqueue.h>
+
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
+
+/**
+ * @defgroup rtpext ccRTP Extension classes
+ * @{
+ **/
+
+/**
+ * @class RTPDuplex rtp.h cc++/rtp.h
+ *
+ * A peer associated RTP socket pair for physically connected peer
+ * hosts.  This has no RTCP and assumes the receiver is connected
+ * to a known transmitter, hence no "foreign" packets will arrive.
+ *
+ * @author David Sugar
+ * @short RTP peer host over UDP.
+ */
+class CCXX_CLASS_EXPORT RTPDuplex : public RTPDataQueue, protected UDPReceive, public UDPTransmit
+{
+public:
+	/**
+	 * @param bind network address this socket is to be bound
+	 * @param local transport port this socket is to be bound
+	 * @param remote peer transpor port
+	 */
+	RTPDuplex(const InetAddress &bind, tpport_t local, tpport_t remote);
+
+	/**
+	 *
+	 */
+	virtual
+	~RTPDuplex();
+
+	/**
+	 * @param host peer address
+	 * @param port peer port. If not specified, the same as the
+	 *        local is used
+	 * @return socket status
+	 */
+	Socket::Error 
+	connect(const InetHostAddress &host, tpport_t port = 0);
+
+protected:
+
+	/**
+	 * @param timeout how much time to wait for new data
+	 * @return if there is some new data
+	 */
+	bool 
+	isPendingData(microtimeout_t timeout)
+	{ return isPendingReceive(timeout); }
+
+	/**
+	 * @param buffer pointer to data to be written
+	 * @param len how many octets to write
+	 * @return number of octets written
+	 */
+	size_t 
+	writeData(const unsigned char *const buffer, size_t len)
+	{ return UDPTransmit::transmit((const char *)buffer, len); }
+
+	/**
+	 * @param buffer where to store the retrieved data
+	 * @param len how many octets to read
+	 * @return number of octets read
+	 */
+	size_t
+	readData(unsigned char *buffer, size_t len)
+	{ return UDPReceive::receive(buffer, len); }
+
+	/**
+	 * @return the associated peer information
+	 */
+	SyncSource &getPeer();
+
+private:
+	tpport_t dataBasePort;
+};
+
+/*@}*/ // rtpext
 
 #ifdef	CCXX_NAMESPACES
 };
 #endif
+
+#endif //CCXX_RTP_EXT_H
 
 /** EMACS **
  * Local variables:
@@ -59,8 +144,3 @@ namespace ost {
  * c-basic-offset: 8
  * End:
  */
-
-
-
-
-

@@ -1,4 +1,4 @@
-// Copyright (C) 2000-2001 Open Source Telecom Corporation.
+// Copyright (C) 2000-2002 Open Source Telecom Corporation.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 #include <cc++/file.h>
 #include <cc++/misc.h>
-#include <rtp.h>
+#include <cc++/rtp/rtp.h>
 #include "phone.h"
  
 #ifdef	CCXX_NAMESPACES

@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002 Federico Montesino <p5087@quintero.fie.us.es>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,137 +38,165 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// RTPSource class implementation
-//
+/**
+ * @file control.cpp
+ *
+ * @short SDESItemsHolder, RTPSource and Participant classes implementation.
+ **/
+
+#include <cc++/process.h>
 #include "private.h"
+#include <cc++/rtp/sources.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
-const char *const RTPSource::unknown("unknown");
-
-RTPSource::RTPSource(uint32 ssrc):
-	ssrc(ssrc),
-	packet_count(0), kitchensize(0), valid(false), active_sender(false),
-	prev(NULL), next(NULL), first(NULL), last(NULL), nextcollis(NULL),
-	sender_info(new SenderInfo()), receiver_info(new ReceiverInfo()),
-	sdes_items(NULL)
+#ifdef WIN32
+int gettimeofday(struct timeval *tv_,  void *tz_)
 {
-	sdes_items = new char* [RTCP_SDES_ITEM_H323_CADDR];
-	for (int i = 0; i < RTCP_SDES_ITEM_H323_CADDR; i++)
-		sdes_items[i] = NULL;
+	// We could use _ftime(), but it is not available on WinCE.
+	// (WinCE also lacks time.h)
+	// Note also that the average error of _ftime is around 20 ms :)
+	DWORD ms = GetTickCount();
+	tv_->tv_sec = ms / 1000;
+	tv_->tv_usec = ms * 1000;
+	return 0;
+}
+#endif //WIN32
 
-	initial_timestamp = 0;
-	last_time.tv_sec = last_time.tv_usec = 0;
-	expectedseqnum = 0; 
-	flag = false;
+static void
+findusername(std::string &username);
+
+#ifndef WIN32
+static void
+findusername(std::string &username)
+{
+	// LOGNAME environment var has two advantages:
+	// 1) avoids problems of getlogin(3) and cuserid(3)
+	// 2) unlike getpwuid, takes into account user
+	//    customization of the environment.
+	// Try both LOGNAME and USER env. var.
+	const char *user = Process::getEnv("LOGNAME");
+	if ( !strcmp(user,"") )
+		user = Process::getEnv("USER");
+	username = user;
 }
 
-RTPSource::~RTPSource()
-{
-	endSource();
-}
+#else
 
-bool RTPSource::getHello(void)
-{
-	if(flag)
-		return false;
-
-	flag = true;
-	return true;
-}
-
-bool RTPSource::getGoodbye(void)
-{
-	if(!flag)
-		return false;
-
-	flag = false;
-	return true;
-}	
-
-void
-RTPSource::endSource()
-{
-	valid = active_sender = false;
-	prev = next = NULL;
-	first = last = NULL;
-	for (int i = 0; i < RTCP_SDES_ITEM_H323_CADDR; i++)
-		if ( sdes_items[i] != unknown )
-			try {
-				delete sdes_items[i];
-			} catch (...) { };
-	try {
-		delete sdes_items;
-	} catch (...) { };
-	
-	flag = false;
-}
-
-RTPSource::RTPSource(const RTPSource &origin)
-{
-	// for now, it makes no sense
-	// TODO: assign a lot of things
-}
-
-uint32 
-RTPSource::getRate() const
+static void
+findusername(std::string &username)
 {
 
-}
-
-void
-RTPSource::recordReception(IncomingRTPPkt& p)
-{
-	packet_count++;
-	setExpectedSeqNum(p.getSeqNum() + 1);
-	
-	if ( !isSender() )
-		setSender(true);
-
-	if ( packet_count == 1 ) {
-		// ooops, it's the first packet from this source
-		setInitialTimestamp(p.getRawTimestamp());
+	unsigned long len;
+	GetUserName(NULL,&len);
+	if ( len > 0 ) {
+		char *n = new char[maxlen];	 
+		GetUserName(n,&len);
+		username = n;
+		delete [] n;
+	} else {
+		username = "unidentified";
 	}
-	// we record the last time a packet from this source was
-	// received, this has statistical interest and is needed to
-	// time out old senders that are no sending any longer.
-	last_time = p.getRecvTimestamp();
 }
-
-void
-RTPSource::recordInsertion(IncomingRTPPkt &pkt)
-{
-	setCurrentKitchenSize(getCurrentKitchenSize() - pkt.getPayloadSize());
-}
-
-void
-RTPSource::recordExtraction(IncomingRTPPkt &pkt)
-{
-	setCurrentKitchenSize(getCurrentKitchenSize() - pkt.getPayloadSize());
-}
-
-const char* const
-RTPSource::getSDESItem(sdes_item_type_t type) const
-{
-	return sdes_items[type - 1];
-}
+#endif // #ifndef WIN32
 
 void 
-RTPSource::setSDESItem(sdes_item_type_t type, const char *const value)
+SDESItemsHolder::setItem(SDESItemType item, const std::string& val)
 {
-	if ( type > RTCP_SDES_ITEM_END && type <= RTCP_SDES_ITEM_H323_CADDR ) {
-		// the first item (END)
-		type = static_cast<sdes_item_type_t>
-			(static_cast<int>(type - 1)); 
-		delete [] sdes_items[type];
-		sdes_items[type] = new char[strlen(value) + 1];
-		memcpy(sdes_items[type],value,strlen(value) + 1);
-	} else 
-		I ( false );
-	// FIX: exception
+	if ( item > SDESItemTypeEND && item <= SDESItemTypeH323CADDR ) {
+		sdesItems[item] = val;
+	}
+}
+	
+const std::string&
+SDESItemsHolder::getItem(SDESItemType type) const
+{
+	if ( type > SDESItemTypeEND && type <= SDESItemTypeH323CADDR ) {
+		return sdesItems[type];
+	} else
+		return sdesItems[SDESItemTypeCNAME];
+}
+
+SyncSource::SyncSource(uint32 ssrc):
+	state(stateUnknown), SSRC(ssrc), participant(NULL),
+	networkAddress("0"), dataTransportPort(0), controlTransportPort(0)
+{
+}
+
+SyncSource::~SyncSource()
+{
+	activeSender = false;
+	state = statePrevalid;
+}
+
+Participant::Participant(const std::string& cname) : SDESItemsHolder()
+{
+	SDESItemsHolder::setItem(SDESItemTypeCNAME,cname);
+}
+
+Participant::~Participant()
+{
+}
+
+RTPApplication& defaultApplication()
+{
+	// default application CNAME is automatically assigned.
+	static RTPApplication defApp("");
+
+	return defApp; 
+}
+
+RTPApplication::RTPApplication(const std::string& cname) :
+		SDESItemsHolder(),
+		participants( new Participant* [defaultParticipantsNum] ),
+		firstPart(NULL), lastPart(NULL)
+{
+	// guess CNAME, in the form of user@host_fqn
+	if ( cname.length() > 0 )
+		SDESItemsHolder::setItem(SDESItemTypeCNAME,cname);
+	else
+		findCNAME();
+}
+
+RTPApplication::~RTPApplication()
+{
+	ParticipantLink *p;
+	while ( NULL != firstPart ) {
+		p = firstPart;
+		firstPart = firstPart->getNext();
+		try {
+			delete p;
+		} catch (...) {}
+	}
+	lastPart = NULL;
+	try {
+		delete [] participants;
+	} catch (...) {}
+}
+
+void
+RTPApplication::addParticipant(Participant& part)
+{
+// TODO
+}
+
+void
+RTPApplication::removeParticipant(Participant& part)
+{
+// TODO
+}
+
+void
+RTPApplication::findCNAME()
+{
+	// build string username@host_fqn
+	std::string username;
+	findusername(username);
+	
+	setSDESItem(SDESItemTypeCNAME, 
+		    username + "@" + InetHostAddress().getHostname());
 }
 
 #ifdef	CCXX_NAMESPACES

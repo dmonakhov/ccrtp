@@ -1,4 +1,4 @@
-// Copyright (C) 2000-2001 Open Source Telecom Corporation.
+// Copyright (C) 2000-2002 Open Source Telecom Corporation.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ RTPAudio::RTPAudio() :
 RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 {
 	rtp = this;
-	setTimeout(keyrtp.getTimer());
-	setExpired(keyrtp.getExpire());
+	setSchedulingTimeout(keyrtp.getTimer());
+	setExpireTimeout(keyrtp.getExpire());
 	groups = 0;
 	unicast = false;
 	shutdown = false;
@@ -44,18 +44,19 @@ RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 void RTPAudio::exit(const char *reason)
 {
 	shutdown = true;
-	bye(reason);
+	dispatchBYE(reason);
 	sleep(500);
 	delete rtp;
 	rtp = NULL;
 }
 
-void RTPAudio::gotHello(RTPSource &src)
+void RTPAudio::onGotHello(const SyncSource &src)
 {
 	RTPEvent *event = RTPEvent::first;
 
-	slog(Slog::levelDebug) << "hello(" << src.getID() << ") "
-		<< src.getCNAME() << std::endl;
+	slog(Slog::levelDebug) << "hello(" << src.getID() << ") ";
+        Participant* p = src.getParticipant();
+	slog() << p->getSDESItem(SDESItemTypeCNAME) << std::endl;
 
 	while(event)
 	{
@@ -64,14 +65,13 @@ void RTPAudio::gotHello(RTPSource &src)
 	}
 }
 
-void RTPAudio::gotGoodbye(RTPSource &src, char *reason)
+void RTPAudio::onGotGoodbye(const SyncSource &src, const string& reason)
 {
 	RTPEvent *event = RTPEvent::first;
 
-	slog(Slog::levelDebug) << "bye(" << src.getID() << ") "
-		<< src.getCNAME();
-	if(reason)
-		slog() << "; " << reason;
+	slog(Slog::levelDebug) << "bye(" << src.getID() << ") ";
+	Participant* p = src.getParticipant();
+	slog() << p->getSDESItem(SDESItemTypeCNAME) << "; " << reason;
 	slog() << std::endl;
 
 	while(event)

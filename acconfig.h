@@ -16,3 +16,4 @@
 #define	__BIG_ENDIAN	4321
 #endif
 
+#undef HAVE_DEV_URANDOM

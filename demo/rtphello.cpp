@@ -1,6 +1,6 @@
 // rtphello
 // A very simple program for testing and illustrating basic features of ccRTP.
-// Copyright (C) 2001  Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002  Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,18 +24,19 @@
 // I am a typical hello world program. I consist of a sender thread,
 // that sends the salutation message on RTP packets; and a receiver
 // thread, that prints the messages. This is a program with an unsual
-// structure, since the sender has no clear periodicity, the receiver
-// is very unreliable, and both are in the same program. Thus, it
+// structure, the receiver just tries to process the first available
+// packet periodically, and both are in the same program. Thus, it
 // should not be seen as an example for typical applications but as a
 // test of some functions of ccRTP.
 
-// In order to use ccRTP, the RTP stack of CommonC++, just include...
-#include "rtp.h"
 #include <cstdio>
-#include <cstdlib>
+//#include <cstdlib>
+// In order to use ccRTP, the RTP stack of CommonC++, just include...
+#include <cc++/rtp/rtp.h>
 
 #ifdef  CCXX_NAMESPACES
 using namespace ost;
+using namespace std;
 #endif
 
 // base ports
@@ -43,7 +44,7 @@ const int RECEIVER_BASE = 33634;
 const int TRANSMITTER_BASE = 32522;
 
 // For this example, this is irrelevant. 
-const int TIMESTAMP_RATE = 90000;
+//const int TIMESTAMP_RATE = 90000;
 
 /**
  * @class ccRTP_Hello_Rx
@@ -54,7 +55,7 @@ class ccRTP_Hello_Rx: public Thread
 
 private:
 	// socket to receive packets
-	RTPSocket *socket;
+	RTPSession *socket;
 	// loopback network address
 	InetHostAddress local_ip;
 	// identifier of this sender
@@ -72,65 +73,71 @@ public:
 		if( ! local_ip ){  
 			// this is equivalent to `! local_ip.isInetAddress()'
 			cerr << "Rx: IP address is not correct!" << endl;
-			exit(1);
+			exit();
 		}
 
 		// create socket for RTP connection and get a random
 		// SSRC identifier
-		socket = new RTPSocket(local_ip,RECEIVER_BASE,0);
-		ssrc = socket->getLocalInfo().getID();
+		socket = new RTPSession(local_ip,RECEIVER_BASE);
+		ssrc = socket->getLocalSSRC();
 	}
 	
 	~ccRTP_Hello_Rx(){
-		cout << endl << "Destroying receiver with ID " << ssrc;
-		Terminate();
+		cout << endl << "Destroying receiver -ID: " << ssrc;
+		terminate();
 		delete socket;
 		cout << "... " << "destroyed.";
 	}
 
 	// This method does almost everything.
-	void Run(void){    
+	void run(void){    
 
-		cout << "Hello, " << socket->getLocalInfo().getCNAME() 
+		cout << "Hello, " << defaultApplication().
+			getSDESItem(SDESItemTypeCNAME)
 		     << " ..." << endl;
 		// redefined from Thread.
 		// Set up connection
-		socket->setTimeout(20000);
-		socket->setExpired(3000000);
+		socket->setSchedulingTimeout(20000);
+		socket->setExpireTimeout(3000000);
 		//socket->UDPTransmit::setTypeOfService(SOCKET_IPTOS_LOWDELAY);
-		if( socket->Connect(local_ip,TRANSMITTER_BASE) < 0 )
+		if( !socket->addDestination(local_ip,TRANSMITTER_BASE) )
 			cerr << "Rx (" << ssrc 
 			     << "): could not connect to port." 
 			     << TRANSMITTER_BASE;
 		
-		// Let's check the queues  (you should read the documentation
-		// so that you know what the queues are for).
-		cout << "Rx (" << ssrc 
-		     << "): The queue is " 
-		     << ( socket->RTPQueue::isActive() ? "" : "in") 
-		     << "active." << endl;		
-
 		cout << "Rx (" << ssrc
 		     << "): " << local_ip.getHostname() 
 		     <<	" is waiting for salutes in port "
 		     << RECEIVER_BASE << "..." << endl;
 		
+		socket->setPayloadFormat(StaticPayloadFormat(sptMP2T));
+		socket->startRunning();
+		// Let's check the queues  (you should read the documentation
+		// so that you know what the queues are for).
+		cout << "Rx (" << ssrc 
+		     << "): The queue is " 
+		     << ( socket->isActive() ? "" : "in") 
+		     << "active." << endl;		
+
 		// This is the main loop, where packets are received.
 		for( int i = 0 ; true ; i++ ){
-			unsigned char buffer[100] = "[empty]";
 			
-			// Wait for an RTP packet. [Absolutely unreliable]
-			while ( !socket->getPacket(socket->getFirstTimestamp(),
-						   buffer,100) )
-			ccxx_sleep(10);
+			// Wait for an RTP packet.
+			const AppDataUnit *adu = NULL;
+			while ( NULL == adu ) {
+				Thread::sleep(10);
+				adu = socket->getData(socket->getFirstTimestamp());
+			}
 			
-			// Print content (likely a salute)
+			// Print content (likely a salute :))
+			// Note we are sure the data is an asciiz string.
 			time_t receiving_time = time(NULL);
 			char tmstring[30];
 			strftime(tmstring,30,"%X",localtime(&receiving_time));
 			cout << "Rx (" << ssrc 
 			     << "): [receiving at " << tmstring << "]: " 
-			     <<	buffer << endl;
+			     <<	adu->getData() << endl;
+			delete adu;
 		}
 	}
 };
@@ -144,7 +151,7 @@ class ccRTP_Hello_Tx: public Thread, public TimerPort
 
 private:
 	// socket to transmit
-	RTPSocket *socket;
+	RTPSession *socket;
 	// loopback network address
 	InetHostAddress local_ip;
 	// identifier of this sender
@@ -162,76 +169,71 @@ public:
 		if( ! local_ip ){  
 		// this is equivalent to `! local_ip.isInetAddress()'
 			cerr << "Tx: IP address is not correct!" << endl;
-			exit(1);
+			exit();
 		}
 		
-		socket = new RTPSocket(local_ip,TRANSMITTER_BASE,0);
-		ssrc = socket->getLocalInfo().getID();
+		socket = new RTPSession(local_ip,TRANSMITTER_BASE);
+		ssrc = socket->getLocalSSRC();
 	}
 
 	~ccRTP_Hello_Tx(){
-		cout << endl << "Destroying transmitter with ID " << ssrc;
-		Terminate();
+		cout << endl << "Destroying transmitter -ID: " << ssrc;
+		terminate();
 		delete socket;
 		cout << "... " << "destroyed.";
 	}
 
 	// This method does almost everything.
-	void Run(void){    
+	void run(void){    
 		// redefined from Thread.
 		cout << "Tx (" << ssrc << "): " << local_ip.getHostname() 
 		     <<	" is going to salute perself through " 
 		     << local_ip << "..." << endl;
 		
 		// Set up connection
-		socket->setTimeout(20000);
-		socket->setExpired(3000000);
-		if( socket->Connect(local_ip,RECEIVER_BASE) < 0 )
+		socket->setSchedulingTimeout(20000);
+		socket->setExpireTimeout(3000000);
+		if( !socket->addDestination(local_ip,RECEIVER_BASE) )
 			cerr << "Tx (" << ssrc 
 			     << "): could not connect to port." 
 			     << RECEIVER_BASE;
 		
-		// Let's check the queues  (you should read the documentation
-		// so that you know what the queues are for).
-		cout << "Tx (" << ssrc << "): The queue is "
-		     << ( socket->RTPQueue::isActive()? "" : "in")
-		     << "active." << endl;
-
 		cout << "Tx (" << ssrc << "): Transmitting salutes to port "
 		     << RECEIVER_BASE << "..." << endl;
 
 		uint32 timestamp = 0;
-		//socket->getCurrentTimestamp(RTP_PAYLOAD_MP2T);
-		time_t initial_time = time(NULL);
 		// This will be useful for periodic execution
 		TimerPort::setTimer(1000);
 
 		// This is the main loop, where packets are sent.
+		socket->setPayloadFormat(StaticPayloadFormat(sptMP2T));
+		socket->startRunning();
+		// Let's check the queues  (you should read the documentation
+		// so that you know what the queues are for).
+		cout << "Tx (" << ssrc << "): The queue is "
+		     << ( socket->isActive()? "" : "in")
+		     << "active." << endl;
+
 		for( int i = 0 ; true ;i++ ){
 
-			const uint32 TIMESTAMP_RATE = 
-				socket->getRate(RTP_PAYLOAD_MP2T);
-			
 			// send RTP packets, providing timestamp,
 			// payload type and payload.  
 			// construct salute.
 			unsigned char salute[50];
 			snprintf((char *)salute,50,
-				 "Hello, brave gnu world! (no %u)",i);
+				 "Hello, brave gnu world (#%u)!",i);
 			time_t sending_time = time(NULL);
 			// get timestamp to send salute
-			if ( i == 0 ){
-				timestamp = socket->
-					getCurrentTimestamp(RTP_PAYLOAD_MP2T);
+			if ( 0 == i ){
+				timestamp = socket->getCurrentTimestamp();
 				
 			} else {
 				// increment for 1 second
-				timestamp += socket->getRate(RTP_PAYLOAD_MP2T);
+				timestamp += socket->getCurrentRTPClockRate();
 			}	
-			socket->putPacket(timestamp,
-					  RTP_PAYLOAD_MP2T,
-					  salute,
-					  strlen((char *)salute)+1);
+
+			socket->putData(timestamp,salute,
+					strlen((char *)salute)+1);
 			// print info
 			char tmstring[30];
 			strftime(tmstring,30,"%X",
@@ -242,13 +244,14 @@ public:
 			     << "..." << endl;
 
 			// Let's wait for the next cycle
-			ccxx_sleep(TimerPort::getTimer());
+			Thread::sleep(TimerPort::getTimer());
 			TimerPort::incTimer(1000);
 		}
 	}
 };
 
-void main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
 
 	// Construct the two main threads. they will not run yet.
 	ccRTP_Hello_Rx *receiver = new ccRTP_Hello_Rx;
@@ -258,15 +261,15 @@ void main(int argc, char *argv[]){
 		endl << "Strike [Enter] when you are fed up with it." << endl;
 
 	// Start execution of hello now.
-	receiver->Start();
-	transmitter->Start();
+	receiver->start();
+	transmitter->start();
 
 	cin.get();
 
-	delete receiver;
 	delete transmitter;
+	delete receiver;
 
-	cout << endl << "That's all" << endl;
+	cout << endl << "That's all." << endl;
 	
 	exit(0);
 }

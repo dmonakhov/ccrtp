@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2001 Open Source Telecom Corporation.
+# Copyright (C) 2000-2002 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -9,14 +9,17 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
+ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in ccrtp.proto \
-	pkginfo.in freebsd/Makefile.in freebsd/pkg-* acconfig.h
+	pkginfo.in ccrtp.lsm.in freebsd/Makefile.in freebsd/pkg-* acconfig.h \
+	COPYING.addendum \
+	ccrtp.kdevprj
 
 PKGBASE = "/opt/OSTrtp"
 PKGNAME = "OSTrtp"
 
-SUBDIRS = src phone
-DIST_SUBDIRS = m4 config src doc demo phone
+SUBDIRS = src phone win32
+DIST_SUBDIRS = m4 config src win32 doc demo phone
 
 kdoc:
 	(cd src ; make kdoc)

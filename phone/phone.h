@@ -1,4 +1,4 @@
-// Copyright (C) 2000-2001 Open Source Telecom Corporation.
+// Copyright (C) 2000-2002 Open Source Telecom Corporation.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #define CCXX_PHONE_H_
  
 #ifndef CCXX_RTP_H_
-#include <cc++/rtp.h>
+#include <cc++/rtp/rtp.h>
 #endif
  
 #ifdef	CCXX_NAMESPACES
@@ -155,10 +155,11 @@ private:
 protected:
 	RTPEvent();
 
-	virtual void gotHello(RTPSource &src)
+	virtual void gotHello(const SyncSource &src)
 		{return;};
 
-	virtual void gotGoodbye(RTPSource &src, char *reason)
+	virtual void gotGoodbye(const SyncSource &src, 
+				const std::string& reason)
 		{return;};
 };
 
@@ -176,8 +177,8 @@ private:
 	bool	unicast;	// indicate if in unicast call
 	bool	shutdown;	// tracks shutdown state
 
-	void gotHello(RTPSource &src);
-	void gotGoodbye(RTPSource &src, char *reason);
+	void onGotHello(const SyncSource &src);
+	void onGotGoodbye(const SyncSource &src, const std::string& reason);
 
 public:
 	RTPAudio();

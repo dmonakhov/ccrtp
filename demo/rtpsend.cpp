@@ -1,6 +1,6 @@
 // rtpsend
 // Send RTP packets using ccRTP.
-// Copyright (C) 2001  Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002  Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,45 +16,62 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "rtp.h"
 #include <cstdlib>
+#include <cc++/rtp/rtp.h>
 
 #ifdef  CCXX_NAMESPACES
 using namespace ost;
+using namespace std;
 #endif
 
 /**
  * @brief This class sends an RTP Packet
  **/
-class Sender: RTPSocket {
+class Sender: public RTPSession, public TimerPort {
 public:
 	Sender(const unsigned char* data, const InetHostAddress& ia, 
 	       tpport_t port, uint32 tstamp, uint16 count):
-		RTPSocket(ia)
+		RTPSession(InetHostAddress("0.0.0.0")),
+		packetsPerSecond(10)
 	{
 		uint32 timestamp = tstamp? tstamp : 0;
 		
-		setTimeout(0);
-		setExpired(1000000);
+		cout << "My SSRC identifier is: " 
+		     << hex << getLocalSSRC() << endl;
+
+		defaultApplication().setSDESItem(SDESItemTypeTOOL,
+						 "rtpsend demo app.");
+		setSchedulingTimeout(10000);
+		setExpireTimeout(1000000);
 		
-		if ( Connect(ia,port) < 0 ) {
+		if ( !addDestination(ia,port) ) {
 			cerr << "Could not connect" << endl;
-			exit(0);
+			exit();
 		}
 		
+		setPayloadFormat(StaticPayloadFormat(sptPCMU));
+		startRunning();
+
+		uint16 tstampInc = getCurrentRTPClockRate()/packetsPerSecond;
+		uint32 period = 1000/packetsPerSecond;
+		TimerPort::setTimer(period);
 		for ( int i = 0; i < count ; i++ ) {
-			putPacket(i*1600,RTP_PAYLOAD_PCMU,
-				  data,strlen((char *)data) + 1);
-			ccxx_sleep(200);
+			putData(timestamp + i*tstampInc,
+				data,strlen((char *)data) + 1);
+			Thread::sleep(TimerPort::getTimer());
+			TimerPort::incTimer(period);
 		}
-		// Allow the service thread to run
-		ccxx_sleep(10);
 	}
+
+private:
+	const uint16 packetsPerSecond;
 };
 
 int
 main(int argc, char *argv[])
 {
+	cout << "rtpsend..." << endl;
+
 	if (argc != 6) { 
 		cerr << "Syntax: " << "data host port timestamp count" << endl;
 		exit(1);

@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2001 Open Source Telecom Corporation.
+# Copyright (C) 1999-2002 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -13,7 +13,7 @@ LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
 LIBS = ../src/libccrtp1.la @EXTLIBS@ @GNULIBS@
-ccxxincludedir=$(includedir)/cc++
+ccxxincludedir=$(includedir)/cc++2/cc++
 EXTRA_DIST = phone.conf
 
 noinst_HEADERS = server.h

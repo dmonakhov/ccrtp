@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
+// Copyright (C) 2000, 2001 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is
+// As a special exception to the GNU General Public License, permission is 
 // granted for additional uses of the text contained in its release 
 // of ccRTP.
 // 
@@ -38,47 +38,110 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// RTPDuplex class implementation
-//
-
+#include <algorithm>
 #include "private.h"
-#include <cc++/rtp/ext.h>
+#include <cc++/rtp/pool.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {
+using std::list;
 #endif
 
-RTPDuplex::RTPDuplex(const InetAddress &ia, tpport_t local, tpport_t remote) :
-	RTPDataQueue(), UDPReceive(ia, local), UDPTransmit(ia, remote)
+RTPSessionPool::RTPSessionPool() :
+	highestSocket(0)
 {
-	dataBasePort = local;
+#ifndef WIN32
+	setPoolTimeout(0,3000);
+	FD_ZERO(&recvSocketSet);
+#endif
 }
 
-RTPDuplex::~RTPDuplex()
+bool
+RTPSessionPool::addSession(RTPSessionBase& session)
 {
-	// Terminate both sockets.
-	endTransmitter();
-	endReceiver();
+#ifndef WIN32
+	bool result = false;
+	poolLock.writeLock();
+	// insert in list. 
+	SOCKET s = getDataRecvSocket(session);
+	if ( sessionList.end() == 
+	     find(sessionList.begin(),sessionList.end(),&session) ) {
+		result = true;
+		sessionList.push_back(&session);
+		if ( s > highestSocket + 1 )
+			highestSocket = s + 1;
+		FD_SET(s,&recvSocketSet);	
+	} else {
+		result = false;
+	}
+	poolLock.unlock();
+	return result;
+#endif
 }
 
-Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
+bool
+RTPSessionPool::removeSession(RTPSessionBase& session)
 {
-	Socket::Error rtn;
+#ifndef WIN32
+	bool result = false;
+	poolLock.writeLock();
+	// remove from list. 
+	SOCKET s = getDataRecvSocket(session);
+	PoolIterator i;
+	if ( sessionList.end() != 
+	     (i = find(sessionList.begin(),sessionList.end(),&session)) ) { 
+		sessionList.erase(i);
+		result = true;
+		FD_CLR(s,&recvSocketSet);
+	} else {
+		result = false;
+	}
+	poolLock.unlock();
+	return result;
+#endif
+}
 
-	if(!port)
-		port = dataBasePort;
+size_t
+RTPSessionPool::getPoolLength() const
+{
+#ifndef WIN32
+	size_t result;
+	poolLock.readLock();
+	result = sessionList.size();
+	poolLock.unlock();
+	return result;
+#endif
+}
 
-	rtn = UDPTransmit::connect(ia, port);
+void
+SingleRTPSessionPool::run()
+{
+#ifndef WIN32
+	SOCKET so;
+	timeval timeout = getPoolTimeout();
 
-	if(!rtn)
-		rtn = UDPReceive::connect(ia, port + 1);
-	if(rtn)
-		return rtn;
+	while ( isActive() ) {
+		PoolIterator i = sessionList.begin();
+		while ( i != sessionList.end() ) {
+			controlReceptionService(**i);
+			controlTransmissionService(**i);
+			i++;
+		}
 
-	startStack();
-
-	return Socket::errSuccess;
+		int n = select(highestSocket,&recvSocketSet,NULL,NULL,
+			       &timeout);
+		
+		i = sessionList.begin();
+		while ( (i != sessionList.end()) ) {
+			so = getDataRecvSocket(**i);
+			if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
+				takeInDataPacket(**i);
+			}
+			dispatchDataPacket(**i);
+			i++;
+		}
+	}
+#endif // ndef WIN32
 }
 
 #ifdef  CCXX_NAMESPACES
@@ -91,6 +154,3 @@ Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
  * c-basic-offset: 8
  * End:
  */
-
-
-

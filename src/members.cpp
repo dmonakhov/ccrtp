@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002 Federico Montesino <p5087@quintero.fie.us.es>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,213 +38,280 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// MembershipControl class implementation
-//
+/** 
+ * @file members.cpp
+ * @shot MembershipBookkeeping class implementation
+ *
+ * @todo implement the reallocation mechanism (e.g., when the number
+ * of ssrcs per collision list goes up to 2, make the size
+ * approx. four times bigger (0.5 ssrcs per list now. when the number
+ * of ssrcs per list goes down to 0.5, decrease four times. Do not use
+ * 2 or 0.5, but `2 + something' and `0.5 - somehting'). Always
+ * jumping between prime numbers -> provide a table from 7 to many.
+ **/
+
 #include "private.h"
+#include <cc++/rtp/cqueue.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
-const RTPSource MembershipControl::dummysource(0);
-
-MembershipControl::MembershipControl(uint32 initial_size):
-	SOURCE_BUCKETS(initial_size), 
-	sources( new RTPSource* [SOURCE_BUCKETS] ),
-	first(NULL), last(NULL)
+MembershipBookkeeping::SyncSourceLink::~SyncSourceLink()
+{ 
+	try {
+		delete source;
+		delete prevConflict;
+		delete receiverInfo;
+		delete senderInfo;
+	} catch (...) { }
+}
+	
+void
+MembershipBookkeeping::SyncSourceLink::initStats()
 {
-	for ( uint32 i = 0; i < SOURCE_BUCKETS; i++ )
-		sources[i] = NULL;
+	lastPacketTime.tv_sec = lastPacketTime.tv_usec = 0;
+	senderInfo = NULL;
+	receiverInfo = NULL;
+
+	obsPacketCount = obsOctetCount = 0;
+	maxSeqNum = extendedMaxSeqNum = 0;
+	cumulativePacketLost = 0;
+	fractionLost = 0;
+	jitter = 0;
+	initialTimestamp = 0;
+	initialTime.tv_sec = initialTime.tv_usec = 0;
+	flag = false;
+
+	badSeqNum = SEQNUMMOD + 1;
+	probation = 0;
+	baseSeqNum = 0;
+	expectedPrior = 0;
+	receivedPrior = 0;
+	seqNumAccum = 0;
 }
 
-MembershipControl::~MembershipControl()
+void
+MembershipBookkeeping::SyncSourceLink::computeStats()
 {
-	endMembers();
+	// See Appendix A.3
+	
+	// compute cumulative packet lost.
+	setExtendedMaxSeqNum(getMaxSeqNum() + getSeqNumAccum());
+	uint32 expected = 
+		(getExtendedMaxSeqNum() - getBaseSeqNum() + 1);
+	uint32 pc = getObservedPacketCount();
+	uint32 lost;
+	if ( 0 == pc )
+		lost = 0;
+	else
+		lost = expected - pc;
+	setCumulativePacketLost(lost);
+	
+	// compute the fraction of packets lost during the last
+	// reporting interval.
+	uint32 expectedDelta = expected - expectedPrior;
+	expectedPrior = expected;
+	uint32 receivedDelta = getObservedPacketCount() -
+		receivedPrior;
+	receivedPrior = getObservedPacketCount();
+	uint32 lostDelta = expectedDelta - receivedDelta;
+	if ( expectedDelta == 0 || lostDelta <= 0 ) 
+		setFractionLost(0);
+	else 
+		setFractionLost((lostDelta<<8) / expectedDelta );
+}
+
+void
+MembershipBookkeeping::SyncSourceLink::setPrevConflict(InetAddress& addr, 
+						       tpport_t dataPort,
+						       tpport_t controlPort)
+{
+	delete prevConflict;
+	prevConflict = 
+		new ConflictingTransportAddress(addr,dataPort,controlPort);
+}
+
+void
+MembershipBookkeeping::SyncSourceLink::
+recordInsertion(const IncomingRTPPktLink& pkt)
+{
+}
+
+void
+MembershipBookkeeping::SyncSourceLink::
+setSenderInfo(void* si)
+{
+	if ( NULL == senderInfo )
+		senderInfo = reinterpret_cast<void*>(new RTCPCompoundHandler::SenderInfo);
+	memcpy(senderInfo,si,sizeof(RTCPCompoundHandler::SenderInfo));
+}
+
+void
+MembershipBookkeeping::SyncSourceLink::
+setReceiverInfo(void* ri)
+{
+	if ( NULL == receiverInfo )
+		receiverInfo = reinterpret_cast<void*>(new RTCPCompoundHandler::ReceiverInfo);
+	memcpy(receiverInfo,ri,sizeof(RTCPCompoundHandler::ReceiverInfo));
+}
+
+const size_t MembershipBookkeeping::defaultMembersHashSize = 11;
+const uint32 MembershipBookkeeping::SEQNUMMOD = (1<<16);
+
+#define HASH(a) ((a + (a >> 8)) % MembershipBookkeeping::sourceBucketsNum)
+
+// Initializes the array (hash table) and the global list of
+// SyncSourceLink objects
+MembershipBookkeeping::MembershipBookkeeping(uint32 initialSize):
+	SyncSourceHandler(), ParticipantHandler(), 
+	ConflictHandler(), Members(),
+	sourceBucketsNum(initialSize),
+	sourceLinks( new SyncSourceLink* [sourceBucketsNum] ),
+	first(NULL), last(NULL)
+{
+	for ( uint32 i = 0; i < sourceBucketsNum; i++ )
+		sourceLinks[i] = NULL;
 }
 
 void 
-MembershipControl::endMembers()
+MembershipBookkeeping::endMembers()
 {
-	RTPSource *s, *prev;
-	for( s = first; s; ) {
-		prev = s;
-		s = s->next;
+	SyncSourceLink* s;
+	while( first ) {
+		s = first;
+		first = first->next;
 		try {
-			delete prev;
+			delete s->getSource();
+			delete s;
 		} catch (...) {}
 	}
-	
+	last = NULL;
 	try {
-		delete [] sources;
+		delete [] sourceLinks;
 	} catch (...) {}
 }
 
-RTPSource & 
-MembershipControl::addNewSource(uint32 ssrc)
+bool
+MembershipBookkeeping::isRegistered(uint32 ssrc)
 {
-	RTPSource *newsource = new RTPSource(ssrc);
+	bool result = false;
+	SyncSourceLink* sl = sourceLinks[ HASH(ssrc) ];
 
-	// FIX: Use a nicer hashing. 
-	uint32 index = (ssrc + (ssrc >> 24)) % SOURCE_BUCKETS; 
-	RTPSource *pos = sources[index];
-	// first, insert into the hash table
-	if ( pos == NULL ) {
-		// there was no one in this collision list as yet
-		sources[index] = newsource;
-	} else {
-		bool inserted = false;
-		// The collision list is ordered ascendently
-		RTPSource *prevpos = NULL;
-		while ( pos != NULL ) {
-			if ( pos->ssrc == ssrc ) {
-				// FIX: solve collision: RAISE
-				// EXCEPTION or call plug-in
-				break;
-			} else if ( pos->ssrc > ssrc ) {
-				// insert
-				if ( prevpos )
-					prevpos->nextcollis = newsource;
-				newsource->nextcollis = pos;
-				sources[index] = newsource;
-				inserted = true;
-				break;
-			} else {
-				// keep on searching
-				prevpos = pos;
-				pos = pos->nextcollis;
-			}
-		}
-		// insert last in this list
-		if ( !inserted) {
-			newsource->nextcollis = NULL;
-			prevpos->nextcollis = newsource;
-		}				
-	}
-	// then, insert into the list of sources
-	if ( first ) {
-		last = last->next = newsource;
-	} else {
-		first = last = newsource;
-	}
-	increaseMembersCount();
-	newsource->setState(RTPSOURCE_STATE_PREVALID);
-	return *newsource;
-}
-
-RTPSource &
-MembershipControl::getSourceBySSRC(uint32 ssrc, bool create) 
-{  
-	RTPSource *result = sources[ (ssrc + (ssrc >> 24)) % SOURCE_BUCKETS ]; 
-	
-	while ( result != NULL ) {
-		if ( result->ssrc == ssrc ) {
-			// we found it!
-			break;              
-		} else if ( result->ssrc > ssrc ) {
-			// it isn't here
-			if ( create )
-				result = &addNewSource(ssrc);  
-			else
-				result = const_cast<RTPSource *>(&dummysource);
+	while ( sl != NULL ) {
+		if ( ssrc == sl->getSource()->getID() ) {
+			result = true;
+			break;
+		} else if ( ssrc < sl->getSource()->getID() ) {
 			break;
 		} else {
 			// keep on searching
-			result = result->nextcollis;
+			sl = sl->getNextCollis();
 		}
 	}
+	return result;
+}
 
-	if ( result == NULL && create ){
-		if ( create )
-			result = &addNewSource(ssrc);
-		else
-			result = const_cast<RTPSource *>(&dummysource);
+// Gets or creates the source and its link structure.
+MembershipBookkeeping::SyncSourceLink*
+MembershipBookkeeping::getSourceBySSRC(uint32 ssrc, bool& created)
+{
+	uint32 hashing = HASH(ssrc);
+	SyncSourceLink* result = sourceLinks[hashing];
+	SyncSourceLink* prev = NULL;
+	created = false;
+
+	if ( NULL == result ) {
+		result = sourceLinks[hashing] = 
+			new SyncSourceLink(this,new SyncSource(ssrc));
+		created = true;
+	} else {
+		while ( NULL != result ) {
+			if ( ssrc == result->getSource()->getID() ) {
+				// we found it!
+				break;
+			} else if ( ssrc > result->getSource()->getID() ) {
+				// keep on searching
+				prev = result;
+				result = result->getNextCollis();
+			} else { 
+				// ( ssrc < result->getSource()->getID() )
+				// it isn't recorded here -> create it.
+				SyncSourceLink* newlink = 
+					new SyncSourceLink(this,new SyncSource(ssrc));
+				if ( NULL != prev )
+					prev->setNextCollis(newlink);
+				else
+					sourceLinks[hashing] = newlink;
+				newlink->setNextCollis(result);
+				result = newlink;
+				created = true;
+				break;
+			}
+		}
+		if ( NULL == result ) {
+			// insert at the end of the collision list
+			result = 
+				new SyncSourceLink(this,new SyncSource(ssrc));
+			created = true;
+			prev->setNextCollis(result);
+		}
 	}
-	return *result;
+	if ( created ) {
+		if ( first )
+			last->setNext(result);			
+		else
+			first =  result;
+		last = result;
+		increaseMembersCount();
+	}
+	return result;
 }
 
 bool
-MembershipControl::BYESource(uint32 ssrc) 
+MembershipBookkeeping::BYESource(uint32 ssrc) 
 {  
 	bool found = false;
 	// If the source identified by ssrc is in the table, mark it
 	// as leaving the session. If it was not, do nothing.
-	RTPSource &src = getSourceBySSRC(ssrc);
-	if ( src != dummysource ) {
+	if ( isRegistered(ssrc) ) {
 		found = true;
-		src.setState(RTPSOURCE_STATE_SAYINGBYE);
-		decreaseMembersCount();
+		decreaseMembersCount(); // TODO really decrease right now?
 	}
 	return found;
 }
 
 bool
-MembershipControl::removeSource(uint32 ssrc) 
+MembershipBookkeeping::removeSource(uint32 ssrc) 
 {  
-	bool removed = false;
-	RTPSource* old = NULL, 
-		* s = sources[ (ssrc + (ssrc >> 24)) % SOURCE_BUCKETS ]; 
+	bool found = false;
+	SyncSourceLink* old = NULL, 
+		* s = sourceLinks[ HASH(ssrc) ]; 
 	while ( s != NULL ){
-		if ( s->ssrc == ssrc ) {
+		if ( s->getSource()->getID() == ssrc ) {
 			// we found it
 			if ( old )
-				old->nextcollis = s->nextcollis;
-			if ( s->prev )
-				s->prev->next = s->next;
-			if ( s->next )
-				s->next->prev = s->prev;
+				old->setNextCollis(s->getNextCollis());
+			if ( s->getPrev() )
+				s->getPrev()->setNext(s->getNext());
+			if ( s->getNext() )
+				s->getNext()->setPrev(s->getPrev());
 			decreaseMembersCount();
-			if ( s->isSender() )
+			if ( s->getSource()->isSender() )
 				decreaseSendersCount();
 			delete s;
-			removed = true;
+			found = true;
 			break;              
-		} else if ( s->ssrc > ssrc ) {
+		} else if ( s->getSource()->getID() > ssrc ) {
 			// it wasn't here
 			break;
 		} else {
 			// keep on searching
 			old = s;
-			s = s->nextcollis;
+			s = s->getNextCollis();
 		}
 	}
-	return removed;
-}
-
-const RTPSource&
-MembershipControl::getFirstPlayer()
-{
-	playerslock.enterMutex();
-
-	playerslock.leaveMutex();
-	return dummysource;
-}
-
-const RTPSource&
-MembershipControl::getLastPlayer()
-{
-	playerslock.enterMutex();
-
-	playerslock.leaveMutex();
-	return dummysource;
-}
-
-const RTPSource&
-MembershipControl::getNextPlayer()
-{
-	playerslock.enterMutex();
-
-	playerslock.leaveMutex();
-	return dummysource;
-}
-
-const RTPSource&
-MembershipControl::getCurrentPlayer()
-{
-	playerslock.enterMutex();
-
-	playerslock.leaveMutex();
-	return dummysource;
+	return found;
 }
 
 #ifdef	CCXX_NAMESPACES

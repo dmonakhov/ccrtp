@@ -1,4 +1,4 @@
-// Copyright (C) 2000-2001 Open Source Telecom Corporation.
+// Copyright (C) 2000-2002 Open Source Telecom Corporation.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ void server(void)
 		exit(-1);
 	}
 
-	rtp->start();	// we assume it's always running
+	rtp->startStack();	// we assume it's always running
 
 	while(!fifo.eof())
 	{

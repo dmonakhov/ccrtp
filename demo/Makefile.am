@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2001 Open Source Telecom Corporation.
+# Copyright (C) 1999-2002 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -10,26 +10,33 @@
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
-LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
+AM_CXXFLAGS= -Wall
+LDFLAGS = @LDFLAGS@ 
+#ignored for programs
+#$(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
 ccxxincludedir=$(includedir)/cc++
 
 noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx
+#ccrtptest
+
+#ccrtptest_SOURCES = ccrtptest.cpp
+#ccrtptest_LDFLAGS = ../src/libccrtp1.la
 
 rtpsend_SOURCES = rtpsend.cpp
-rtpsend_LDFLAGS = ../src/libccrtp.la
+rtpsend_LDFLAGS = ../src/libccrtp1.la
 
 rtplisten_SOURCES = rtplisten.cpp
-rtplisten_LDFLAGS = ../src/libccrtp.la
+rtplisten_LDFLAGS = ../src/libccrtp1.la
 
 rtphello_SOURCES = rtphello.cpp
-rtphello_LDFLAGS = ../src/libccrtp.la
+rtphello_LDFLAGS = ../src/libccrtp1.la
 
 rtpduphello_SOURCES = rtpduphello.cpp
-rtpduphello_LDFLAGS = ../src/libccrtp.la
+rtpduphello_LDFLAGS = ../src/libccrtp1.la
 
 audiorx_SOURCES = audiorx.cpp
-audiorx_LDFLAGS = ../src/libccrtp.la
+audiorx_LDFLAGS = ../src/libccrtp1.la
 
 audiotx_SOURCES = audiotx.cpp
-audiotx_LDFLAGS = ../src/libccrtp.la
+audiotx_LDFLAGS = ../src/libccrtp1.la

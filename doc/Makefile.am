@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2001 Open Source Telecom Corporation.
+# Copyright (C) 2000-2002 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -12,3 +12,6 @@ AUTOMAKE_OPTIONS = no-dependencies
 EXTRA_DIST = Doxyfile Doxyman man3/*.3cc
 #man3/*.3cc html/* latex/*
 
+# not ready yet
+#info_TEXINFOS = ccrtp.texi
+#ccrtp_TEXINFOS = gpl.texi fdl.texi fdlnotice.texi

@@ -1,4 +1,4 @@
-// Copyright (C) 2001 Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002 Federico Montesino <p5087@quintero.fie.us.es>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,65 +38,35 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// RTPData class implementation
-//
+/**
+ * @file data.cpp
+ * @short AppDataUnit class implementation.
+ **/
+
 #include "private.h"
+#include <cc++/rtp/queuebase.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
-RTPData::DataCounter::DataCounter(const unsigned char *data, size_t size, rtp_payload_t pt):
-	count(1), data(data), size(size), pt(pt)
-{
-}
-
-RTPData::DataCounter::~DataCounter()
-{
-	try {
-		delete [] data;
-	} catch (...) {}
-}
-
-RTPData::RTPData(IncomingRTPPkt& packet) :
-	datablock( new DataCounter(packet.getRawPacket(),
-		packet.getRawPacketSize(),packet.getPayloadType()) ),
-	src(&(packet.getSource()))
+AppDataUnit::AppDataUnit(const IncomingRTPPkt& packet, const SyncSource& src):
+	datablock(&packet), source(&src)
 {
 
 }
 
-RTPData::RTPData(const RTPData &origin):
-	datablock(origin.datablock),
-	src(origin.src)
+AppDataUnit::AppDataUnit(const AppDataUnit &origin): 
+	datablock(origin.datablock), source(origin.source)
 {
-	++datablock->count;
-
+	++datablock;
 }
 
-RTPData::~RTPData()
+AppDataUnit&
+AppDataUnit::operator=(const AppDataUnit &rhs)
 {
-	if ( --datablock->count == 0 )
-		try {
-			delete datablock;
-		} catch (...) { }
-}
-
-RTPData &
-RTPData::operator=(const RTPData &source)
-{
-	// autoassignment
-	if ( datablock == source.datablock )
-		return *this;
-
-	// remove the last "soft link"
-	if ( --datablock->count == 0 )
-		delete datablock;
-
-	datablock = source.datablock;
-	++datablock->count;
-
+	datablock.operator=(rhs.datablock);
+	source = rhs.source;
 	return *this;
 }
 

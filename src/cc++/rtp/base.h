@@ -1,5 +1,5 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
-//  
+// Copyright (C) 2001, 2002 Federico Montesino Pouzols <fedemp@altern.org>.
+// 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is
+// As a special exception to the GNU General Public License, permission is 
 // granted for additional uses of the text contained in its release 
 // of ccRTP.
 // 
@@ -38,52 +38,79 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-//
-// RTPDuplex class implementation
-//
+#ifndef	CCXX_RTP_BASE_H_
+#define CCXX_RTP_BASE_H_
 
-#include "private.h"
-#include <cc++/rtp/ext.h>
+#include <cc++/config.h>
+#include <cc++/socket.h>
 
-#ifdef  CCXX_NAMESPACES
+#ifdef CCXX_NAMESPACES
 namespace ost {
 #endif
 
-RTPDuplex::RTPDuplex(const InetAddress &ia, tpport_t local, tpport_t remote) :
-	RTPDataQueue(), UDPReceive(ia, local), UDPTransmit(ia, remote)
+/** 
+ * @file base.h 
+ *
+ * @short Base elements for RTP stacks: constants, types and global
+ * functions.
+ **/
+
+/// RTP protocol version supported.
+const uint8 CCRTP_VERSION = 2;
+
+/// Time interval expressed in microseconds.
+typedef uint32 microtimeout_t;
+
+/// Time interval expressed in nanoseconds.
+typedef uint32 nanotimeout_t;
+
+/**
+ * Convert a time interval, expressed as a microtimeout_t (number of
+ * microseconds), into a timeval value.
+ *
+ * @param to time interval, in microseconds.
+ * @return the same time interval, as a timeval value.
+ **/
+timeval
+microtimeout2Timeval(microtimeout_t to);
+
+/**
+ * Convert a time interval, expressed as a timeval value into a
+ * microseconds counter.
+ *
+ * @param t time, as a timeval.
+ * @return the same time, as a microseconds counter.
+ **/
+inline microtimeout_t
+timeval2microtimeout(const timeval& t)
+{ return ((t.tv_sec * 1000000ul) + t.tv_usec); }
+
+/**
+ * Convert a time interval, expressed as the difference between two
+ * timeval values (t1-t2), into a microseconds counter.
+ *
+ * @param t1 First timeval.
+ * @param t2 Second timeval.
+ * @return difference between t1 and t2, in microseconds.
+ **/
+inline microtimeout_t
+timevalDiff2microtimeout(const timeval& t1, const timeval& t2)
 {
-	dataBasePort = local;
+	return ((t1.tv_sec - t2.tv_sec) * 1000000ul) + 
+		(t1.tv_usec - t2.tv_usec);
 }
 
-RTPDuplex::~RTPDuplex()
-{
-	// Terminate both sockets.
-	endTransmitter();
-	endReceiver();
-}
+/// registered default RTP data transport port
+const tpport_t DefaultRTPDataPort = 5004;
 
-Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
-{
-	Socket::Error rtn;
-
-	if(!port)
-		port = dataBasePort;
-
-	rtn = UDPTransmit::connect(ia, port);
-
-	if(!rtn)
-		rtn = UDPReceive::connect(ia, port + 1);
-	if(rtn)
-		return rtn;
-
-	startStack();
-
-	return Socket::errSuccess;
-}
+/// registered default RTCP transport port
+const tpport_t DefaultRTCPPort = 5005;
 
 #ifdef  CCXX_NAMESPACES
 };
 #endif
+
+#endif  // ndef CCXX_RTP_BASE_H_
 
 /** EMACS **
  * Local variables:
@@ -91,6 +118,3 @@ Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
  * c-basic-offset: 8
  * End:
  */
-
-
-
