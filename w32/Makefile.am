@@ -12,6 +12,6 @@ MAINTAINERCLEANFILES = Makefile.in Makefile
 
 EXTRA_DIST =  README msvcpp/ccrtp1.dsw msvcpp/ccrtp1.dsp \
         msvcpp/ccRTPdemo.dsw msvcpp/demo/*.dsp \
-        cape/*.dsw cape/*.dsp \
+        cape/*.dsw cape/*.dsp cape/*.sln cape/*.vcproj \
         mingw32/Makefile.gcc common/*.dsp
 

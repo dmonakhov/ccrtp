@@ -42,13 +42,13 @@
 
 #ifndef WIN32
 #include <sys/ioctl.h>
-inline size_t ccioctl(int so, int request, size_t& len) 
+inline size_t ccioctl(SOCKET so, int request, size_t& len) 
 { return ::ioctl(so,request,&len); }
 #else
-inline size_t ccioctl(int so, int request, size_t& len )
+inline size_t ccioctl(SOCKET so, int request, size_t& len )
 { 
 	unsigned long l; 
-	size_t result;
+	size_t result = 0;
 	::ioctlsocket(so,request,&l); 
 	len = l; 
 	return result;

@@ -1082,8 +1082,7 @@ protected:
 	size_t
 	takeInDataPacket();
 
-	void
-	renewLocalSSRC();
+	void renewLocalSSRC();
 
 	/**
 	 * This is used to fetch a packet in the receive queue and to

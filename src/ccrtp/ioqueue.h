@@ -275,6 +275,9 @@ protected:
 	timerTick()
 	{ return; }
 
+	void renewLocalSSRC()
+		{return IncomingDataQueue::renewLocalSSRC();};
+
 private:
 	RTPDataQueue(const RTPDataQueue &o);
 	
@@ -312,6 +315,8 @@ private:
 	/* RTP session bandwidth control */
 	static const uint32 defaultSessionBw;
 	uint32 sessionBw;
+
+
 };
 
 /** @}*/ // ioqueue

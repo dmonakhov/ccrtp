@@ -1,3 +1,22 @@
+2005-02-06  David Sugar <dyfet@ostel.com<
+	* cape vs.net projects added.
+
+	* src/control.cpp: some casting fixups for fixed size data types.  fractionLost is a uint8 and so does
+	not need to pass through htonx stuff.
+
+	* src/ccrtp/ioqueue.h: satisfy dominenance by asserting RTPDataQueue which inherets renewLocalSSRC
+	through both iqueue and oqueue now refers explicity to the iqueue one.
+
+	* src/ccrtp/rtppkt.h, queuebase.h: some explicit type conversions added.
+
+	* src/ccrtp/channel.h: ccioctl now uses "SOCKET" rather than pure int type, w32 returns 0.
+
+	* src/incqueue.cpp: explicit type casts added.  "count" seems unused in getData.
+
+	* src/queue.cpp: should we avoid casting address to 32 bit object??
+
+	* src/rtppkt.cpp: explicit typecasts added as needed.
+
 2005-01-28  David Sugar <dyfet@ostel.com>
 	* libccrtp1.pc.in: fix for pkgconfig dependency on libccext2.
 

@@ -454,9 +454,9 @@ QueueRTCPManager::onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks)
 void
 QueueRTCPManager::updateAvgRTCPSize(size_t len)
 {
-	uint32 newlen = len; 
+	size_t newlen = len; 
 	newlen += lowerHeadersSize;
-	rtcpAvgSize = ( (15 * rtcpAvgSize) >> 4 ) + ( newlen >> 4);
+	rtcpAvgSize = (uint16)(( (15 * rtcpAvgSize) >> 4 ) + ( newlen >> 4));
 }
 
 bool
@@ -469,8 +469,8 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t)
 
 	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
 	     < pkt.getLength() ) {
-		uint16 endpointer = pointer + sizeof(RTCPFixedHeader) + 
-			pkt.fh.block_count * sizeof(uint32);
+		uint16 endpointer = (uint16)(pointer + sizeof(RTCPFixedHeader) + 
+			pkt.fh.block_count * sizeof(uint32));
 		uint16 len = rtcpRecvBuffer[endpointer];
 		reason = new char[len + 1];
 		memcpy(reason,rtcpRecvBuffer + endpointer + 1,len);
@@ -698,9 +698,9 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 		setPrevMembersNum(1);
 		rtcpInitial = true;
 		rtcpWeSent = false;
-		rtcpAvgSize = sizeof(RTCPFixedHeader) + sizeof(uint32) +
+		rtcpAvgSize = (uint16)(sizeof(RTCPFixedHeader) + sizeof(uint32) +
 			strlen(reason.c_str()) + 
-			(4 - (strlen(reason.c_str()) & 0x03));
+			(4 - (strlen(reason.c_str()) & 0x03)));
 		gettimeofday(&(reconsInfo.rtcpTc),NULL);
 		timeval T = computeRTCPInterval();
 		timeradd(&(reconsInfo.rtcpTp),&T,&(reconsInfo.rtcpTn));
@@ -737,7 +737,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 	len += sizeof(RTCPFixedHeader) + sizeof(BYEPacket);
 	// add the optional reason
 	if ( reason.c_str() != NULL ){
-		pkt->info.BYE.length = strlen(reason.c_str());
+		pkt->info.BYE.length = (uint8)strlen(reason.c_str());
 		memcpy(buffer + len,reason.c_str(),pkt->info.BYE.length);
 		len += pkt->info.BYE.length;
 		padlen = 4 - ((len - len1) & 0x03);
@@ -851,13 +851,13 @@ QueueRTCPManager::dispatchControlPacket(void)
 	// (B) put report blocks
 	// After adding report blocks, we have to leave room for at
 	// least a CNAME SDES item
-	uint16 available = getPathMTU()
+	uint16 available = (uint16)(getPathMTU()
 		- lowerHeadersSize
 		- len
 		- (sizeof(RTCPFixedHeader) +
 		   2*sizeof(uint8) + 
 		   getApplication().getSDESItem(SDESItemTypeCNAME).length()) 
-		- 100;
+		- 100);
 
 	// if we have to go to a new RR packet
 	bool another = false;
@@ -933,13 +933,13 @@ QueueRTCPManager::packSDES(uint16 &len)
 		getApplication().getSDESItem(SDESItemTypeCNAME).length();
 	const char* cname = 
 		getApplication().getSDESItem(SDESItemTypeCNAME).c_str();
-	pkt->info.SDES.item.len = cnameLen;
+	pkt->info.SDES.item.len = (uint8)cnameLen;
 	len += sizeof(RTCPFixedHeader) + sizeof(pkt->info.SDES.ssrc) + 
 		sizeof(pkt->info.SDES.item.type) +
 		sizeof(pkt->info.SDES.item.len);
 	
 	memcpy((rtcpSendBuffer + len),cname,cnameLen);
-	len += cnameLen;
+	len += (uint16)cnameLen;
 	// pack items other than CNAME (following priorities
 	// stablished inside scheduleSDESItem()).
 	SDESItemType nexttype = scheduleSDESItem();
@@ -949,7 +949,7 @@ QueueRTCPManager::packSDES(uint16 &len)
 		item->type = nexttype;
 		const char *content = 
 			getApplication().getSDESItem(nexttype).c_str();
-		item->len = strlen(content);
+		item->len = (uint8)strlen(content);
 		len += 2;
 		memcpy(reinterpret_cast<char *>(rtcpSendBuffer + len),
 			  content,item->len);
@@ -987,8 +987,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 		// update stats.
 		srcLink.computeStats();
 		blocks[j].ssrc = Nssrc;
-		blocks[j].rinfo.fractionLost = 
-			htonl(srcLink.getFractionLost());
+		blocks[j].rinfo.fractionLost = srcLink.getFractionLost();
 		blocks[j].rinfo.lostMSB = 
 			(srcLink.getCumulativePacketLost() & 0xFF0000) >> 16;
 		blocks[j].rinfo.lostLSW = 

@@ -143,7 +143,7 @@ public:
 	 **/
 	inline uint8
 	getContributorsCount() const
-	{ return datablock->getCSRCsCount(); }
+	{ return (uint8)datablock->getCSRCsCount(); }
 
 	/**
 	 * Get the array of 32-bit CSRC identifiers.

@@ -67,7 +67,7 @@ static uint32 MD5BasedRandom32()
 	message.array[0] =
 		static_cast<uint8>(message.data.time.tv_sec * 
 				   message.data.time.tv_usec);
-	message.data.address = (uint32)&message;
+	message.data.address = (uint32)(&message);
 	memcpy(message.data.cname,
 	       defaultApplication().getSDESItem(SDESItemTypeCNAME).c_str(),10);
 

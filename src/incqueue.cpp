@@ -187,9 +187,9 @@ IncomingDataQueue::takeInDataPacket(void)
 	InetHostAddress network_address;
 	tpport_t transport_port;
 
-	uint32 nextSize = getNextDataPacketSize();
+	uint32 nextSize = (uint32)getNextDataPacketSize();
 	unsigned char* buffer = new unsigned char[nextSize];
-	int32 rtn = recvData(buffer,nextSize,network_address,transport_port);
+	int32 rtn = (int32)recvData(buffer,nextSize,network_address,transport_port);
 	if ( (rtn < 0) || ((uint32)rtn > getMaxRecvPacketSize()) ){
 		delete buffer;
 		return 0;
@@ -446,7 +446,7 @@ const AppDataUnit*
 IncomingDataQueue::getData(uint32 stamp, const SyncSource* src)
 {
 	IncomingRTPPktLink* pl;
-	unsigned count = 0;
+//	unsigned count = 0;
 	AppDataUnit* result;
 
 	if ( NULL != (pl = getWaiting(stamp,src)) )
@@ -459,7 +459,7 @@ IncomingDataQueue::getData(uint32 stamp, const SyncSource* src)
 
 		// delete the packet link, but not the packet
 		delete pl;
-		count += len;
+//		count += len;
 	} else {
 		result = NULL;
 	}

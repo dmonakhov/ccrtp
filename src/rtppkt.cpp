@@ -107,7 +107,7 @@ DynamicPayloadFormat::DynamicPayloadFormat(PayloadType type, uint32 rate)
 // constructor commonly used for incoming packets
 RTPPacket::RTPPacket(const unsigned char* const block, size_t len, 
 		     bool duplicate):
-	total(len),
+	total((uint32)len),
 	duplicated(duplicate)
 {
 
@@ -120,7 +120,7 @@ RTPPacket::RTPPacket(const unsigned char* const block, size_t len,
 	}
 	if ( header->padding ) 
 		len -= block[len - 1];
-	payloadSize = len - hdrSize;
+	payloadSize = (uint32)(len - hdrSize);
 	
 	if ( duplicate ) {
 		buffer = new unsigned char[len];
@@ -133,11 +133,11 @@ RTPPacket::RTPPacket(const unsigned char* const block, size_t len,
 // constructor commonly used for outgoing packets
 RTPPacket::RTPPacket(size_t hdrlen, size_t plen) :
 	buffer(NULL),
-	hdrSize(hdrlen),
-	payloadSize(plen),
+	hdrSize((uint32)hdrlen),
+	payloadSize((uint32)plen),
 	duplicated(false)
 {
-	total = hdrlen + payloadSize;
+	total = (uint32)(hdrlen + payloadSize);
 	// compute if there must be padding
 	uint8 padding = total & 0x03;
 	if ( padding ) {
@@ -176,7 +176,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) * numcsrc 
 		  + hdrextlen),datalen)
 {
-	uint32 pointer = getSizeOfFixedHeader();
+	uint32 pointer = (uint32)getSizeOfFixedHeader();
 	// add CSCR identifiers (putting them in network order).
 	setCSRCArray(csrcs,numcsrc);
 	pointer += numcsrc * sizeof(uint32);
@@ -195,7 +195,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	const unsigned char* data, size_t datalen) :
 	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) *numcsrc),datalen)
 {
-	uint32 pointer = getSizeOfFixedHeader();
+	uint32 pointer = (uint32)getSizeOfFixedHeader();
 	// add CSCR identifiers (putting them in network order).
 	setCSRCArray(csrcs,numcsrc);
 	pointer += numcsrc * sizeof(uint32);

@@ -413,7 +413,7 @@ public:
 	 **/
 	uint16
 	getLastSRNTPTimestampInt() const
-	{ return ((ntohl(receiverInfo.lsr) & 0xFFFF0000) >> 16); }
+	{ return (uint16)((ntohl(receiverInfo.lsr) & 0xFFFF0000) >> 16); }
 
 	/**
 	 * Get the fractional part of the NTP timestamp of the last SR
@@ -422,7 +422,7 @@ public:
 	 **/
 	uint16
 	getLastSRNTPTimestampFrac() const
-	{ return (ntohl(receiverInfo.lsr) & 0xFFFF); }
+	{ return (uint16)(ntohl(receiverInfo.lsr) & 0xFFFF); }
 
 	/**
 	 * Get the delay between the last SR packet received and the
