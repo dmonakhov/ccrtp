@@ -139,9 +139,9 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen) :
 {
 	total = (uint32)(hdrlen + payloadSize);
 	// compute if there must be padding
-	uint8 padding = total % paddinglen;
-	if ( 0 != padding ) {
-		padding = paddinglen - padding;
+	uint8 padding = 0;
+	if ( 0 != paddinglen ) {
+		padding = paddinglen - (total % paddinglen);
 		total += padding;
 	}
 	// now we know the actual total length of the packet

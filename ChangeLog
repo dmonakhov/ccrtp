@@ -1,3 +1,10 @@
+2005-03-23  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/oqueue.h, src/outqueue.cpp: destinationCounter
+	eventually replaced with the size method of std::list.
+
+	* src/rtppkt.cpp: padding calculation fixed.
+	
 2005-03-22  David Sugar <dyfet@ostel.com>
 
 	* configure.ac: bumped version up for next release to 1.3.0, rather 

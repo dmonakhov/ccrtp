@@ -68,7 +68,7 @@ class __EXPORT DestinationListHandler
 {
 protected:
 	struct TransportAddress;
-	unsigned destinationCounter;
+	std::list<TransportAddress*> destList;
 
 public:
 	DestinationListHandler();
@@ -79,7 +79,7 @@ public:
 	 * Get whether there is only a destination in the list.
 	 **/
 	inline bool isSingleDestination() const
-	{ return (destinationCounter == 1); }
+	{ return (1 == destList.size()); }
 
 	inline TransportAddress* getFirstDestination() const
 	{ return destList.front(); }
@@ -127,8 +127,6 @@ protected:
 		InetAddress networkAddress;
 		tpport_t dataTransportPort, controlTransportPort;
 	};
-
-	std::list<TransportAddress*> destList;
 
 private:
 	mutable ThreadLock destinationLock;
