@@ -1,3 +1,86 @@
+2002-10-21  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* ccRTP has been rewritten. This changelog summarizes the most
+	important changes. Read it from bottom up.
+
+	* src/cc++/rtp/cqueue.h, src/control.cpp: getSDES splitted into
+	onGotSDES and a new virtual: onGotSDESChunk.
+	* src/cc++/rtp.h, control.cpp: added/updated onGotSR, onGotRR,
+	onGotAPP, onGotRRSRExtension and onSSRCCollision plug-in to
+	QueueRTCPManager class.
+
+	* src/cc++/rtp/oqueue.h, src/cc++/rtp/iqueue.h, src/cc++/cqueue.h:
+	readData, writeData, readControl and writeControl virtuals from
+	RTPQueue renamed to recvData, sendData, recvControl and
+	sendControl, respectively. recvData now provided the source
+	transport address. Added new getNextDataPacketSize virtual.
+
+	* src/cc++/rtp/pool.h, src/pool.cpp: added experimental "RTP
+	session pool" implementation.
+
+	* src/cc++/rtp/rtp.h: T_RTPSocket has been replaced with
+	TRTPSessionBase, which does not include any threading mechanism
+	and uses the new socket classes defined in
+	src/cc++/rtp/socket.h. New template class
+	SingleThreadRTPSession. Its run method is implemented using the
+	new QueueRTCPManager::controlReceptionService,
+	QueueRTCPManager::controlTransmissionService,
+	IncomingDataQueue::takeInDataPacket
+	OutgoingDataQueue::dispatchDataPacket.
+
+	* src/cc++/rtp/cqueue.h: added class AVPQueue.
+	* src/cc++/rtp/socket.h: new class RTPBaseUDPIPv4Socket, and template
+	class DualRTPChannel.
+	* src/cc++/rtp/oqueue.h, src/outqueue.cpp: new class
+	DestinationListHandler.
+	* src/cc++/rtp/iqueue.h, src/incqueue.cpp: class IncomingDataQueue
+	splitted from the old RTPQueue class.
+	* src/cc++/rtp/iqueue.h, src/outqueue.cpp: class OutgoingDataQueue
+	spllited from the old RTPQueue class.
+	* src/cc++/rtp/iqueue.h: MembershipControl is now
+	MembershipBookkeeping, inherits from the xxxHandler classes and
+	defines nested structures IncomingRTPPktLink and SyncSourceLink,
+	for packets/sources lists and hash table.	
+	* src/cc++/rtp/iqueue.h: new classes SyncSourceHandler, 
+	ParticipantHandler, ApplicationHandler and ConflictHandler.
+	* src/cc++/rtp/queuebase.h, src/data.cpp: new class AppDataUnit
+	* src/cc++/rtp/queuebase.h, src/queue.cpp: new class RTPQueueBase.
+	* src/cc++/rtp/queuebase.h, src/outqueue.cpp: new class 
+	OutgoingDataQueueBase.
+	* src/cc++/rtp/queuebase.h, src/incqueue.cpp: new class
+	IncomingDataQueueBase.
+
+	* src/cc++/rtp/sources.h, src/source.cpp: new classes SDESItemsHolder,
+	RTPApplication and Participant. RTPSource has been replaced with
+	SyncSource.
+	* src/cc++/rtp/rtcppkt.h, src/rtcppkt.cpp: RTCPCompoundHandler
+	moved and updated. New classes RTCPReceiverInfo and
+	RTCPSenderInfo.
+	* src/c++/rtp/rtppkt.h, src/rtppkt.cpp: RTPPacket, IncomingRTPPkt and 
+	OutgoingRTPPkt moved and updated.
+	* src/cc++/rtp/formats.h, src/rtppkt.cpp: Added new PayloadType
+	typedef, and classes PayloadFormat, DynamicPayloadFormat and
+	StaticPayloadFormat. The old PayloadType enumeration is now called
+	StaticPayloadType and has been changed.
+	* src/cc++/rtp/base.h: common consts and routines.
+	
+	* src/incqueue.cpp, src/outqueue.cpp: splitted from queue.cpp with
+	a lot of new stuff.
+	* src/packet.cpp: splitted into rtppkt.cpp and rtcppkt.cpp
+	* win32/msvcpp/: added GNUccRTP workspace for ccRTP, and ccRTPdemo
+	workspace for demos.
+	* demo/: Makefile.am and demos updated for CC++ 2 and ccRTP 1.0.
+	* phone/: updated for 1.0.
+	* doc/Doxyfile, doc/Doxyman: added src/cc++/rtp to INPUT.
+	* doc/fdl.texi, fdlnotice.texi, doc/gpl.texi, doc/srcmodel.txt,
+	doc/srcmodel.dia: added for ccRTP manual.
+	* Makefile.am: added COPYING.addendum to EXTRA_DIST, and -Wall.
+	* acconfig.h: HAVE_DEV_URANDOM.
+	* configure.in, src/Makefile.am, src/rtp.h, src/rtpext.h:
+	public headers splitted and moved to src/cc++/rtp/.
+	* configure.in: REQUIRES="1.0.0", check for /dev/urandom and
+	cleaned up some headers checks.
+
 2002-07-29  David Sugar <dyfet@ostel.com> (from 0.9.1 to 0.9.2)
 
 	* Updated build for Hammer (x86-64) support.

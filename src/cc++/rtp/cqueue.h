@@ -617,8 +617,9 @@ private:
 };
 
 /**
- * This class adds audio/video profile specific methods to the generic
- * RTCP service queue (QueueRTCPManager).
+ * This class, an RTP/RTCP queue, adds audio/video profile (AVP)
+ * specific methods to the generic RTCP service queue
+ * (QueueRTCPManager).
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
