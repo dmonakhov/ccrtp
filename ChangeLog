@@ -1,3 +1,11 @@
+2002-10-31 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/cc++/rtp/queuebase.h, src/queue.cpp, src/outqueue.cpp,
+	src/control.cpp: added localSSRCNetwork and reladed methods.
+	* demo/rtplisten.cpp: added onGotGoodbye virtual redefinition.
+	* src/control.cpp: (takeInControlPacket), (getOnlyBye), (getBye)
+	fixed.
+	
 2002-10-28 Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/source.cpp, src/cc++/rtp/sources.h: participants

@@ -61,7 +61,7 @@ public:
 	{
 		RTPSession::onGotSR(source,SR,blocks);
 		cout << "I got an SR RTCP report from sync. source "
-		     << hex << (int)source.getID() << ". From " 
+		     << hex << (int)source.getID() << ". From "  << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -72,7 +72,7 @@ public:
 	{
 		RTPSession::onGotRR(source,RR,blocks);
 		cout << "I got an RR RTCP report from sync. source "
-		     << hex << (int)source.getID() << ". From " 
+		     << hex << (int)source.getID() << ". From " << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 	}
@@ -83,10 +83,20 @@ public:
 	{ 
 		bool result = RTPSession::onGotSDESChunk(source,chunk,len);
 		cout << "I got a SDES chunk from sync. source "
-		     << source.getID() << ". From " 
+		     << source.getID() << ". From " << dec
 		     << source.getNetworkAddress() << ":" 
 		     << source.getControlTransportPort() << endl;
 		return result;
+	}
+	
+	void
+	onGotGoodbye(const SyncSource& source, const std::string& reason)
+	{ 
+		cout << "I got a Goodbye packet from sync. source "
+		     << source.getID() << ". From " << dec
+		     << source.getNetworkAddress() << ":" 
+		     << source.getControlTransportPort() << endl;
+		cout << "   Goodbye reason: \"" << reason << "\"" << endl;
 	}
 };
 

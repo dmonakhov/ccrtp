@@ -1,8 +1,6 @@
 - simplified incoming queue for only 1 source / or a low number of
 sources.
 
-- save calls to htonl(getLocalSSRC());
-
 - preallocated buffers mode for scheduling queue.
 
 - QueueRTCPManager::expireSSRCs
@@ -46,4 +44,4 @@ Experimental things, close everything up here before looking down here:
 
 - Consider RTCP Feedback profile (AVPF profile)
 
-Last change: 20 Oct, 2002
+Last change: 31 Oct, 2002
