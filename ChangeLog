@@ -1,3 +1,10 @@
+2005-02-28  Federico Montesino Pouzols  <fedemp@altern.org>
+	* configure.ac: require cc++ >= 1.3.0.
+
+	* src/outqueue.cpp:
+	(DestinationListHandler::removeDestinationFromList) fixed removal
+	of destination addresses.
+	
 2005-02-11  David Sugar <dyfet@ostel.com>
 	* configure.ac: version bumped to 1.2.2
 
