@@ -426,11 +426,11 @@ a multicast address. In the latter case, the application will join to
 a multicast group.
 
 @findex RTPSession::startRunning
-@findex RTPSession::startStack
+@findex RTPSession::enableStack
 General purpose @acronym{RTP} stacks of ccRTP, such as
 @code{RTPSession} objects, must be signaled to start execution. This
 is done calling the @code{startRunning()} method. Note there is also a
-@code{startStack()} method, this only activates the stack but does not
+@code{enableStack()} method, this only activates the stack but does not
 start the execution of the stack thread.
 
 After the steps above, the application can receive data, but will not
