@@ -163,7 +163,10 @@ public:
 
 	inline virtual
 	~TRTPSessionBase()
-	{ endSocket(); }
+	{ 
+	 dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing");
+	 endSocket(); 
+	}
 
 protected:
 	/**
@@ -473,7 +476,7 @@ protected:
 				timeout = 0;
 			}
 		}
-		dispatchBYE("ccRTP stack finishing.");
+		dispatchBYE("GNU ccRTP stack finishing.");
 		sleep(~0);
 	}
 };
