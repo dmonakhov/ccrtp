@@ -683,7 +683,7 @@ QueueRTCPManager::computeRTCPInterval()
 size_t
 QueueRTCPManager::dispatchBYE(const std::string& reason)
 {
-	// for this method, see section 6.3.7 in RFC XXXX
+	// for this method, see section 6.3.7 in RFC 3550
 	// never send a BYE packet if never sent an RTP or RTCP packet
 	// before
 	if ( !(getSendPacketCount() || getSendRTCPPacketCount()) )

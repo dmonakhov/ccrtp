@@ -553,10 +553,13 @@ its source.
 @cindex Closing Sessions
 
 RTP sessions can be closed deleting or destroying @code{RTPSession}
-objects. The stack send a BYE packet to every destination when the
-destructor of sessions is called. It is also possible to explicitly
-send a BYE packet through the dispatchBYE method, which takes the
-leaving reason string as argument.
+objects. The stack sends a BYE packet to every destination when the
+destructor of sessions is called. It is also possible to explicitly send
+a BYE packet through the dispatchBYE method, which takes the leaving
+reason string as argument. Note that dispatchBYE will honor a number of
+rules for sending BYE packets specified in the RTP standard: a BYE
+packet is not sent if no RTP/RTCP packet was sent, and BYE floods
+avoiding mechanisms are employed.
 
 Note that when a BYE RTCP packet is received from a remote
 participant, the virtual @code{onGotGoodbye} will be called.

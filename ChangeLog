@@ -1,3 +1,9 @@
+2005-02-10  Federico Montesino Pouzols  <fedemp@altern.org>
+	* doc/ccrtp.texi: 'Clossing Sessions' extended and clarified.
+
+	* src/ccrtp/rtp.h, src/control.cpp: doc clarifications and updates
+	to RFC 3550/3551.
+	
 2005-02-07  David Sugar <dyfet@ostel.com>
 	* configure.ac: release 1.2.1
 	

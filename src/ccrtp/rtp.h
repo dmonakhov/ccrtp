@@ -42,9 +42,8 @@
  * ccRTP.
  *
  * The classes and types in this header provide general RTP
- * functionality (following RFC 1889/draft-ietf-avt-rtp-new) as well
- * as audio/video RTP profile specific functionality (following RFC
- * 1890/draft-ietf-avt-profile-new).
+ * functionality (following RFC 3550) as well as audio/video RTP
+ * profile specific functionality (following RFC 3551).
  **/
 
 #ifndef	CCXX_RTP_RTP_H_
@@ -564,7 +563,8 @@ typedef RTPSession RTPSocket;
 /**
  * @typedef SymmetricRTPSession
  *
- * Uses one pair of sockets for RTP data and RTCP transmission/reception.
+ * Uses one pair of sockets, (1) for RTP data and (2) for RTCP
+ * transmission/reception.
  *
  * @short Symmetric UDP/IPv4 RTP session scheduled by one thread of execution.
  **/
