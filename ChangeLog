@@ -1,3 +1,7 @@
+2003-03-22  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* win32/msvcpp/ccrtp1.dsp: fixed debug project linking settings.
+
 2003-02-03  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtp.h: fixes for multicast methods of TRTPSessionBase.
