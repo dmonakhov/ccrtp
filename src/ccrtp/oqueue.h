@@ -146,7 +146,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT OutgoingDataQueue:
+class __EXPORT OutgoingDataQueue:
 	public OutgoingDataQueueBase,
 	protected DestinationListHandler
 {

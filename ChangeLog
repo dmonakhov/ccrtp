@@ -7,6 +7,9 @@
 	* src/ccrtp/ioqueue.h: satisfy dominenance by asserting RTPDataQueue which inherets renewLocalSSRC
 	through both iqueue and oqueue now refers explicity to the iqueue one.
 
+	* src/ccrtp/rtp.h: inheritence issues for gcc 3.4 support in templated 
+	RTP class.
+
 	* src/ccrtp/rtppkt.h, queuebase.h: some explicit type conversions added.
 
 	* src/ccrtp/channel.h: ccioctl now uses "SOCKET" rather than pure int type, w32 returns 0.

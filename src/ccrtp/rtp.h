@@ -162,6 +162,9 @@ public:
 	{ build(ia,dataPort,controlPort,iface); }
 
 
+	inline virtual size_t dispatchBYE(const std::string &str)
+		{return QueueRTCPManager::dispatchBYE(str);}
+
 	inline virtual
 	~TRTPSessionBase()
 	{ 
@@ -445,6 +448,33 @@ public:
 	{ enableStack(); Thread::start(); }
 
 protected:
+	inline void enableStack(void)
+		{RTPDataQueue::enableStack();}
+
+	inline microtimeout_t getSchedulingTimeout(void)
+		{return OutgoingDataQueue::getSchedulingTimeout();};
+
+	inline void controlReceptionService(void)
+		{return QueueRTCPManager::controlReceptionService();}
+
+	inline void controlTransmissionService(void)
+		{return QueueRTCPManager::controlTransmissionService();}
+
+	inline timeval getRTCPCheckInterval(void)
+		{return QueueRTCPManager::getRTCPCheckInterval();}
+
+	inline size_t dispatchDataPacket(void)
+		{return OutgoingDataQueue::dispatchDataPacket();}
+
+	inline virtual void timerTick(void)
+		{return;}
+
+	inline virtual bool isPendingData(microtimeout_t timeout)
+		{return UDPReceive::isPendingReceive(timeout);}
+
+	inline size_t takeInDataPacket(void)
+		{return IncomingDataQueue::takeInDataPacket();}
+
 	/**
 	 * Single runnable method for this RTP stacks, schedules
 	 * outgoing and incoming RTP data and RTCP packets.
@@ -484,6 +514,10 @@ protected:
 		dispatchBYE("GNU ccRTP stack finishing.");
 		sleep(~0);
 	}
+
+	inline virtual size_t dispatchBYE(std::string &str)
+		{return QueueRTCPManager::dispatchBYE(str);}
+
 };
 
 /**
