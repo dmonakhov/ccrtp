@@ -61,6 +61,7 @@ rm -fr %{buildroot}
 %doc doc/html/*.html doc/html/*.*g*
 %{_prefix}/lib/libccrtp*.a
 %{_prefix}/lib/libccrtp*.so
+%{_prefix}/lib/libccrtp*.la
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 %{_infodir}/ccrtp*info*
