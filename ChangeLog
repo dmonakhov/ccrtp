@@ -1,5 +1,7 @@
 2003-09-23  Federico Montesino Pouzols  <fedemp@altern.org>
-	
+
+	* src/source.cpp: (RTPApplication::removeParticipant): fixed a bug
+	at first participant addition.
 	* src/ccrtp/rtp.h, src/incqueue.cpp, src/outqueue.cpp: fixed minor
 	signed/unsigned inconsistencies
 

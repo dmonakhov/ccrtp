@@ -181,7 +181,7 @@ RTPApplication::addParticipant(Participant& part)
 {
 	ParticipantLink* pl = new ParticipantLink(part,NULL);
 	if ( NULL == firstPart )
-		firstPart = pl;
+		firstPart = lastPart = pl;
 	else
 		lastPart->setNext(pl);
 	lastPart = pl;

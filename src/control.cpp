@@ -573,7 +573,7 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 	SyncSourceLink* srcLink = getLink(source);
 	Participant* part = source.getParticipant();
 
-	size_t pointer = sizeof(chunk.ssrc);;
+	size_t pointer = sizeof(chunk.ssrc);
 
 	// process chunk items
 	while ( (pointer < len) && !end ) {

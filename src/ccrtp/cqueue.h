@@ -265,6 +265,8 @@ protected:
 	 * @param source Synchronization source of SDES chunk.
 	 * @param chunk SDES chunk structure.
 	 * @param len Length of chunk, in octets.
+	 *
+	 * @return whether there was a CNAME.
 	 **/
 	virtual bool
 	onGotSDESChunk(SyncSource& source, SDESChunk& chunk, size_t len);
