@@ -19,7 +19,7 @@ packet queues.
 %prep
 rm -rf $RPM_BUILD_ROOT
 
-%setup
+%setup -n ccrtp-%{PACKAGE_VERSION}
 ./configure --prefix=%{_prefix}
 
 %build
