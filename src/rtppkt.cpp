@@ -173,7 +173,7 @@ RTPPacket::endPacket()
 OutgoingRTPPkt::OutgoingRTPPkt(
 	const uint32* const csrcs, uint16 numcsrc, 
         const unsigned char* const hdrext, uint32 hdrextlen,
-	const unsigned char* const data, uint32 datalen) :
+	const unsigned char* const data, size_t datalen) :
 	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) * numcsrc 
 		  + hdrextlen),datalen)
 {
@@ -193,7 +193,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 
 OutgoingRTPPkt::OutgoingRTPPkt(
 	const uint32* const csrcs, uint16 numcsrc, 
-	const unsigned char* data, uint32 datalen) :
+	const unsigned char* data, size_t datalen) :
 	RTPPacket((getSizeOfFixedHeader() + sizeof(uint32) *numcsrc),datalen)
 {
 	uint32 pointer = getSizeOfFixedHeader();

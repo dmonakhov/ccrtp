@@ -48,11 +48,13 @@ using std::list;
 #endif
 
 RTPSessionPool::RTPSessionPool() :
-	highestSocket(0)
 {
 #ifndef WIN32
+	highestSocket = 0;
 	setPoolTimeout(0,3000);
 	FD_ZERO(&recvSocketSet);
+#else
+	return false;
 #endif
 }
 
@@ -76,6 +78,8 @@ RTPSessionPool::addSession(RTPSessionBase& session)
 	}
 	poolLock.unlock();
 	return result;
+#else
+	return false;
 #endif
 }
 
@@ -98,6 +102,8 @@ RTPSessionPool::removeSession(RTPSessionBase& session)
 	}
 	poolLock.unlock();
 	return result;
+#else
+	return 0;
 #endif
 }
 

@@ -77,8 +77,9 @@ static uint32 MD5BasedRandom32()
 
 	// compute MD5.
 	MD5Digest md5;
-	md5.putDigest(message.array,sizeof(message));
-	md5.getDigest(digest.buf8);
+	md5.putDigest(reinterpret_cast<unsigned char*>(message.array),
+		      sizeof(message));
+	md5.getDigest(reinterpret_cast<unsigned char*>(digest.buf8));
 	
 	// Get result as xor of the four 32-bit words from the MD5 algorithm.
 	uint32 result = 0;

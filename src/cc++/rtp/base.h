@@ -71,7 +71,7 @@ typedef uint32 nanotimeout_t;
  * @param to time interval, in microseconds.
  * @return the same time interval, as a timeval value.
  **/
-timeval
+CCXX_EXPORT(timeval)
 microtimeout2Timeval(microtimeout_t to);
 
 /**
@@ -105,6 +105,11 @@ const tpport_t DefaultRTPDataPort = 5004;
 
 /// registered default RTCP transport port
 const tpport_t DefaultRTCPPort = 5005;
+
+#ifdef WIN32
+CCXX_EXPORT(int)
+gettimeofday(struct timeval *tv_, void *tz_);
+#endif
 
 #ifdef  CCXX_NAMESPACES
 };

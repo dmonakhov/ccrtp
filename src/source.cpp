@@ -92,7 +92,7 @@ findusername(std::string &username)
 	unsigned long len;
 	GetUserName(NULL,&len);
 	if ( len > 0 ) {
-		char *n = new char[maxlen];	 
+		char *n = new char[len];	 
 		GetUserName(n,&len);
 		username = n;
 		delete [] n;

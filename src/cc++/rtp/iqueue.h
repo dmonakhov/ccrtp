@@ -471,7 +471,7 @@ protected:
 	struct SyncSourceLink
 	{
 		// 2^16
-		static const uint32 SEQNUMMOD = 65536;
+		static const uint32 SEQNUMMOD;
 
 		SyncSourceLink(MembershipBookkeeping* m,
 			       SyncSource* s,

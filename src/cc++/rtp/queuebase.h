@@ -107,7 +107,7 @@ public:
 	 *
 	 * @return Raw pointer to data block.
 	 **/
-	inline const uint8*
+	inline const uint8* const
 	getData() const
 	{ return datablock->getPayload(); };
 		

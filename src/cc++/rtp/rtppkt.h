@@ -118,9 +118,9 @@ public:
 	/**
 	 * @return pointer to the payload section of the packet.
 	 **/
-	inline const unsigned char* const
+	inline const uint8* const
 	getPayload() const
-	{ return buffer + getHeaderSize(); }
+	{ return (uint8*)(buffer + getHeaderSize()); }
 		
 	/**
 	 * @return lenght of the payload section, in octets.

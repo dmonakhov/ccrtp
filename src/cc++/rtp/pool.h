@@ -130,8 +130,8 @@ protected:
 	inline void setPoolTimeout(struct timeval to)
 	{ poolTimeout = to; }
 
-	list<RTPSessionBase*> sessionList;
-	typedef list<RTPSessionBase*>::iterator PoolIterator;
+	std::list<RTPSessionBase*> sessionList;
+	typedef std::list<RTPSessionBase*>::iterator PoolIterator;
 
 #ifndef WIN32
 	fd_set recvSocketSet;

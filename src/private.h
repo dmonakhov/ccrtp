@@ -77,6 +77,7 @@
 #define CCXX_RTP_PRIVATE_H_
 
 #include <cc++/config.h>
+#include <cc++/export.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -100,8 +101,6 @@ namespace ost {
 #endif
 
 #ifdef WIN32
-#include  <sys/timeb.h>
-int gettimeofday(struct timeval *tv_,  void *tz_);
 
 #ifndef timeradd
 #define timeradd(a, b, result)	                               \

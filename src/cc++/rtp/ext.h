@@ -91,7 +91,7 @@ public:
 	 *        local is used
 	 * @return socket status
 	 */
-	Socket::Error 
+	UDPTransmit::Error 
 	connect(const InetHostAddress &host, tpport_t port = 0);
 
 protected:
@@ -134,7 +134,13 @@ protected:
 
 	inline size_t
 	getNextDataPacketSize() const
-	{ size_t len; ccioctl(UDPReceive::so,FIONREAD,len); return len; }
+	{ 
+#ifndef WIN32
+		size_t len; ccioctl(UDPReceive::so,FIONREAD,len); return len; 
+#else
+		unsigned long len; ccioctl(UDPReceive::so,FIONREAD,len); return len;
+#endif
+	}
 
 	/**
 	 * @return the associated peer information

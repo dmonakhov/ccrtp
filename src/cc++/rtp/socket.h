@@ -48,7 +48,7 @@
 inline size_t ccioctl(int so, int request, size_t& len) 
 { return ::ioctl(so,request,&len); }
 #else
-inline size_t ccioctl(int so, int request, size_t& len )
+inline size_t ccioctl(int so, int request, unsigned long& len )
 { return ::ioctlsocket(so,request,&len); }
 #endif
 

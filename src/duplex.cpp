@@ -62,9 +62,9 @@ RTPDuplex::~RTPDuplex()
 	endReceiver();
 }
 
-Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
+UDPTransmit::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 {
-	Socket::Error rtn;
+	UDPTransmit::Error rtn;
 
 	if(!port)
 		port = dataBasePort;
@@ -78,7 +78,7 @@ Socket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 
 	startStack();
 
-	return Socket::errSuccess;
+	return UDPTransmit::errSuccess;
 }
 
 #ifdef  CCXX_NAMESPACES

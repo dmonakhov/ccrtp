@@ -64,7 +64,7 @@ QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 	queueApplication(app)
 {
 	controlServiceActive = false;
-	controlBwFract = 0.05;
+	controlBwFract = 0.05f;
 	sendControlBwFract = 0.25;
 	recvControlBwFract = 1-sendControlBwFract;
 	ctrlSendCount = 0;

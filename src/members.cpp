@@ -57,6 +57,8 @@
 namespace ost {
 #endif
 
+const uint32 MembershipBookkeeping::SyncSourceLink::SEQNUMMOD = (1<<16);
+
 MembershipBookkeeping::SyncSourceLink::~SyncSourceLink()
 { 
 	try {

@@ -438,7 +438,7 @@ OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data,
 	if ( max > packet->getPayloadSize() - offset )
 		max = packet->getPayloadSize() - offset;
 
-	memcpy(const_cast<unsigned char*>(packet->getPayload()) + offset,
+	memcpy((unsigned char*)(packet->getPayload()) + offset,
 	       data, max);
 	sendLock.unlock();
 	return max;
