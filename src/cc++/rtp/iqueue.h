@@ -634,10 +634,10 @@ protected:
 		inline void setLastPacketTransitTime(uint32 time)
 		{ lastPacketTransitTime = time; }
 
-		inline uint32 getJitter() const
+		inline float getJitter() const
 		{ return jitter; }
 
-		inline void setJitter(uint32 j)
+		inline void setJitter(float j)
 		{ jitter = j; }
 
 		inline uint32 getInitialTimestamp() const 
@@ -763,7 +763,7 @@ protected:
 		// for interarrivel jitter computation
 		uint32 lastPacketTransitTime;
 		// interarrival jitter of packets from this source.
-		uint32 jitter;
+		float jitter;
 		uint32 initialTimestamp;
 		timeval initialTime;
 

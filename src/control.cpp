@@ -118,7 +118,6 @@ QueueRTCPManager::endQueueRTCPManager()
 {
 	controlServiceActive = false;
 	controlBwFract = sendControlBwFract = 0;
-	dispatchBYE("ccRTP stack finishing session");
 }
 
 bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
@@ -968,7 +967,8 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 			htons(srcLink.getCumulativePacketLost() & 0xFFFF);
 		blocks[j].rinfo.highestSeqNum = 
 			htonl(srcLink.getExtendedMaxSeqNum());
-		blocks[j].rinfo.jitter = htonl(srcLink.getJitter());
+		blocks[j].rinfo.jitter = 
+			htonl(static_cast<uint32>(srcLink.getJitter()));
 		RTCPCompoundHandler::SenderInfo* si = 
 			reinterpret_cast<RTCPCompoundHandler::SenderInfo*>(srcLink.getSenderInfo());
 		if ( NULL == si ) {

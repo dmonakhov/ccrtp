@@ -687,9 +687,10 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		srcLink.setLastPacketTransitTime(transitTime);
 		if ( delta < 0 )
 			delta = -delta;
-		srcLink.setJitter((1.0f / 16.0f) * 
+		srcLink.setJitter( srcLink.getJitter() + 
+				   static_cast<int>((1.0f / 16.0f) * 
 				  (static_cast<float>(delta) - 
-				   srcLink.getJitter()) * 256);
+				   srcLink.getJitter())) );
 	}
 	return result;
 }

@@ -47,7 +47,7 @@
 #ifndef	CCXX_RTP_QUEUEBASE_H_
 #define CCXX_RTP_QUEUEBASE_H_
 
-#include <cc++/template.h>
+#include <cc++/pointer.h>
 #include <cc++/rtp/rtppkt.h>
 #include <cc++/rtp/sources.h>
 

@@ -9,8 +9,6 @@ sources.
 
 - save calls to htonl(getLocalSSRC());
 
-- avoid floats in jitter computation
-
 - preallocated buffers mode for scheduling queue.
 
 - QueueRTCPManager::expireSSRCs

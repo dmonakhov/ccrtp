@@ -179,7 +179,7 @@ protected:
 			 uint32 size = RTPDataQueue::defaultMembersHashSize, 
 			 RTPApplication& app = defaultApplication());
 
-	inline virtual 
+	virtual 
 	~QueueRTCPManager();
 
 	const RTPApplication&
