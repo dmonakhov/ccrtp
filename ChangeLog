@@ -69,6 +69,7 @@
 	* src/packet.cpp: splitted into rtppkt.cpp and rtcppkt.cpp
 	* win32/msvcpp/: added GNUccRTP workspace for ccRTP, and ccRTPdemo
 	workspace for demos.
+	* win32/mingw32/: added mingw32 cross-compiling makefile.
 	* demo/: Makefile.am and demos updated for CC++ 2 and ccRTP 1.0.
 	* phone/: updated for 1.0.
 	* doc/Doxyfile, doc/Doxyman: added src/cc++/rtp to INPUT.
