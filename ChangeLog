@@ -1,3 +1,14 @@
+2003-04-04  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/channel.h: (RTPBaseUDPIPv4Socket::join): call
+	Socket::join, instead of UDPSocket::join in order to avoid
+	conflicts with the new join added to releases of common c++ later
+	than 1.0.8.
+	* win32/msvcpp/demo/rtphello.dsp, win32/msvcpp/demo/rtpsend.cpp,
+	win32/msvcpp/demo/rtplisten.dsp: link ws2_32.lib.
+	* src/source.cpp: avoid access violation in the win32 version of
+	findusername, from Christian Steindl.
+	
 2003-04-02  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtp.h: (TRTPSocketBase::endSocket): free cso and dso.

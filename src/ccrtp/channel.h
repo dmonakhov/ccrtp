@@ -134,7 +134,7 @@ public:
 
 	inline Socket::Error
 	join(const InetMcastAddress& ia)
-	{ return UDPSocket::join(ia); }
+	{ return Socket::join(ia); }
 
 	inline Socket::Error
 	drop(const InetMcastAddress& ia)

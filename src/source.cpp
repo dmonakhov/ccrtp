@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002,2003 Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -88,10 +88,8 @@ findusername(std::string &username)
 static void
 findusername(std::string &username)
 {
-
-	unsigned long len;
-	GetUserName(NULL,&len);
-	if ( len > 0 ) {
+	unsigned long len = 0;
+	if ( GetUserName(NULL,&len) && (len > 0) ) {
 		char *n = new char[len];	 
 		GetUserName(n,&len);
 		username = n;
