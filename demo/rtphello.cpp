@@ -243,7 +243,7 @@ public:
 			strftime(tmstring,30,"%X",
 				 localtime(&sending_time));
 			cout << "Tx (" << hex << (int)ssrc 
-			     << "): sending salute " << "no " << i 
+			     << "): sending salute " << "no " << dec << i 
 			     << ", at " << tmstring 
 			     << "..." << endl;
 
