@@ -8,7 +8,7 @@ Prefix: %{_prefix}
 Copyright: GPL
 BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
-Requires: CommonC++ >= 1.9.0
+Requires: CommonC++ >= 1.9.2
 
 %description
 The ccrtp package offers a generic framework for sending and receiving of

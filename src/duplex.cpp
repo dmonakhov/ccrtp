@@ -44,7 +44,7 @@
 
 #include "private.h"
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -83,7 +83,7 @@ sockerror_t RTPDuplex::Connect(const InetHostAddress &ia, tpport_t port)
 	return SOCKET_SUCCESS;
 }
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 };
 #endif
 

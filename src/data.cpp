@@ -43,7 +43,7 @@
 //
 #include "private.h"
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -100,7 +100,7 @@ RTPData::operator=(const RTPData &source)
 	return *this;
 }
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

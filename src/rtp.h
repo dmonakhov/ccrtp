@@ -51,7 +51,7 @@
 #include <cc++/socket.h>
 #endif
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -2567,7 +2567,7 @@ private:
 	tpport_t base;
 };
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 };
 #endif
 

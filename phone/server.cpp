@@ -17,7 +17,7 @@
 #include <cc++/slog.h>
 #include "server.h"
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -92,6 +92,6 @@ void server(void)
 	exit(0);
 }
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif

@@ -83,7 +83,7 @@
 #   error "Portability problem: you do not have sys/utsname.h"
 #endif
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -258,7 +258,7 @@ struct RTCPPacket
 
 #pragma pack()
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 };
 #endif
 

@@ -19,7 +19,7 @@
 #include <rtp.h>
 #include "phone.h"
  
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -37,7 +37,7 @@ public:
 
 void	server(void);
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

@@ -43,7 +43,7 @@
 //
 #include "private.h"
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -1015,7 +1015,7 @@ RTPQueue::RTPService(microtimeout_t &wait)
 	}
 }
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 };
 #endif
 

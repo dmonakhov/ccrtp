@@ -16,7 +16,7 @@
 
 #include "server.h"
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -72,6 +72,6 @@ KeyThreads keythreads;
 KeyAudio keyaudio;
 KeyRTP keyrtp;
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif

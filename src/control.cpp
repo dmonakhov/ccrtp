@@ -43,7 +43,7 @@
 //
 #include "private.h"
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -824,7 +824,7 @@ QueueRTCPManager::tryAnotherRR(RTCPPacket *&pkt, uint16 &len, uint16 &blocks)
 	return result;
 }
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

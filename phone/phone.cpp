@@ -18,7 +18,7 @@
 #include <getopt.h>
 #include <sys/wait.h>
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -105,7 +105,7 @@ static int getPid()
 	return pid;
 }	
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 extern "C" {
 #endif
 
@@ -162,6 +162,6 @@ int main(int argc, char **argv)
 	exit(0);
 }
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 }; };
 #endif

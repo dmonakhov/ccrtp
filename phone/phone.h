@@ -21,7 +21,7 @@
 #include <cc++/rtp.h>
 #endif
  
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -209,7 +209,7 @@ extern KeyAudio keyaudio;
 extern RTPAudio *rtp;
 extern DevAudio *audio;
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

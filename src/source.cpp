@@ -43,7 +43,7 @@
 //
 #include "private.h"
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -171,7 +171,7 @@ RTPSource::setSDESItem(sdes_item_type_t type, const char *const value)
 	// FIX: exception
 }
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

@@ -49,7 +49,7 @@
 #ifndef  CCXX_RTPEXT_H
 #   define   CCXX_RTPEXT_H
 
-#ifdef  __NAMESPACES__
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -674,7 +674,7 @@ typedef struct
 }       RTCPFixedHeader;
 #pragma pack()
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 

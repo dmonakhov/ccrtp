@@ -32,7 +32,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 using namespace ost;
 #endif
 

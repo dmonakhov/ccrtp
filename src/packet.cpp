@@ -44,7 +44,7 @@
 //
 #include "private.h"
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
 
@@ -188,7 +188,7 @@ IncomingRTPPkt::~IncomingRTPPkt()
 {
 };
 
-#ifdef	__NAMESPACES__
+#ifdef	CCXX_NAMESPACES
 };
 #endif
 
