@@ -14,12 +14,21 @@ cfg_options=""
 if test -z "$*" ; then
         if test -f ~/.configure ; then
 		cfg_options=`grep ^ccrtp: ~/.configure | sed -e s/^ccrtp://`
+        elif test -f /etc/configure.conf ; then
+		cfg_options=`grep ^ccrtp: /etc/configure.conf | sed -e s/^ccrtp://`   
         fi
 fi
 
 if test ! -z "$cfg_options" ; then
         echo "using ~/.configure defaults...$cfg_options"
+        case "$SHELL" in       
+        */bash*)
+                exec $SHELL $0 $cfg_options
+                exit -1
+                ;;
+        esac
         exec $0 $cfg_options
+        exit -1
 fi
 
 VERSION="1.1.1"

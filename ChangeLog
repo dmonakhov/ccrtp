@@ -1,3 +1,7 @@
+2004-11-14  David Sugar <dyfet@ostel.com>
+	* configure.ac: standardized autoconfiguring a bit including
+	shell issues with freebsd.
+
 2004-11-11  David Sugar <dyfet@ostel.com>
 	* m4/ost_debug.m4 and debug support added.
 	* configure.in moved to configure.ac.
