@@ -148,6 +148,78 @@ SingleRTPSessionPool::run()
 #endif // ndef WIN32
 }
 
+SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
+		const InetHostAddress& ia, 
+			       tpport_t dataPort, 
+			       tpport_t controlPort,
+			       int pri,
+			       uint32 memberssize,
+			       RTPApplication& app):
+		Thread(pri),
+		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app)
+	{ }
+
+SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
+	const InetMcastAddress& ia,
+			       tpport_t dataPort, 
+			       tpport_t controlPort, 
+			       int pri,
+			       uint32 memberssize,
+			       RTPApplication& app,
+			       uint32 iface): 
+		Thread(pri),
+		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app,iface)
+	{ }
+
+bool SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::isPendingData(microtimeout_t timeout)
+{
+	return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
+}
+
+void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::timerTick(void)
+{
+}
+
+void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::run(void)
+{
+		microtimeout_t timeout = 0;
+		while ( ServiceQueue::isActive() ) {
+			if ( timeout < 1000 ){ // !(timeout/1000)
+				timeout = getSchedulingTimeout();
+			}
+			setCancel(cancelDeferred);
+			controlReceptionService();
+			controlTransmissionService();
+			setCancel(cancelImmediate);
+			microtimeout_t maxWait = 
+				timeval2microtimeout(getRTCPCheckInterval());
+			// make sure the scheduling timeout is
+			// <= the check interval for RTCP
+			// packets
+			timeout = (timeout > maxWait)? maxWait : timeout;
+			if ( timeout < 1000 ) { // !(timeout/1000)
+				setCancel(cancelDeferred);
+				dispatchDataPacket();
+				setCancel(cancelImmediate);
+				timerTick();
+			} else {
+				if ( isPendingData(timeout/1000) ) {
+					setCancel(cancelDeferred);
+					takeInDataPacket();
+					setCancel(cancelImmediate);
+				}
+				timeout = 0;
+			}
+		}
+		dispatchBYE("GNU ccRTP stack finishing.");
+		sleep(~0);
+}
+
+
+
+
 #ifdef  CCXX_NAMESPACES
 }
 #endif

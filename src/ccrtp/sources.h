@@ -501,7 +501,7 @@ private:
  * assigned (as user\@host), whereas the other application objects'
  * CNAME is provided to its constructor.
  **/
-RTPApplication& defaultApplication();
+__EXPORT RTPApplication& defaultApplication();
 
 /** @}*/ // sources
 

@@ -111,7 +111,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ccext2.lib ccgnu2.lib ws2_32.lib"
-				ShowProgress="1"
+				ShowProgress="0"
 				OutputFile=".\Release/ccrtp1.dll"
 				Version="1.2.1"
 				LinkIncremental="1"

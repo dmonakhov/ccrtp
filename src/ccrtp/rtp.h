@@ -424,12 +424,8 @@ public:
 			       int pri = 0,
 			       uint32 memberssize = 
 			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication()): 
-		Thread(pri),
-		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app)
-	{ }
-
+			       RTPApplication& app = defaultApplication());
+	
 	SingleThreadRTPSession(const InetMcastAddress& ia, 
 			       tpport_t dataPort = DefaultRTPDataPort, 
 			       tpport_t controlPort = 0, 
@@ -437,11 +433,7 @@ public:
 			       uint32 memberssize = 
 			       MembershipBookkeeping::defaultMembersHashSize,
 			       RTPApplication& app = defaultApplication(),
-			       uint32 iface = 0): 
-		Thread(pri),
-		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app,iface)
-	{ }
+			       uint32 iface = 0); 
 
 	~SingleThreadRTPSession()
 	{ terminate(); }
@@ -472,11 +464,9 @@ protected:
 	inline size_t dispatchDataPacket(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
 
-	inline virtual void timerTick(void)
-		{return;}
+	virtual void timerTick(void);
 
-	virtual bool isPendingData(microtimeout_t timeout) 
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}; 
+	virtual bool isPendingData(microtimeout_t timeout); 
 
 	inline size_t takeInDataPacket(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
@@ -489,41 +479,7 @@ protected:
 	 * Single runnable method for this RTP stacks, schedules
 	 * outgoing and incoming RTP data and RTCP packets.
 	 **/
-	void 
-	run()
-	{
-		microtimeout_t timeout = 0;
-		while ( ServiceQueue::isActive() ) {
-			if ( timeout < 1000 ){ // !(timeout/1000)
-				timeout = getSchedulingTimeout();
-			}
-			setCancel(cancelDeferred);
-			controlReceptionService();
-			controlTransmissionService();
-			setCancel(cancelImmediate);
-			microtimeout_t maxWait = 
-				timeval2microtimeout(getRTCPCheckInterval());
-			// make sure the scheduling timeout is
-			// <= the check interval for RTCP
-			// packets
-			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( timeout < 1000 ) { // !(timeout/1000)
-				setCancel(cancelDeferred);
-				dispatchDataPacket();
-				setCancel(cancelImmediate);
-				timerTick();
-			} else {
-				if ( isPendingData(timeout/1000) ) {
-					setCancel(cancelDeferred);
-					takeInDataPacket();
-					setCancel(cancelImmediate);
-				}
-				timeout = 0;
-			}
-		}
-		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep(~0);
-	}
+	virtual void run();
 };
 
 /**
