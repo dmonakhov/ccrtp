@@ -48,6 +48,7 @@
 
 #include <cc++/socket.h>
 #include <cc++/rtp/ioqueue.h>
+#include <cc++/rtp/socket.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {
@@ -109,7 +110,7 @@ protected:
 	 * @return number of octets written
 	 */
 	size_t 
-	writeData(const unsigned char *const buffer, size_t len)
+	sendData(const unsigned char *const buffer, size_t len)
 	{ return UDPTransmit::transmit((const char *)buffer, len); }
 
 	/**
@@ -118,8 +119,22 @@ protected:
 	 * @return number of octets read
 	 */
 	size_t
-	readData(unsigned char *buffer, size_t len)
-	{ return UDPReceive::receive(buffer, len); }
+	recvData(unsigned char *buffer, size_t len, 
+		 InetHostAddress& na, tpport_t& tp)
+	{ na = UDPReceive::getPeer(&tp); 
+	return UDPReceive::receive(buffer, len); }
+
+        inline void
+        setDataPeer(const InetAddress &host, tpport_t port)
+	{ }
+
+        inline void
+        setControlPeer(const InetAddress &host, tpport_t port)
+	{ }
+
+	inline size_t
+	getNextDataPacketSize() const
+	{ size_t len; ccioctl(UDPReceive::so,FIONREAD,len); return len; }
 
 	/**
 	 * @return the associated peer information

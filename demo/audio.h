@@ -1,6 +1,6 @@
 // Common header for audiorx/audiotx. 
 // A simple and amusing application for testing basic features of ccRTP.
-// Copyright (C) 2001  Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002  Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,7 +38,3 @@ const int PERIOD = 20;
 
 // Packets are 8000*20/1000 = 160 octects long. 
 const int PACKET_SIZE=SAMPLING_RATE*PERIOD/1000;
-
-
-
-

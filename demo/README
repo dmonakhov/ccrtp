@@ -10,6 +10,4 @@ usging RTPDuplex
 	
 	* rtpsend: sends RTP packets
 
-	* rtplisten: waits for RTP packets incoming to a socket
-
-	And soon there will be more...
+	* rtplisten: waits for RTP incoming packets

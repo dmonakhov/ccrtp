@@ -1,6 +1,6 @@
 // audiorx. 
 // A simple and amusing program for testing basic features of ccRTP.
-// Copyright (C) 2001  Federico Montesino <p5087@quintero.fie.us.es>
+// Copyright (C) 2001,2002  Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@
 // I am a player of \mu-law encoded RTP audio packets. I 
 // do not accept any arguments.
 
-// In order to use ccRTP, the RTP stack of CommonC++, you only need to
-// include ...
-#include "rtp.h"
-
-// Some consts common to audiorx and audiotx
-#include <audio.h>
 #include <cstdio>
 #include <cstdlib>
+// Some consts common to audiorx and audiotx
+#include <audio.h>
+// In order to use ccRTP, the RTP stack of CommonC++, you only need to
+// include ...
+#include <cc++/rtp/rtp.h>
 
 #ifdef	CCXX_NAMESPACES
 using namespace ost;
+using namespace std;
 #endif
 
 /**
@@ -47,9 +47,8 @@ class ccRTP_AudioReceiver: public Thread, public TimerPort
 private:
 	// This is the file we will write to (/dev/audio)
 	int audiooutput;
-
 	// The aforementioned file will be transmitted through this socket
-	RTPSocket *socket;
+	RTPSession *socket;
 
 public:
 	// Constructor
@@ -60,7 +59,7 @@ public:
 			cout << "Audio device is ready to play." << endl;
 		}else{
 			cout << "I could not open /dev/audio " << endl;
-			exit(0);
+			exit();
 		}
 
 		socket=NULL;
@@ -68,14 +67,13 @@ public:
 	
 	// Destructor. 
 	~ccRTP_AudioReceiver(){
-		Terminate();
-		if( socket )
-			delete socket;  
-		close(audiooutput);
+		terminate();
+		delete socket;  
+		::close(audiooutput);
 	}
 
 	// This method does almost everything.
-	void Run(void){    
+	void run(void){    
 		// redefined from Thread.
 		
 		// Before using ccRTP you should learn something about other
@@ -89,7 +87,7 @@ public:
 		if( ! local_ip ){  
 		// this is equivalent to `! local_ip.isInetAddress()'
 			cerr << ": IP address is not correct!" << endl;
-			exit(1);
+			exit();
 		}
 		
 		cout << local_ip.getHostname() << 
@@ -99,39 +97,38 @@ public:
 		// ____Here comes the real RTP stuff____
 		
 		// Construct the RTP socket
-		socket = new RTPSocket(local_ip,RECEIVER_BASE,0);
+		socket = new RTPSession(local_ip,RECEIVER_BASE,0);
 		
 		// Set up receiver's connection
-		socket->setTimeout(10000);  
-		socket->setExpired(1000000);
-		socket->setGlobalKitchenDuration(40000);
-		if( socket->Connect(local_ip,TRANSMITTER_BASE) < 0 )
+		socket->setSchedulingTimeout(10000);  
+		if( !socket->addDestination(local_ip,TRANSMITTER_BASE) )
 			cerr << "The receiver could not connect.";
 		
 		// Let's check the queue (you should read the documentation
 		// so that you know what the queue is for).
+		socket->startRunning();
 		cout << "The RTP queue is ";
-		if( socket->RTPQueue::isActive() )
+		if( socket->isActive() )
 			cout << "active." << endl;
 		else
 			cerr << "not active." << endl;
 		
 		cout << "Waiting for audio packets..." << endl;
 		
-		// This is not important.
-		unsigned char buffer[PACKET_SIZE];
-
 		// This will be useful for periodic execution.
 		TimerPort::setTimer(PERIOD);
 
-		setCancel(THREAD_CANCEL_IMMEDIATE);
+		setCancel(cancelImmediate);
 		// This is the main loop, where packets are sent and receipt.
+		socket->setPayloadFormat(StaticPayloadFormat(sptPCMU));
 		for( int i=0 ; true ; i++ ){
+			const AppDataUnit* adu;
 			int count;			
 			do{
-				const RTPData &d = socket->getCookedPacket();
-				count = d.getSize();
-			}while (count <= 0);
+				adu = socket->getData(socket->getFirstTimestamp());
+				if ( NULL == adu )
+					Thread::sleep(5);
+			}while ( (NULL == adu) || (adu->getSize() <= 0) );
 
 			
 			// This is for buffering some packets at the
@@ -141,26 +138,24 @@ public:
 			// below, or stop transmission and continue
 			// later: you will probably hear noise or
 			// cracks.  
-			// Do not worry, this will soon be
-			// incorporated in ccRTP.
-			if(i==0)
-				ccxx_sleep(20);
+			if (i==0)
+				Thread::sleep(20);
 			
-			write(audiooutput,buffer,count);
+			::write(audiooutput,adu->getData(),adu->getSize());
 
-			cout << "."<<flush;
+			cout << "." << flush;
 
 			// Let's wait for the next cycle
-			ccxx_sleep(TimerPort::getTimer());
+			Thread::sleep(TimerPort::getTimer());
 			TimerPort::incTimer(PERIOD);
 		}
 
-	} // end of Run
+	} // end of run
 };
 
 
-void main(int argc, char *argv[]){
-
+int main(int argc, char *argv[])
+{
 	cout << "This is audiorx, a simple test program for ccRTP." << endl;
 	cout << "I am waiting for audio packets on port " << RECEIVER_BASE
 	     << "." << endl;
@@ -171,7 +166,7 @@ void main(int argc, char *argv[]){
 	ccRTP_AudioReceiver *receiver = new ccRTP_AudioReceiver();
 	
 	// Run it.
-	receiver->Start();
+	receiver->start();
 
 	cin.get();
 
