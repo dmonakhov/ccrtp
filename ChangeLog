@@ -17,7 +17,7 @@
 	- src/private.h: do not include <cc++/digest.h>
 	- src/queue.cpp: copy (and minor tweaks) md5 parts of digest.h and md5.cpp from cc++
 	- libccrtp1.pc.in: require libccgnu2 instead of libccext2
-	- src/Makefile: added LIBS= @GNULIBS@ to avoid linking to libccext2
+	- src/Makefile.am: added LIBS= @GNULIBS@ to avoid linking to libccext2
 	- Directory w32/cape/: ccrtp1.vcproj, ccrtp1.dsp, rtphello.vcproj,
 	rtphello.dsp, rtplisten.vcproj, rtplisten.dsp, rtpsend.vcproj,
 	rtpsend.dsp: removed ccext2.lib

@@ -130,8 +130,6 @@ protected:
 	std::list<TransportAddress*> destList;
 
 private:
-	uint8 destinationCounter;
-	TransportAddress* firstDestination, * lastDestination;
 	mutable ThreadLock destinationLock;
 };
 
