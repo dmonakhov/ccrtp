@@ -22,10 +22,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				InlineFunctionExpansion="0"
 				AdditionalIncludeDirectories="..\..\src,C:\Program Files\GNU Telephony\CAPE Framework\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				EnableFunctionLevelLinking="FALSE"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\Debug\rtpsend/rtpsend.pch"
 				AssemblerListingLocation=".\Debug\rtpsend/"
@@ -41,7 +43,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ccrtp1.lib ccext2.lib ccgnu2.lib odbc32.lib odbccp32.lib ws2_32.lib"
-				OutputFile=".\Debug/rtpsend.exe"
+				OutputFile="Debug/rtpsend.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="Debug,C:\Program Files\GNU Telephony\CAPE Framework\debugxp"
