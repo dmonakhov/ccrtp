@@ -4,6 +4,9 @@
 	src/queue.cpp, src/rtcppkt.cpp, src/source.cpp: support source 
 	build where exceptions have been disabled.
 
+	* src/pool.cpp: header file include order changed for qnx6
+	build.
+
 2004-03-15  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/source.cpp: (findusername): fixed username initialization,
