@@ -11,10 +11,19 @@ BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
 Requires: commoncpp2 >= 0.99.0
 
+%package devel
+Requires: ccrtp1, commoncpp2-devel
+Group: Development/Libraries
+Summery: headers and link libraries
+
 %description
 The ccrtp package offers a generic framework for sending and receiving of
 realtime streaming data over UDP packets by the use of send and receive
 packet queues.
+
+%description devel
+This package holds documentation, header files, and static link libraries
+for building applications that use GNU ccScript.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -35,8 +44,12 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 
 %files
 %defattr(-,root,root,0755)
-%doc AUTHORS COPYING NEWS README TODO ChangeLog 
-%{_prefix}/lib/libcc*
+%{_prefix}/lib/libcc*so*
+
+%files devel
+%defattr(-,root,root,0755)
+%doc AUTHORS COPYING NEWS README TODO ChangeLog
+%{_prefix}/lib/libcc*a
 %{_prefix}/include/cc++2/cc++/phone.h
 %{_prefix}/include/cc++2/cc++/rtp
 %{_mandir}/man3/*.3cc*
