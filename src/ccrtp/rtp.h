@@ -161,14 +161,15 @@ public:
 		ServiceQueue(ssrc,membersSize,app)
 	{ build(ia,dataPort,controlPort,iface); }
 
-
-	inline virtual size_t dispatchBYE(const std::string &str)
-		{return QueueRTCPManager::dispatchBYE(str);}
+	virtual size_t dispatchBYE(const std::string &str)
+	{
+	return QueueRTCPManager::dispatchBYE(str);
+	}
 
 	inline virtual
 	~TRTPSessionBase()
 	{ 
-	 dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
+	dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
 	 endSocket(); 
 	}
 
@@ -388,6 +389,8 @@ private:
 
 	tpport_t dataBasePort;
 	tpport_t controlBasePort;
+
+protected:
 	RTPDataChannel* dso;
 	RTCPChannel* cso;
 	friend class RTPSessionBaseHandler;
@@ -470,7 +473,7 @@ protected:
 		{return;}
 
 	virtual bool isPendingData(microtimeout_t timeout) 
-		{return dso->isPendingData();}; 
+		{return dso->isPendingRecv(timeout);}; 
 
 	inline size_t takeInDataPacket(void)
 		{return IncomingDataQueue::takeInDataPacket();}
@@ -514,10 +517,6 @@ protected:
 		dispatchBYE("GNU ccRTP stack finishing.");
 		sleep(~0);
 	}
-
-	inline virtual size_t dispatchBYE(std::string &str)
-		{return QueueRTCPManager::dispatchBYE(str);}
-
 };
 
 /**
