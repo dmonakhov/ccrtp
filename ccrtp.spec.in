@@ -14,7 +14,7 @@ Requires: commoncpp2 >= 0.99.0
 %package devel
 Requires: ccrtp1, commoncpp2-devel
 Group: Development/Libraries
-Summery: headers and link libraries
+Summary: headers and link libraries
 
 %description
 The ccrtp package offers a generic framework for sending and receiving of
