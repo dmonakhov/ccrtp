@@ -432,7 +432,8 @@ QueueRTCPManager::end2EndDelayed(IncomingRTPPktLink& pl)
 void
 QueueRTCPManager::onGotSR(SyncSource& source, SendReport& SR, uint8 blocks)
 {
-	getLink(source)->setSenderInfo(&(SR.sinfo));
+	getLink(source)->setSenderInfo
+		(reinterpret_cast<unsigned char*>(&(SR.sinfo)));
 }
 
 void
@@ -442,7 +443,9 @@ QueueRTCPManager::onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks)
 		// this generic RTCP manager ignores reports about
 		// other sources than the local one
 		if ( getLocalSSRC() == htonl(RR.ssrc) ) {
-			getLink(source)->setReceiverInfo(&(RR.blocks[i].rinfo));
+			getLink(source)->
+				setReceiverInfo
+				(reinterpret_cast<unsigned char*>(&(RR.blocks[i].rinfo)));
 		}
 	}
 }
