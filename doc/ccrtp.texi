@@ -8,9 +8,9 @@
 @documentencoding ISO-8859-1
 @c %** end of header
 
-@set EDITION 1.0pre1
-@set VERSION 1.0pre1
-@set UPDATED November 2002
+@set EDITION 1.0
+@set VERSION 1.0
+@set UPDATED March 2003
 
 @dircategory Development
 @direntry
