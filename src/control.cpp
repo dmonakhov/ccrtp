@@ -119,7 +119,7 @@ QueueRTCPManager::endQueueRTCPManager()
 void
 QueueRTCPManager::findCNAME()
 {
-	utsname name;
+	struct utsname name;
 	// uname is POSIX, unlike gethostname
 	int ret = uname(&name);
 	
