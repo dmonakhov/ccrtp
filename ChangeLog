@@ -1,3 +1,8 @@
+2001-11-27  David Sugar <dyfet@ostel.com> (from 0.7.0 to 0.7.1)
+	* fixed memory leaks in sdes and bye string builds.
+	* added functional virtuals for session control start and stop.
+	* created start of "phone" user agent.
+
 2001-11-02  David Sugar <dyfet@ostel.com> (from 0.6.2 to 0.7.0)
 	* addition of namespace support and changes for Common C++ 1.9.0.
 
