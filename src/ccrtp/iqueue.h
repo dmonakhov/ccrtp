@@ -789,12 +789,12 @@ protected:
 	isRegistered(uint32 ssrc);
 
 	/**
-	 * Get the description of a source by its <code>ssrc<code> identifier.
+	 * Get the description of a source by its <code>ssrc</code> identifier.
 	 *
 	 * @param ssrc SSRC identifier, in host order. 
 	 * @param created whether a new source has been created.
 	 * @return Pointer to the SyncSource object identified by
-	 * <code>ssrc<code>.
+	 * <code>ssrc</code>.
 	 */
 	SyncSourceLink*
 	getSourceBySSRC(uint32 ssrc, bool& created);

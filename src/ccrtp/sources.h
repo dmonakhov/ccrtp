@@ -353,7 +353,7 @@ private:
  * values. Represents local participants.
  *
  * An application in the context of RTP: an entity that has a CNAME
- * (unique identifier in the form of user@host.domain) as well as
+ * (unique identifier in the form of user\@host.domain) as well as
  * other RTCP SDES items (such as NAME or TOOL), and may open a number
  * of RTP sessions. Each application is a different source of
  * synchronization (with a potentially diferent SSRC identifier) in
@@ -479,7 +479,7 @@ private:
 	removeParticipant(ParticipantLink* part);
 
 	/**
-	 * Find out the local CNAME as user@host and store it as part
+	 * Find out the local CNAME as user\@host and store it as part
 	 * of the internal state of this class.  
 	 */
 	void
@@ -498,7 +498,7 @@ private:
  * "RTP application"). Note that this application object differs from
  * all the others that may be defined in that it is automatically
  * constructed by the ccRTP stack and its CNAME is automatically
- * assigned (as user@host), whereas the other application objects'
+ * assigned (as user\@host), whereas the other application objects'
  * CNAME is provided to its constructor.
  **/
 RTPApplication& defaultApplication();

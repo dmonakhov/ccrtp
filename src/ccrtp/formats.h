@@ -78,7 +78,7 @@ const PayloadType ptINVALID = 128;
  **/
 typedef enum {
 	// Types for audio formats:
-	sptPCMU = 0,        ///< ITU-T G.711. $\mu-$law audio 8 Khz (RFC 1890)
+	sptPCMU = 0,        ///< ITU-T G.711. mu-law audio 8 Khz (RFC 1890)
 	firstStaticPayloadType = sptPCMU,
 	// 1016 static payload type is now deprecated. Type 1 is reserved.
 	// spt1016,         ///< CELP audio (FED-STD 1016) (RFC 1890)
