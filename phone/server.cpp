@@ -22,9 +22,13 @@ namespace ost {
 #endif
 
 void server(void)
-{
+{	
+	const char *reason = "exiting";
+	char *cp, *ep;
 	fstream fifo;
 	new RTPAudio;
+
+	::signal(SIGPIPE, SIG_IGN);
 
 	int fd;
 	char buf[256];
@@ -69,10 +73,22 @@ void server(void)
 	while(!fifo.eof())
 	{
 		fifo.getline(buf, 256);
+		cp = buf;
+		while(isspace(*cp))
+			++cp;
+		ep = strrchr(cp, '\n');
+		if(ep)
+			*ep = 0;
+		if(!*cp)
+			continue;	
+		slog(SLOG_DEBUG) << "fifo: " << cp << endl;
+		if(!strnicmp(cp, "exit", 4))
+			break;
+
 	}
+	rtp->Exit(reason);
 	fifo.close();
-	slog(SLOG_WARNING) << "fifo exiting..." << endl;
-	delete rtp;
+	slog(SLOG_WARNING) << "server exiting..." << endl;
 	exit(0);
 }
 

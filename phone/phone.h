@@ -134,9 +134,12 @@ class RTPAudio : public RTPSocket
 private:
 	unsigned groups;	// multicast groups joined
 	bool	unicast;	// indicate if in unicast call
+	bool	shutdown;	// tracks shutdown state
 
 public:
 	RTPAudio();
+
+	void Exit(const char *reason);
 };
 
 extern bool multicast;

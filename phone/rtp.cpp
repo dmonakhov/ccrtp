@@ -29,8 +29,18 @@ RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 	setExpired(keyrtp.getExpire());
 	groups = 0;
 	unicast = false;
+	shutdown = false;
 }
 
+void RTPAudio::Exit(const char *reason)
+{
+	shutdown = true;
+	Bye(reason);
+	Sleep(500);
+	delete rtp;
+	rtp = NULL;
+}
+	
 RTPAudio *rtp;
 
 #ifdef	__NAMESPACES__
