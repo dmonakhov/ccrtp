@@ -23,16 +23,19 @@ AC_DEFUN(OST_CC_ENDIAN,[
 	AC_CHECK_HEADER(endian.h,[
 		AC_DEFINE(HAVE_ENDIAN_H, [1], [have endian header])
 		],[
+		order=""
 		case "$target_cpu" in
 		alpha* | i?86)
-			AC_DEFINE(__BYTE_ORDER, [1234])
+			order="1234"
 			;;
 		hppa* | m68* | mips* | powerpc* | sparc*)
-			AC_DEFINE(__BYTE_ORDER, [4321])
+			order="4321"
 			;;
 		esac
+		if test ! -z "$order" ; then
+			AC_DEFINE(__BYTE_ORDER, [$order], [endian order])
+		fi
 	])
-	AH_TEMPLATE(__BYTE_ORDER, [default endian order])
 	AH_BOTTOM([
 #ifdef  HAVE_ENDIAN_H
 #include <endian.h>
