@@ -22,12 +22,16 @@ namespace ost {
 #endif
 
 bool daemon = true;
+bool drop = false;
+bool answer = false;
 
-static void initial(int argc, char **argv)
+static int initial(int argc, char **argv)
 {
 	static bool usage = false;
 
 	static struct option long_options[] = {
+		{"hangup", 0, 0, 'd'},
+		{"drop", 0, 0, 'd'},
 		{"background", 0, 0, 'D'},
                 {"foreground", 0, 0, 'F'},
                 {"daemon", 0, 0, 'D'},
@@ -37,7 +41,7 @@ static void initial(int argc, char **argv)
 		
 	int idx, opt;	
 		
-	while(EOF != (opt = getopt_long(argc, argv, "p:FDh", long_options, &idx)))
+	while(EOF != (opt = getopt_long(argc, argv, "dp:FDh", long_options, &idx)))
 	{
 		switch(opt)
 		{
@@ -50,6 +54,9 @@ static void initial(int argc, char **argv)
 		case 'D':
 			daemon = true;
 			break;
+		case 'd':
+			drop = true;
+			break;
 		default:
 			usage = true;
 		}	
@@ -59,6 +66,7 @@ static void initial(int argc, char **argv)
 		cerr << "use: phone [options] [parties...]" << endl;
 		exit(-1);
 	}
+	return optind;
 }
 		
 static int getPid() 
@@ -86,13 +94,15 @@ extern "C" {
 int main(int argc, char **argv)
 {
 	int pid = 0;
+	int idx;
+	ofstream fifo;
 	
 	chdir(getenv("HOME"));
 	if(canAccess(".phonepid"))
 		if(canModify(".phonectrl"))
 			pid = getPid();		
 
-	initial(argc, argv);
+	idx = initial(argc, argv);
 
 	if(!pid)
 	{
@@ -102,8 +112,27 @@ int main(int argc, char **argv)
 //			server();
 			exit(0);
 		}
-		sleep(2);
+		sleep(1);
 	}
+	fifo.open(".phonectrl", ios::out);
+	if(!fifo.is_open())
+	{
+		cerr << "phone: cannot get control interface" << endl;
+		exit(-1);
+	}
+	if(idx == argc && drop)
+		fifo << "DROP *" << endl;
+
+	while(idx < argc)
+	{
+		if(drop)
+			fifo << "DROP " << argv[idx++] << endl;
+		else
+			fifo << "JOIN " << argv[idx++] << endl;
+	}
+		
+	fifo.close();
+		
 	exit(0);
 }
 
