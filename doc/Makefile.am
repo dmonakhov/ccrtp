@@ -19,11 +19,11 @@ noinst_DATA = doxy
 
 if COMMON
 doxy:   Doxyfile
-	$(DOXYGEN) @srcdir@/Doxyfile
+	(cd @srcdir@ ; $(DOXYGEN) Doxyfile)
 	touch doxy
 else
 doxy:   Doxyfile
-	$(DOXYGEN) @srcdir@/Doxymini
+	(cd @srcdir@ ; $(DOXYGEN) Doxymini)
 	touch doxy
 endif
 
