@@ -248,7 +248,7 @@ OutgoingDataQueue::getSchedulingTimeout(void)
 		// translate timestamp to timeval
 		send.tv_sec = stamp / rate;
 		rem = stamp % rate;
-		send.tv_usec = 1000000ul * rem / rate;
+		send.tv_usec = (1000ul*rem) / (rate/1000ul); // 10^6 * rem/rate
 
 		// add timevals. Overflow holds the inital time
 		// plus the time accumulated through successive
