@@ -1,47 +1,56 @@
-- URGENT!!!: Fill the SR, RR and some SDES reports 
+TODO before 1.0.0:
 
-	- NTP - Timestamp  synchronization  (for end2end delay)
+- BYE packets do not have correct format
 
-- Add user interface for RTP header extensions and CSRC specification
+- really handle application participant list
 
-- Kitchen: playout delay compensation
+Other TODOs:
 
-- QueueRTCPManager::TimeOutSSRCs()
+- simplified incoming queue for only 1 source / or a low number of
+sources.
 
-- RTPQueue::newTalkSpurt() -> M
+- save calls to htonl(getLocalSSRC());
 
-- provide faster handling of sessions with one or few senders
+- avoid floats in jitter computation
 
-- Filter PT field (RTQueue::setReceivedPayloadType)
+- preallocated buffers mode for scheduling queue.
 
-- Add good exception handling
+- QueueRTCPManager::expireSSRCs
 
-- good suport for RTP muxing - mixers and translators
+- remove conflicting addresses after 10 RTCP report intervals 
 
-- for video, timestamp must be determined from the frame number or from
-the system clock.
-
-- QueueRTCPManager::QueueRTCPManager(..): path MTU is always assumed to be 1500
-
-	- path MTU discovery for RTCP (Arrggg, we use UDP!)
+- add separated collision and loop counters?
 
 - check robust handling of payload change
 
-- Add support for dynamic pts (BT656, H263-1998, MP1S, MP2P, BMPEG) 
+API additions:
 
-- Address the enhanced/best-effort service issue
+- Add user interface for RTP header extensions  
 
-- queue.cpp: Improve random number generation (necessary for win32)
+- Interface for CSRC list and RTCP reports about CSRCs, for RTP mixers
 
-- Check against rtpdump, SpeakFreely, etc.
+- provide/improve NTP-RTP mapping interface
+
+- encryption: no, full, RTP and non-SDES RTCP packets: provide
+'setEncryptionMode' method and virtuals for encryption
+implementation. setKey method.
+
+More TODO:
 
 - Test ccRTP following RFC 3158: ``RTP Testing Strategies'', 
 
+- adaptive jitter buffer schemes
 
-(Experimental things, close everything up here before looking down here)
+- Address the enhanced/best-effort service issue
 
-* Implement SSRC sampling algorithm
+- QueueRTCPManager::QueueRTCPManager(..): path MTU is always assumed to be 1500
 
-* Consider SRTP profile, currently only immature draft
+Experimental things, close everything up here before looking down here:
 
-Last change: 29 Nov 2001
+- Implement SSRC sampling algorithm
+
+- Consider SRTP, (SAVP profile)
+
+- Consider RTCP Feedback profile (AVPF profile)
+
+Last change: 20 Oct, 2002
