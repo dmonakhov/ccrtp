@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002,2003 Federico Montesino <fedemp@altern.org>
+// Copyright (C) 2001,2002,2003,2004 Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -175,6 +175,23 @@ RTPApplication::~RTPApplication()
 	try {
 		delete [] participants;
 	} catch (...) {}
+}
+
+// TODO: it should be implemented using the participant iterators
+const Participant*
+RTPApplication::getParticipant(const std::string& cname) const
+{
+	ParticipantLink* pl = firstPart;
+	while ( (NULL != pl) && 
+		( pl->getParticipant()->getSDESItem(SDESItemTypeCNAME)
+		  != cname) ) {
+		pl = pl->getNext();
+	}
+	if ( pl ) {
+		return pl->getParticipant();
+	} else {
+		return NULL;
+	}
 }
 
 void

@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
+// Copyright (C) 1999-2004 Open Source Telecom Corporation.
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -583,11 +583,20 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 			pointer += sizeof(item->type) + sizeof(item->len) + 
 				item->len;
 			if ( NULL == part && SDESItemTypeCNAME == item->type ) {
-				part = new Participant("-");
+				const RTPApplication& app = getApplication();
+				std::string cname = std::string(item->data,item->len);
+				const Participant* p = app.getParticipant(cname);
+				if ( p ) {
+					part = const_cast<Participant*>(p);
+					setParticipant(*(srcLink->getSource()),*part);
+				} else {
+					part = new Participant("-");
+					addParticipant(const_cast<RTPApplication&>(getApplication()),*part);
+				}
 				setParticipant(*(srcLink->getSource()),*part);
-				addParticipant(const_cast<RTPApplication&>(getApplication()),*part);
 			}
-			
+
+			// support for CNAME updates
 			if ( part )
 				setSDESItem(part,(SDESItemType)item->type,
 					    item->data,item->len);

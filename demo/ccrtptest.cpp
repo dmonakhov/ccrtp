@@ -22,9 +22,43 @@ using namespace ost;
 using namespace std;
 #endif
 
-const InetHostAddress NA = "localhost";
-const uint16 PORT = 34566;
-unsigned char data[65535];
+
+class PacketsPattern
+{
+public:
+	inline const InetHostAddress&
+	getDestinationAddress() const
+	{ return destinationAddress; }
+
+	inline const tpport_t
+	getDestinationPort() const
+	{ return destinationPort; }
+
+	uint32
+	getPacketsNumber() const
+	{ return packetsNumber; }
+
+	const unsigned char*
+	getPacketData(uint32 i)
+	{ return data; }
+	
+	const size_t
+	getPacketSize(uint32 i)
+	{ return packetsSize; }
+
+private:
+	static const InetHostAddress destinationAddress;
+	static const uint16 destinationPort = 34566;
+	static const uint32 packetsNumber = 100;
+	static const uint32 packetsSize = 100;
+	static unsigned char data[65535];
+};
+
+const InetHostAddress PacketsPattern::destinationAddress = 
+InetHostAddress("localhost");
+unsigned char PacketsPattern::data[65535];
+
+PacketsPattern pattern;
 
 class
 Test
@@ -41,14 +75,12 @@ public:
 	void
 	run()
 	{
-		cerr << "send run start" << endl;
 		doTest();
-		cerr << "send run end" << endl;
 	}
 
 	int doTest()
 	{
-		// should be valid
+		// should be valid?
 		//RTPSession tx();
 		RTPSession tx(InetHostAddress("localhost"));
 		tx.setSchedulingTimeout(10000);
@@ -57,7 +89,8 @@ public:
 		tx.startRunning();
 		
 		tx.setPayloadFormat(StaticPayloadFormat(sptPCMU));
-		if ( !tx.addDestination(NA,PORT-1) ) {
+		if ( !tx.addDestination(pattern.getDestinationAddress(),
+					pattern.getDestinationPort()) ) {
 		return 1;
 		}
 		
@@ -65,8 +98,10 @@ public:
 		uint32 period = 20;
 		uint16 inc = tx.getCurrentRTPClockRate()/50;
 		TimerPort::setTimer(period);
-		for ( int i = 0; i < 100; i++ ) {
-			tx.putData(i*inc,data,100);
+		for ( uint32 i = 0; i < pattern.getPacketsNumber(); i++ ) {
+			tx.putData(i*inc,
+				   pattern.getPacketData(i),
+				   pattern.getPacketSize(i));
 			Thread::sleep(TimerPort::getTimer());
 			TimerPort::incTimer(period);
 		}
@@ -82,15 +117,14 @@ public:
 	void
 	run()
 	{
-		cerr << "recv run start" << endl;
 		doTest();
-		cerr << "recv run stop" << endl;
 	}
 
 	int
 	doTest()
 	{		
-		RTPSession rx(NA,PORT);
+		RTPSession rx(pattern.getDestinationAddress(),
+			      pattern.getDestinationPort());
 
 		rx.setSchedulingTimeout(10000);
 		rx.setExpireTimeout(1000000);
@@ -98,7 +132,7 @@ public:
 		rx.startRunning();
 		rx.setPayloadFormat(StaticPayloadFormat(sptPCMU));
 		// arbitrary number of loops
-		for ( int i = 0; i < 1000 ; i++ ) {
+		for ( int i = 0; i < 500 ; i++ ) {
 			const AppDataUnit* adu;
 			while ( (adu = rx.getData(rx.getFirstTimestamp())) ) {
 
@@ -109,7 +143,6 @@ public:
 		return 0;
 	}
 };
-
 
 class
 MiscTest : public Test, public Thread, public TimerPort
@@ -123,8 +156,8 @@ MiscTest : public Test, public Thread, public TimerPort
 	int
 	doTest()
 	{
-		const uint32 NSESSIONS = 50;
-		RTPSession rx(NA,PORT);
+		const uint32 NSESSIONS = 10;
+		RTPSession rx(pattern.getDestinationAddress(),pattern.getDestinationPort());
 		RTPSession **tx = new RTPSession* [NSESSIONS];
 		for ( uint32 i = 0; i < NSESSIONS; i++ ) {
 			tx[i] = new RTPSession(InetHostAddress("localhost"));
@@ -133,14 +166,10 @@ MiscTest : public Test, public Thread, public TimerPort
 			tx[i]->setSchedulingTimeout(10000);
 			tx[i]->setExpireTimeout(1000000);
 			tx[i]->setPayloadFormat(StaticPayloadFormat(sptPCMU));
-			if ( !tx[i]->addDestination(NA,PORT) ) {
-				cerr << "dest";
+			if ( !tx[i]->addDestination(pattern.getDestinationAddress(),
+						    pattern.getDestinationPort()) ) {
 				return 1;
 			}
-  			if ( !tx[i]->addDestination(NA,PORT) ) {
-  				cerr << "dest";
-  				return 1;
-  			}
 		}
 
 		rx.setPayloadFormat(StaticPayloadFormat(sptPCMU));
@@ -153,12 +182,18 @@ MiscTest : public Test, public Thread, public TimerPort
 		}
 		uint32 period = 20;
 		TimerPort::setTimer(period);
-		for ( uint32 i = 0; i < 100; i++ ) {
+		for ( uint32 i = 0; i < pattern.getPacketsNumber(); i++ ) {
+			if ( i == 70 ) {
+				RTPApplication &app = defaultApplication();
+				app.setSDESItem(SDESItemTypeCNAME,"foo@bar");
+			}
 			for ( uint32 s = 0; s  < NSESSIONS; s++) {
 			// 50 packets per second (packet duration of 20ms)
 				uint16 inc = 
 					tx[s]->getCurrentRTPClockRate()/50;
-				tx[s]->putData(i*inc,data,100);
+				tx[s]->putData(i*inc,
+					       pattern.getPacketData(i),
+					       pattern.getPacketSize(i));
 			}
 			Thread::sleep(TimerPort::getTimer());
 			TimerPort::incTimer(period);
@@ -168,29 +203,29 @@ MiscTest : public Test, public Thread, public TimerPort
 		for ( uint32 i = 0; i < NSESSIONS; i++ ) {
 			delete tx[i];
 		}
-		cerr << "it begin" << endl;
 		RTPSession::SyncSourcesIterator it;
+		cout << "Sources of synchronization:" << endl;
 		for (it = rx.begin() ; it != rx.end(); it++) {
 			const SyncSource &s = *it;
-			cerr << s.getID() << "-" ;
+			cout << s.getID();
 			if ( s.isSender() ) 
-				cout << "(sender)-";
+				cout << " (sender) ";
 			cout << s.getNetworkAddress() << ":" <<
 				s.getControlTransportPort() << "/" <<
-				s.getDataTransportPort() << endl;
+				s.getDataTransportPort();
 			Participant *p = s.getParticipant();
-			cerr << p->getSDESItem(SDESItemTypeCNAME) << endl;
+			cout << " (" << 
+				p->getSDESItem(SDESItemTypeCNAME)
+			     << ") " << endl;
 		}
 		RTPApplication &app = defaultApplication();
 		RTPApplication::ParticipantsIterator ai;
+		cout << "Participants:" << endl;
 		for ( ai = app.begin(); ai != app.end(); ai++ ) {
 			const Participant &p = *ai;
-			cerr << "app it: " << p.getSDESItem(SDESItemTypeCNAME);
-			//cerr << p.getPRIVPrefix();
+			cout << p.getSDESItem(SDESItemTypeCNAME) << endl;
+			//cout << p.getPRIVPrefix();
 		}
-
-		cerr << "it end" << endl;
-
 		delete tx;
 		return 0;
 	}
@@ -224,19 +259,10 @@ int main(int argc, char *argv[])
 		rx->start();
 		rx->join();
 	} else {
-		//tx = new SendPacketTransmissionTest();
-		//tx->start();
-		//rx = new RecvPacketTransmissionTest();
-		//rx->start();
-
 		MiscTest m;
 		m.start();
-		
-		//tx->join();
-		//rx->join();
 		m.join();
 	}
-
 	exit(result);
 }
 

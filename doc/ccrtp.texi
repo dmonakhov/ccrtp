@@ -367,11 +367,18 @@ transmission queue handled by the stack. In general, packet insertion
 and transmission occur at different times, though it is not necessary.
 
 In order to use ccRTP, you must include the main header
-(@file{#include <ccrtp/rtp.h>}.
+(@file{#include <ccrtp/rtp.h>}. Two additional headers are provided by
+ccRTP:
 
-@emph{TODO: comment @file{#include <ccrtp/rtppool.h}.}
+@table @code
 
-@emph{TODO: comment @file{#include <ccrtp/rtpext.h>}.}
+@item @file{#include <ccrtp/rtppool.h}
+Classes for pools of RTP service threads.
+
+@item @file{#include <ccrtp/rtpext.h>}
+Classes for RTP extensions which are not mature yet.
+
+@end table
 
 You must also link in the library, currently @file{ccrtp1}.
 

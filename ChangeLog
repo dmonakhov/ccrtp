@@ -1,3 +1,13 @@
+2004-01-18  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/sources.h, src/source.cpp, src/control.cpp: added
+	RTPApplication::getParticipant, used in
+	QueueRTCPManager::onGotSDESChunk to lookup participants by CNAME.
+
+	* demo/ccrtptest.cpp: added the class PacketsPattern.
+	
+	* doc/ccrtp.texi: more explanations on headers.
+	
 2004-01-17  Federico Montesino Pouzols  <fedemp@altern.org>
 	
 	* src/ccrtp/oqueue.h: added to OutgoingDataQueue methods for CSRC
