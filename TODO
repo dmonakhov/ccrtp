@@ -1,3 +1,5 @@
+- make RTCP interval randomization optinal?
+
 - simplified incoming queue for only 1 source / or a low number of
 sources.
 

@@ -630,7 +630,7 @@ timeval
 QueueRTCPManager::computeRTCPInterval()
 {	
 	float bwfract = controlBwFract * getSessionBandwidth();
-	uint32 participants = 0;
+	uint32 participants = getMembersCount();
 	if ( getSendersCount() > 0 &&
 	     ( getSendersCount() < (getMembersCount() * sendControlBwFract) )) {
 		// reserve "sendControlBwFract" fraction of the total
@@ -655,15 +655,17 @@ QueueRTCPManager::computeRTCPInterval()
 	if ( bwfract != 0 ) {
 		interval = static_cast<microtimeout_t>
 			((participants * rtcpAvgSize / bwfract) * 1000000);
-				if ( interval < rtcpMinInterval )
+
+		if ( interval < rtcpMinInterval )
 			interval = rtcpMinInterval;
 	} else {
 		// 100 seconds instead of infinite
 		interval = 100000000;
 	}
-	
-	interval *= static_cast<microtimeout_t>(0.5 + 
-						(rand() / (RAND_MAX + 1.0)));
+
+	interval = static_cast<microtimeout_t>(interval * ( 0.5 + 
+						(rand() / (RAND_MAX + 1.0))));
+
 	timeval result;
 	result.tv_sec = interval / 1000000;
 	result.tv_usec = interval % 1000000;

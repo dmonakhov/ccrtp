@@ -1,3 +1,8 @@
+2003-10-21  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/control.cpp: (QueueRTCPManager::computeRTCPInterval): fixed
+	the RTCP interval randomization code.
+
 2003-10-20  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp, src/queue.cpp: added checks for extreme control
