@@ -1,3 +1,7 @@
+2002-11-27 David Sugar <sugar@gnu.org>
+	* modify spec file for rpm build
+	* release 1.0pre1 prep work
+
 2002-11-24 Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/cc++/rtp is now src/ccrtp.
