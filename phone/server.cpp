@@ -72,8 +72,7 @@ void server(void)
 		exit(-1);
 	}
 
-	rtp->startStack();	// we assume it's always running
-
+	rtp->startRunning();	// we assume it's always running
 	while(!fifo.eof())
 	{
 		fifo.getline(buf, 256);

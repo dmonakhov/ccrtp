@@ -62,7 +62,7 @@ RTPDuplex::~RTPDuplex()
 	endReceiver();
 }
 
-UDPTransmit::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
+UDPSocket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 {
 	UDPTransmit::Error rtn;
 
@@ -76,7 +76,7 @@ UDPTransmit::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 	if(rtn)
 		return rtn;
 
-	startStack();
+	enableStack();
 
 	return UDPTransmit::errSuccess;
 }

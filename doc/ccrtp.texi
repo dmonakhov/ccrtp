@@ -8,9 +8,9 @@
 @documentencoding ISO-8859-1
 @c %** end of header
 
-@set EDITION 1.0
-@set VERSION 1.0
-@set UPDATED May 2003
+@set EDITION 1.1
+@set VERSION 1.1
+@set UPDATED Jan 2004
 
 @dircategory Development
 @direntry
@@ -26,7 +26,7 @@ GNU ccRTP is a C++ class framework for the development of Real Time
 Transport Protocol (@acronym{RTP}) based applications. It is based on
 GNU Common C++.
 
-Copyright @copyright{} 2001, 2002 Federico Montesino Pouzols
+Copyright @copyright{} 2001, 2002, 2003, 2004 Federico Montesino Pouzols
 @email{fedemp@@altern.org}.
 @include fdlnotice.texi
 @end ifnottex
@@ -46,7 +46,7 @@ Copyright @copyright{} 2001, 2002 Federico Montesino Pouzols
 
 @page
 @vskip 0pt plus 1filll
-@center{Copyright @copyright{} 2001, 2002 Federico Montesino Pouzols}
+@center{Copyright @copyright{} 2001, 2002, 2003, 2004 Federico Montesino Pouzols}
 @include fdlnotice.texi
 @page
 @end titlepage
@@ -95,20 +95,6 @@ GNU ccRTP version @value{VERSION}.
 @node Introduction
 @chapter Introduction
 @cindex Introduction
-
-@quotation
-Tentative Note: throughout this document we refer to
-@cite{draft-ietf-avt-rtp-new}, @cite{draft-ietf-avt-profile-new} and
-@cite{draft-ietf-avt-rtp-mime}. As of this writing (late August 2002),
-these two Internet drafts, which will supersede @cite{RFC 1889} and
-@cite{RFC 1890}, are ``tentatively approved'' by the @acronym{IESG}
-and are expected to be published as @acronym{RFC} within
-weeks. Although these three drafts are not yet strictly normative,
-ccRTP follows them rather than the two old @acronym{RFC}. We expect to
-remove this note and replace @cite{draft-ietf-avt-rtp-new}, and
-@cite{draft-ietf-avt-profile-new} @cite{draft-ietf-avt-rtp-mime} with
-three new RFC soon.
-@end quotation
 
 @cindex Common C++
 @cindex C++
@@ -217,7 +203,7 @@ Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 
 @item Highly extensible to specialized stacks.
 
-@item Supports unicast, multi-unicast and multicast. Handles multiple sources (including synchronization sources and contributing sources) and destinations.
+@item Supports unicast, multi-unicast and multicast. Handles multiple sources (including synchronization sources and contributing sources) and destinations. Also supports symmetric RTP.
 
 @item Automatic RTCP functions handling, such as association of synchronization sources from the same participant or NTP-RTP timestamp mapping.
 
@@ -373,7 +359,7 @@ does not directly read packets from sockets but gets them from a
 reception queue. The stack is responsible for inserting received
 packets in the reception queue and handling this queue. In general, a
 packet reception and insertion in the reception queue does not occur
-at the same time that the application gets it from the queue.
+at the same time the application gets it from the queue.
 
 Conversely, the basic idea for packet transmission with ccRTP is that
 packets are not directly written to sockets but inserted in a
@@ -459,23 +445,28 @@ set as follows:
 @findex RTPQueueBase::setPayloadFormat
 @cindex static payload type
 @cindex PCMU
+@cindex default value
 @item Set payload format. Method @code{setPayloadFormat}. By default, the static payload type 0 is assumed (PCMU format at 8Khz).
 
 @cindex RTCP packets
 @cindex RTCP compound packets
 @cindex SDES item
 @cindex CNAME
+@cindex default value
 @cindex PRIV
 @findex RTPPApplication::setSDESItem
 @findex RTPApplication::setPRIVPrefix
 @findex defaultApplication
-@item Set local SDES Items. For common application, the CNAME item value is automatically guessed as user@@host. For those items that should be sent in @acronym{RTCP} packets along with the mandatory CNAME, its values can be set calling the @code{setSDESItem}  and @code{setPRIVPrefix} methods over the object returned by the @code{defaultApplication} global function.
+@item Set local SDES Items. For common applications, the CNAME item value is automatically guessed as user@@host. Other items have no default value and are not sent in RTCP packets unless a value is specified by the application. For those items that should be sent in @acronym{RTCP} packets along with the mandatory CNAME, its values can be set calling the @code{setSDESItem}  and @code{setPRIVPrefix} methods over the object returned by the @code{defaultApplication} global function.
 
 @item setting addresses: 
 
 
 @findex QueueRTCPMaanger::setControlBandwidth
-@item Set session bandwidth calling the @code{setSessionBandwidth} method of the session object. If not called, a default bandwidth of 64Kbps is assumed, and 5% of this bandwidth is used for RTCP. This percentaje can be changed through the setControlBandwidth method.
+@cindex default value
+@cindex default bandwidth
+@cindex RTCP bandwidth
+@item Set session bandwidth calling the @code{setSessionBandwidth} method of the session object. If not called, a default bandwidth of 64Kbps is assumed, and 5% of this bandwidth is used for RTCP. This percentage can be changed through the setControlBandwidth method.
 
 @end itemize
 
@@ -495,6 +486,8 @@ internally, so the timestamp value that corresponds to the session
 creation time is 0.
 
 @findex OutgoingDataQueue::setMark
+@cindex default value
+@cindex marker bit
 By default, the marker bit of the sent packets is not set. Its value
 for the next packet (the one that will convey the data provided in the
 next call to @code{putData}) can be set through the @code{setMark}
@@ -502,6 +495,8 @@ method, which takes a boolean as argument.
 
 @findex OutgoingDataQueueBase::setMaxSendSegmentSize
 @findex OutgoingDataQueueBase::getDefaultMaxSendSegmentSize
+@cindex default value
+@cindex segment size
 ccRTP also supports fragmenting data blocks into several RTP
 packets. The @code{setMaxSendSegmentSize} method can be used to
 request that no @acronym{RTP} packet be transmitted with a payload
@@ -529,6 +524,11 @@ block. In ccRTP application data units are represented through objects
 of the @code{AppDataUnit} class, that provides access to the
 synchronization source of the data and other related properties.
 
+@cindex duplicate packets
+@cindex reordering
+The incoming packet queue takes care of functions such as packet
+reordering or filtering out duplicate packets.
+
 @findex IncomingDataQueue::isWaiting
 You can guess if there are packets in the reception queue calling
 @code{isWaiting}. Both @code{getData} and @code{isWaiting} take an
@@ -546,7 +546,7 @@ RTP sessions can be closed deleting or destroying @code{RTPSession}
 objects. The stack send a BYE packet to every destination when the
 destructor of sessions is called. It is also possible to explicitly
 send a BYE packet through the dispatchBYE method, which takes the
-leaving reson string as argument.
+leaving reason string as argument.
 
 Note that when a BYE RTCP packet is received from a remote
 participant, the virtual @code{onGotGoodbye} will be called.
@@ -570,12 +570,11 @@ formats.
 
 These codes were initially specified in @cite{RFC 1890, ``RTP Profile
 for Audio and Video Conferences with Minimal Control'' (AVP profile)},
-superseded by @cite{draft-ietf-avt-rtp-new}, and are registered as
-MIME types in @cite{draft-ietf-avt-rtp-mime}. Codes below 96 may be
-assigned statically, although the default bindings for many of them
-are already reserverd. Codes in the range 96-127 are assigned
-dinamically by means outside of the @acronym{RTP} profile or protocol
-specification.
+superseded by @cite{RFC 3550}, and are registered as MIME types in
+@cite{RFC 3555}. Codes below 96 may be assigned statically, although
+the default bindings for many of them are already reserverd. Codes in
+the range 96-127 are assigned dinamically by means outside of the
+@acronym{RTP} profile or protocol specification.
 
 @cindex IANA
 @cindex RTP parameters
@@ -610,7 +609,7 @@ Static payload format objects are built from a static payload
 code. These are defined in the enumerated type
 @code{StaticPayloadType}. The following example constructs a
 @code{StaticPayloadFormat} object corresponding to the payload type 0
-(statically bounded to PCMA in @cite{draft-ietf-avt-profile-new}):
+(statically bounded to PCMA in @cite{RFC 3551}):
 
 @findex StaticPayloadFormat::StaticPayloadFormat
 @example
@@ -644,9 +643,8 @@ of 90 Khz. Note that the numeric identifier does not have to be in the
 dynamic range. The static payload types are default bindings and MAY
 be overriden, thus, DynamicPayloadFormat(0,90000) is a valid construct
 provided 0 has been established as the payload type through a previous
-negotiation process@footnote{Despite the fact that
-draft-ietf-avt-profile-new defines a static binding of the 0 code to
-mu-law PCM at 8Khz.}.
+negotiation process@footnote{Despite the fact that RFC 3551 defines a
+static binding of the 0 code to mu-law PCM at 8Khz.}.
 
 @cindex Session control
 Whether and how the payload has been negotiated is outside of the
@@ -704,18 +702,19 @@ local source sends data and control packets to itself, a
 
 @findex defaultApplication
 @findex RTPApplication
+@cindex default value
 The association of @acronym{RTP} sessions and participants with
 @code{RTPApplication} objects makes it possible to implement several
 ``RTP applications'' in the same application or process, each one
 having a separate CNAME space. By default, all @acronym{RTP} sessions
-are associated to a default @acronym{RTP} application provided by the
-global method @code{defaultApplication()}. The local CNAME for the
-default application is guessed from the user and machine name, as
-specified in @cite{draft-ietf-avt-rtp-new}. However, other
-applications may be created through the constructor
-@code{RTPApplication::RTPApplication(const std::string&
-cname)}. @acronym{RTP} sessions are associated with applications other
-than the default via an optional constructor parameter.
+are associated to an @acronym{RTP} application provided by the global
+method @code{defaultApplication()}. The local CNAME for the default
+application is guessed from the user and machine name, as specified in
+@cite{RFC 3550}. However, other applications may be created through
+the constructor @code{RTPApplication::RTPApplication(const
+std::string& cname)}. @acronym{RTP} sessions are associated with
+applications other than the default via an optional constructor
+parameter.
 
 @emph{TODO: SyncSource states}.
 
@@ -829,7 +828,7 @@ RTCP packets.
 
 Note that this events correspond to RTCP packets, not RTCP compound
 packets, and probably the reception of a compound packet will trigger
-more thatn one of these events.
+more than one of these events.
 
 
 @c -----------------------------------------------------------------------
@@ -875,11 +874,11 @@ more thatn one of these events.
 
 @itemize
 
-@item @cite{RTP: A Transport Protocol for Real-Time Applications (RFC 1889/draft-ietf-avt-rtp-new)}.
+@item @cite{RTP: A Transport Protocol for Real-Time Applications (RFC 1889/RFC 3550)}.
 
-@item @cite{RTP Profile for Audio and Video Conferences with Minimal Control (RFC 1890/draft-ietf-avt-profile-new)}.
+@item @cite{RTP Profile for Audio and Video Conferences with Minimal Control (RFC 1890/RFC 3551)}.
 
-@item @cite{MIME Type Registration of RTP Payload Formats (draft-ietf-avt-rtp-mime)}.
+@item @cite{MIME Type Registration of RTP Payload Formats (RFC 3555)}.
 
 @item @cite{IANA RTP Parameters}.
 
@@ -890,10 +889,15 @@ more thatn one of these events.
 
 @itemize
 
+Not yet implemented:
+
+@cindex profile
 @cindex SRTP
 @cindex Secure RTP
 @item @cite{The Secure Real-time Transport Protocol}. SRTP provile.
 
+@cindex AVPF
+@cindex RTCP-based feedback
 @item @cite{Extended RTP Profile for RTCP-based Feedback (RTP/AVPF)}.
 
 @end itemize
@@ -993,8 +997,8 @@ For example, @code{RTP_PAYLOAD_PCMU} must be replaced with something
 like @code{StaticPayloadFormat pcmu(sptPCMU)}, where @code{pcmu} is
 the name of a static payload object that binds an statically assigned
 @code{PayloadType} @footnote{The static payload type 0 corresponds to
-the audio format PCMU, see @cite{draft-ietf-avt-rtp-new}.}. to its
-corresponding @acronym{RTP} clock rate@footnote{8 khz.}.
+the audio format PCMU, see @cite{RFC 3550}.}. to its corresponding
+@acronym{RTP} clock rate@footnote{8 khz.}.
 
 @item RTPSocket::Connect
 The call connect has been removed. Now, in order to send packets to a
@@ -1060,9 +1064,9 @@ Performance:
 @section Collisions and Loops
 @cindex Collisions and Loops
 
-ccRTP performs loop detection (following 8.2 in
-@cite{draft-ietf-avp-rtp-new}, though the algorithm in ccRTP differs
-is structure because of two reasons:
+ccRTP performs loop detection (following 8.2 in @cite{RFC 3550},
+though the algorithm in ccRTP differs is structure because of two
+reasons:
 
 @itemize
 
@@ -1088,9 +1092,8 @@ other.
 @section Algorithms in the Standard
 @cindex Algoritms in the Standard
 
-Algorithms specified in appendixes from
-@cite{draft-ietf-avt-rtp-new}. A ``mapping'' between routines in the
-RFC and methods/routines in ccRTP is provided.
+Algorithms specified in appendixes from @cite{RFC 3550}. A ``mapping''
+between routines in the RFC and methods/routines in ccRTP is provided.
 
 @menu
 * A.1::                @acronym{RTP} Data Header Validity Checks.

@@ -1,3 +1,46 @@
+2004-01-17  Federico Montesino Pouzols  <fedemp@altern.org>
+	
+	* src/ccrtp/oqueue.h: added to OutgoingDataQueue methods for CSRC
+	handling (addContributor and removeContributor).
+
+	* src/ccrtp/queuebase.h: added to AppDataUnit methods for
+	accessing CSRC (getContributorsCount and getContributorsID)
+
+	* src/ccrtp/rtp.h, src/ccrtp/channel.h: added support for
+	symmetric RTP (SymmetricRTPSession).
+
+	* src/ccrtp/ioqueue.h, src/ccrtp/rtp.h: startStack renamed to
+	enableStack to avoid confussion with startRunning.
+	
+	* src/control.cpp: fixed a bug in SDES items type and length
+	processing (QueueRTCPManager::onGotSDESChunk). This bug could
+	cause crashes when iterating through the participants list.
+	
+	* doc/ccrtp.texi: updated to new RFCs 355x
+
+	* demo/ccrtptest.cpp, demo/Makefile.am: added a simple test
+	program.
+	
+2003-12-26  David Sugar <dyfet@ostel.com>
+	* configure.in, w32/Makefile.am: support for new configure
+	--with-commoncpp=dir option to link Common C++ source files for
+	w32 specific builds, and ability to "make dist" either with or
+	without extra w32 files linked in.  One can also "disable"
+	redistribution of Common C++ files in ccrtp by using either
+	--without-commoncpp, or by specifying an invalid directory.
+
+2003-12-20  David Sugar <dyfet@ostel.com>
+	* Makefile.am, doc/Makefile.am, configure.in: we now regerate
+	doxygen documentation automatically as part of "make" if doxygen
+	is installed.  Hence, we no longer distribute pre-generated doxy
+	stuff in the tarball.
+
+2003-11-15  David Sugar <dyfet@ostel.com>
+	* src/private.h, src/queue.cpp, src/source.cpp,
+	src/ccrtp/base.h src/ccrtp/ext.h: re-arranged headers and
+	dependencies on common C++ headers so use of includes and
+	symbol exports would be correct per Common C++ 1.1.
+
 2003-10-30  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/iqueue.h, src/incqueue.cpp: corrected members counter

@@ -9,8 +9,25 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies
-EXTRA_DIST = srcmodel.txt srcmodel.dia Doxyfile Doxyman man3/*.3cc
-#man3/*.3cc html/* latex/*
+EXTRA_DIST = srcmodel.txt srcmodel.dia Doxyfile Doxymini
 
 info_TEXINFOS = ccrtp.texi
 ccrtp_TEXINFOS = gpl.texi fdl.texi fdlnotice.texi
+
+if DOXY
+noinst_DATA = doxy
+
+if COMMON
+doxy:   Doxyfile
+	$(DOXYGEN) Doxyfile
+	touch doxy
+else
+doxy:   Doxyfile
+	$(DOXYGEN) Doxymini
+	touch doxy
+endif
+
+
+endif
+
+

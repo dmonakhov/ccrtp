@@ -27,11 +27,11 @@ using namespace std;
 class Listener: RTPSession {
 public:
 	Listener(InetMcastAddress& ima, tpport_t port):
-		RTPSocket(ima,port)
+		RTPSession(ima,port)
 	{ }
 
 	Listener(InetHostAddress& ia, tpport_t port):
-		RTPSocket(ia,port)
+		RTPSession(ia,port)
 	{ }
 
 	void listen()

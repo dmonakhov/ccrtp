@@ -578,7 +578,7 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 	// process chunk items
 	while ( (pointer < len) && !end ) {
 		SDESItem* item = 
-			reinterpret_cast<SDESItem*>(&(chunk) + pointer);
+			reinterpret_cast<SDESItem*>(size_t(&(chunk)) + pointer);
 		if ( item->type > SDESItemTypeEND && item->type <= SDESItemTypeLast) {
 			pointer += sizeof(item->type) + sizeof(item->len) + 
 				item->len;

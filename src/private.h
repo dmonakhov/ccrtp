@@ -83,13 +83,15 @@
 #define CCXX_RTP_PRIVATE_H_
 
 #include <cc++/config.h>
+#include <cc++/thread.h>
+#include <cc++/socket.h>
+#include <cc++/digest.h>
+#include <cc++/process.h>
 #include <cc++/export.h>
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
 #undef	PACKAGE
 #undef	VERSION
-#endif
 
 // This is only of interest for developers, so it is included only if
 // --with-nana flag is given to configure

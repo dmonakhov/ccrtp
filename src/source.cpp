@@ -44,7 +44,6 @@
  * @short SDESItemsHolder, RTPSource and Participant classes implementation.
  **/
 
-#include <cc++/process.h>
 #include "private.h"
 #include <ccrtp/sources.h>
 
@@ -52,6 +51,7 @@
 namespace ost {
 #endif
 
+#ifndef	HAVE_GETTIMEOFDAY
 #ifdef WIN32
 int gettimeofday(struct timeval *tv_,  void *tz_)
 {
@@ -64,6 +64,7 @@ int gettimeofday(struct timeval *tv_,  void *tz_)
 	return 0;
 }
 #endif //WIN32
+#endif
 
 static void
 findusername(std::string &username);

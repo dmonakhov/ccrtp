@@ -350,7 +350,7 @@ IncomingDataQueue::insertRecvPacket(IncomingRTPPktLink* packetLink)
 	if ( plink && (seq < plink->getPacket()->getSeqNum()) ) {
 		// a disordered packet, so look for its place
 		while ( plink && (seq < plink->getPacket()->getSeqNum()) ){
-			// the packet is duplicated
+			// the packet is a duplicate
 			if ( seq == plink->getPacket()->getSeqNum() ) {
 				recvLock.unlock();
 				VDL(("Duplicated disordered packet: seqnum %d, SSRC:",

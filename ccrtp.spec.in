@@ -1,20 +1,25 @@
-Summary: ccrtp - a Common C++ class framework for RTP/RTCP
-Name: ccrtp1
+Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
+Name: ccrtp
 Version: @VERSION@
 Release: 1
+Epoch: 0
+License: GPL
 Group: Development/Libraries
 URL: http://www.gnu.org/software/ccrtp
 Source: ftp://ftp.gnu.org/gnu/ccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
 Prefix: %{_prefix}
-Copyright: GPL
 BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
-Requires: commoncpp2 >= 0.99.0
+Requires: commoncpp2 >= 1.1.0
+BuildRequires: commoncpp2-devel
+BuildRequires: doxygen
 
 %package devel
-Requires: ccrtp1, commoncpp2-devel
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Requires: commoncpp2-devel
+Requires(post,postun): info
 Group: Development/Libraries
-Summary: headers and link libraries
+Summary: headers and link libraries for ccrtp
 
 %description
 ccRTP is a generic, extensible and efficient C++ framework for
@@ -31,41 +36,45 @@ This package holds documentation, header files, and static link libraries
 for building applications that use GNU ccRTP.
 
 %prep
-rm -rf $RPM_BUILD_ROOT
-
-%setup -n ccrtp-%{PACKAGE_VERSION}
-./configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir}
-
+%setup
 %build
-uname -a|grep SMP && make -j 2 || make
+%configure
+make %{?_smp_mflags}
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
-make prefix=$RPM_BUILD_ROOT/%{_prefix} \
-	mandir=$RPM_BUILD_ROOT/%{_mandir} \
-	infodir=$RPM_BUILD_ROOT/%{_infodir} install
-make prefix=$RPM_BUILD_ROOT/%{_prefix} \
-	mandir=$RPM_BUILD_ROOT/%{_mandir} man
+rm -fr %{buildroot}
 
-%files
-%defattr(-,root,root,0755)
-%{_prefix}/lib/libcc*so*
-%{_prefix}/bin/phone
-
-%files devel
-%defattr(-,root,root,0755)
-%doc AUTHORS COPYING NEWS README TODO ChangeLog
-%{_prefix}/lib/libcc*a
-%{_prefix}/include/ccrtp
-%{_mandir}/man3/*.3cc*
-%{_infodir}/ccrtp*info*
+%makeinstall
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -fr %{buildroot}
 
-%post
-/sbin/ldconfig -n @libdir@
+%files
+%exclude %{_libdir}/*.la
+%defattr(-,root,root,-)
+%doc AUTHORS COPYING COPYING.addendum README
+%{_prefix}/lib/libccrtp*.so.*
+# %{_prefix}/bin/phone
 
-%postun
-/sbin/ldconfig -n @libdir@
+%files devel
+%defattr(-,root,root,-)
+%doc doc/html/*.html doc/html/*.*g*
+%{_prefix}/lib/libccrtp*.a
+%{_prefix}/lib/libccrtp*.so
+%dir %{_includedir}/ccrtp
+%{_includedir}/ccrtp/*.h
+%{_infodir}/ccrtp*info*
 
+%post -p /sbin/ldconfig
+
+%post devel
+/sbin/install-info %{_infodir}/ccrtp.info %{_infodir}/dir
+
+%postun -p /sbin/ldconfig
+
+%postun devel
+/sbin/install-info --delete %{_infodir}/ccrtp.info %{_infodir}/dir
+
+%changelog
+* Tue Jan 16 2004 David Sugar <dyfet[AT]ostel.com> 0:1.1.0-1
+- "modernized" for more current RPM systems.

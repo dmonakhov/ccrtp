@@ -38,7 +38,6 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-#include <cc++/digest.h>
 #include "private.h"
 #include <ccrtp/queuebase.h>
 #include <ccrtp/ioqueue.h>
@@ -93,6 +92,7 @@ uint32 random32()
 	// If /dev/urandom fails, default to the MD5 based algorithm
 	// given in the RTP specification.
 	uint32 number;
+#ifndef	WIN32
 	bool success = true;
 	int fd = open("/dev/urandom",O_RDONLY);
         if (fd == -1) {
@@ -104,6 +104,7 @@ uint32 random32()
 	}
         close(fd);
 	if ( !success )
+#endif
 		number = MD5BasedRandom32();
         return number;
 }
