@@ -1,3 +1,6 @@
+2005-01-28  David Sugar <dyfet@ostel.com>
+	* libccrtp1.pc.in: fix for pkgconfig dependency on libccext2.
+
 2005-01-24  David Sugar <dyfet@ostel.com>
 	* reconfig: getting to work generically and rh7 specific
 
