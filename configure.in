@@ -27,7 +27,6 @@ OST_AUTOMAKE_MODE
 OST_MAINTAINER_MODE
 OST_CCXX2_VERSION([$REQUIRES])
 OST_CC_ENDIAN
-OST_CC_GETOPT
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_MSG_CHECKING([if libnana is installed])
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging [default=no]], 
