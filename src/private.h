@@ -92,7 +92,10 @@
 #include <cc++/process.h>
 #include <cc++/export.h>
 
+#ifndef	CCRTP_CAPE
 #include "config.h"
+#endif
+
 #undef	PACKAGE
 #undef	VERSION
 

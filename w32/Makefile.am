@@ -19,5 +19,6 @@ endif
 
 EXTRA_DIST =  README msvcpp/ccrtp1.dsw msvcpp/ccrtp1.dsp \
         msvcpp/ccRTPdemo.dsw msvcpp/demo/*.dsp \
+        cape/*.dsw cape/*.dsp \
         mingw32/Makefile.gcc common/*.dsp $(W32_DIST)
 
