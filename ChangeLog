@@ -1,3 +1,9 @@
+2001-12-28  David Sugar <dufet@ostel.com> (from 0.7.1 to 0.7.2)
+
+	* src/rtp.h: header fixups for newer Common C++
+
+	* application of Debian patch for gcc 3.0.
+
 2001-11-28  Federico Montesino <p5087@quintero.fie.us.es> (from 0.6.2 to 0.6.3)
 
 	* src/members.cpp: fixed a bug in RTPSource::addNewSource(uint32)

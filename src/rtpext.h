@@ -459,7 +459,7 @@ private:
 	// prev/next in the sending list
 	OutgoingRTPPkt *next, *prev;       
 
-	friend RTPQueue;
+	friend class RTPQueue;
 };	
 
 /**
@@ -647,8 +647,8 @@ private:
 	static const uint16 RTP_INVALID_MASK = (0x7e);
 	static const uint16 RTP_INVALID_VALUE = (0x48);
 
-	friend RTPQueue;
-	friend RTPSource;
+	friend class RTPQueue;
+	friend class RTPSource;
 };	
 
 #pragma pack(1)

@@ -47,7 +47,7 @@
 #ifndef	CCXX_RTP_H_
 #define CCXX_RTP_H_
 
-#ifndef   CCXX_SOCKET_H_
+#ifndef  CCXX_SOCKET_H_
 #include <cc++/socket.h>
 #endif
 
@@ -288,7 +288,7 @@ private:
 	// Who sent this data
 	RTPSource* src;
 
-	friend RTPQueue;
+	friend class RTPQueue;
 };
 
 /** 
@@ -604,9 +604,9 @@ private:
 
 	
 	friend class MembershipControl;
-	friend RTPQueue;
-	friend QueueRTCPManager;
-	friend IncomingRTPPkt;
+	friend class RTPQueue;
+	friend class QueueRTCPManager;
+	friend class IncomingRTPPkt;
 };
 
 // TODO: implement this idea
@@ -1551,7 +1551,7 @@ protected:
 	uint32 initial_timestamp;
 
 private:
-	friend IncomingRTPPkt;
+	friend class IncomingRTPPkt;
 
 	RTPQueue(const RTPQueue &o);
 
