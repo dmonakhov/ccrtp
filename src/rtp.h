@@ -1722,18 +1722,17 @@ protected:
 	void 
 	Bye(const char* const reason = NULL);
 
- 	/**
- 	 * A plugin point for hello message.
- 	 */
- 	void 
-	gotHello(RTPSource &src, sdes_item_type_t item, char* sdes) 
-	{ return; }
+	/**
+	 * A plugin point for sdes contact.
+	 */
+	virtual void
+	gotHello(RTPSource &src);
  
  	/**
  	 * A plugin point for goodbye message.
  	 */
- 	void 
-	gotGoodbye(RTCPPacket &pkg, char *reason)
+ 	virtual void 
+	gotGoodbye(RTPSource &src, char *reason)
 	{ return; }
 
 	/**

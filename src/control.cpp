@@ -343,25 +343,28 @@ bool
 QueueRTCPManager::getBYE(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 {
 	int i = 0;
+	char *reason = NULL;
+	uint16 endpointer = pointer + pkt.fh.block_count * sizeof(uint32);
+	
+	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32)) 
+	     < ntohs(4*pkt.fh.length)){
+			char *reason = new char[rtcprecv_buffer[endpointer] + 1];
+			memcpy(reason,rtcprecv_buffer + endpointer + 1,
+			       rtcprecv_buffer[endpointer]);
+			reason[endpointer] = '\0';
+	}
+	
 	while ( i < pkt.fh.block_count ){
+		RTPSource &src = getSourceBySSRC(pkt.info.BYE.ssrc);
 		i++;
 		pointer += sizeof(uint32);
+		gotGoodbye(src, reason);
 		removeSource(pkt.info.BYE.ssrc);
 		// REVERSE RECONSIDERATION
 		ReverseReconsideration();
 	}
-	if ( (sizeof(RTCPFixedHeader) + i * sizeof(uint32)) 
-	     < ntohs(4*pkt.fh.length)){
-			char *reason = new char[rtcprecv_buffer[pointer] + 1];
-			memcpy(reason,rtcprecv_buffer + pointer + 1,
-			       rtcprecv_buffer[pointer]);
-			reason[pointer] = '\0';
-			// FIX: call some plug-in to get reasons
-			gotGoodbye(pkt, reason);
-			delete[] reason;
-	}
-	else
-		gotGoodbye(pkt, NULL);
+	if(reason)
+		delete reason;
 	return true;
 }
 
@@ -422,7 +425,6 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					if ( item->type == RTCP_SDES_ITEM_CNAME) {
 						cname_found = true;
 					}
-					gotHello(src, (sdes_item_type_t)item->type, x);
 					delete[] x;
 					
 				} else if ( item->type == RTCP_SDES_ITEM_END) {
@@ -445,6 +447,7 @@ QueueRTCPManager::getSDES_APP(RTCPPacket &pkt, uint16 &pointer, uint16 len)
 					I( false );
 				}
 			}
+			gotHello(src);
 		}
 	}
 
