@@ -485,6 +485,26 @@ parameter. ccRTP handles the random offset for the RTP timestamp
 internally, so the timestamp value that corresponds to the session
 creation time is 0.
 
+@findex OutgoingDataQueue::setMark
+By default, the marker bit of the sent packets is not set. Its value
+for the next packet (the one that will convey the data provided in the
+next call to @code{putData}) can be set through the @code{setMark}
+method, which takes a boolean as argument.
+
+@findex OutgoingDataQueueBase::setMaxSendSegmentSize
+@findex OutgoingDataQueueBase::getDefaultMaxSendSegmentSize
+ccRTP also supports fragmenting data blocks into several RTP
+packets. The @code{setMaxSendSegmentSize} method can be used to
+request that no @acronym{RTP} packet be transmitted with a payload
+length greater than the value specified through
+@code{setMaxSendSegmentSize}. The default value of this parameter can
+be retrieved via @code{getDefaultMaxSendSegmentSize}, which currently
+should return 65536. When data blocks greater than the maximum segment
+size are provided through @code{putData}, two or more packet will be
+inserted in the outgoing packet queue. All these packets but the last
+one will have length equal to the maximum segment size, whereas the
+last one's size will be lower or equal to the maximum segment size.
+
 
 @c -----------------------------------------------------------------------
 @node Receiving Data
