@@ -1,7 +1,14 @@
+2002-10-28 Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/source.cpp, src/cc++/rtp/sources.h: participants
+	implementation completed.
+	* src/cc++/rtp/rtp.h: send BYE in session destructor.
+	* src/control.cpp: fixed RTCP header init. bug in dispatchBYE.
+	
 2002-10-27 Federico Montesino Pouzols  <fedemp@altern.org>
 
-	* src/cc++/iqueue.h, src/members.cpp: SR and RR info are stores as
-	unsigned char* instead of void*
+	* src/cc++/rtp/iqueue.h, src/members.cpp: SR and RR info are
+	stores as unsigned char* instead of void*
 	* src/private.h: added tags for rtpsend and rtplisten demos.
 	
 2002-10-26 Federico Montesino Pouzols  <fedemp@altern.org>

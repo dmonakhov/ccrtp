@@ -1,9 +1,3 @@
-TODO before 1.0.0:
-
-- really handle application participant list
-
-Other TODOs:
-
 - simplified incoming queue for only 1 source / or a low number of
 sources.
 
