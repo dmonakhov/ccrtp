@@ -1,3 +1,7 @@
+2005-01-16  David Sugar <dyfet@ostel.com>
+	* src/ccrtp/iqueue.h: virtual methods for packet filtering were
+	hidden as private; made protected so they can be used.
+
 2005-01-10  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (QueueRTCPManager::getBYE) patch from Michel de
@@ -6,10 +10,10 @@
 	* doc/ccrtp.texi: added note on threads, sockets, and sessions.
 	
 2004-11-28  David Sugar <dyfet@ostel.com>
-    * src/private.h: ignore config.h if pure w32 unpack from cvs
+    	* src/private.h: ignore config.h if pure w32 unpack from cvs
     
-    * w32/cape/...: new w32 build tree for combined CAPE Framework
-    installer.
+    	* w32/cape/...: new w32 build tree for combined CAPE Framework
+    	installer.
 
 2004-11-22  Federico Montesino Pouzols  <fedemp@altern.org>
 

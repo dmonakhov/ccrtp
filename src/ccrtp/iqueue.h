@@ -1138,7 +1138,7 @@ protected:
 	onNewSyncSource(const SyncSource&)
 	{ }
 
-private:
+protected:
 	/**
 	 * A virtual function to support parsing of arriving packets
 	 * to determine if they should be kept in the queue and to
