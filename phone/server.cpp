@@ -64,6 +64,8 @@ void server(void)
 		exit(-1);
 	}
 
+	rtp->Start();	// we assume it's always running
+
 	while(!fifo.eof())
 	{
 		fifo.getline(buf, 256);

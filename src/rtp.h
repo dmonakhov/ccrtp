@@ -807,6 +807,11 @@ class CCXX_CLASS_EXPORT RTPQueue : protected Thread, protected MembershipControl
 {
 public:
 	/**
+	 * Make Start public.
+	 */
+	inline void Start(void)
+		{Thread::Start();};
+	/**
 	 * Get the application description.
 	 *
 	 * @return The RTPSource object describing the local application
@@ -2166,11 +2171,11 @@ public:
 	 * @param port transport port this socket is to be bound
 	 * @param pri service thread base priority relative to it's parent
 	 * */
-	T_RTPSocket(const InetMcastAddress& bind, tpport_t port = 5004, int pri = 0)
+	T_RTPSocket(const InetMcastAddress& ia, tpport_t port = 5004, int pri = 0)
 	{
 		base = even_port(port);
-		dso = new dataSocket(ia,even_port(port));
-		cso = new controlSocket(ia,odd_port(port + 1));
+		dso = new dataSocket((InetAddress)ia,even_port(port));
+		cso = new controlSocket((InetAddress)ia,odd_port(port + 1));
 	};
 
 	/**

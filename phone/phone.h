@@ -51,6 +51,18 @@ public:
 	 */
 	inline tpport_t getPort(void)
 		{return (tpport_t) atoi(getLast("port"));};
+
+	/**
+	 * Get stack timer.
+	 */
+	inline microtimeout_t getTimer(void)
+		{return (microtimeout_t)atol(getLast("timer")) * 1000l;};
+
+	/**
+	 * Get packet expiration timer.
+	 */
+	inline microtimeout_t getExpire(void)
+		{return (microtimeout_t)atol(getLast("expire")) * 1000l;};
 };
 
 /**
