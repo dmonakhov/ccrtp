@@ -148,7 +148,7 @@ RTPDataQueue::initQueue()
 {
 	dataServiceActive = false;
 	typeOfService = tosBestEffort; // assume a best effort network
-	sessionBw = 0;
+	sessionBw = getDefaultSessionBandwidth();
 }
 
 void 

@@ -651,10 +651,17 @@ QueueRTCPManager::computeRTCPInterval()
 	if ( rtcpInitial )
 		min_interval /= 2;
 	// this is the real computation:
-	microtimeout_t interval = static_cast<microtimeout_t>
-		((participants * rtcpAvgSize / bwfract) * 1000000);
-	if ( interval < rtcpMinInterval )
-		interval = rtcpMinInterval;
+	microtimeout_t interval = 0;
+	if ( bwfract != 0 ) {
+		interval = static_cast<microtimeout_t>
+			((participants * rtcpAvgSize / bwfract) * 1000000);
+		if ( interval < rtcpMinInterval )
+			interval = rtcpMinInterval;
+	} else {
+		// 100 seconds instead of infinite
+		interval = 100000000;
+	}
+	cout  << "RTCPInterval: " << (int)interval << "\n";
 	
 	interval *= static_cast<microtimeout_t>(0.5 + 
 						(rand() / (RAND_MAX + 1.0)));
