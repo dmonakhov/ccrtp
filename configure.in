@@ -14,6 +14,7 @@ REQUIRES="0.99.0"
 LT_RELEASE="0.9"
 LT_VERSION="0:0"
 AC_CONFIG_AUX_DIR(config)
+OST_PROG_CC_POSIX
 AC_PROG_CXX
 AC_PROG_CXXCPP
 AM_PROG_LIBTOOL
@@ -26,6 +27,7 @@ OST_AUTOMAKE_MODE
 OST_MAINTAINER_MODE
 OST_CCXX2_VERSION([$REQUIRES])
 OST_CC_ENDIAN
+OST_CC_GETOPT
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_MSG_CHECKING([if libnana is installed])
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging [default=no]], 
