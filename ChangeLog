@@ -2,6 +2,8 @@
 	* src/ccrtp/iqueue.h: virtual methods for packet filtering were
 	hidden as private; made protected so they can be used.
 
+	* src/ccrtp/rtppkt.h: getRawTimestamp needed for packet filtering.
+
 2005-01-10  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (QueueRTCPManager::getBYE) patch from Michel de

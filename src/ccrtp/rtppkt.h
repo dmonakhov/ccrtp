@@ -322,7 +322,8 @@ protected:
          uint32 fixsize = sizeof(RTPFixedHeader) + (getHeader()->cc << 2); 
 	 return (reinterpret_cast<RTPHeaderExt*>(buffer + fixsize));
 	}
-		
+
+public:		
 	/**
 	 * Obtain the absolute timestamp carried in the packet header.
 	 *
@@ -332,6 +333,7 @@ protected:
 	getRawTimestamp() const
 	{ return ntohl(getHeader()->timestamp); };
 
+protected:
 	inline void 
 	setbuffer(const void* src, size_t len, size_t pos)
 	{ memcpy(buffer + pos,src,len); }
