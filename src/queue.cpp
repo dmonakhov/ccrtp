@@ -123,9 +123,9 @@ uint16 random16()
 RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 {
 	if ( NULL == ssrc )
-		localSSRC = random32();
+		setLocalSSRC(random32());
 	else
-		localSSRC = *ssrc;
+		setLocalSSRC(*ssrc);
 	// assume a default rate and payload type.
 	setPayloadFormat(StaticPayloadFormat(sptPCMU));
 	// queue/session creation time

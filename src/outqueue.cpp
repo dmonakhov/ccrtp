@@ -348,7 +348,7 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 		packet->setPayloadType(getCurrentPayloadType());
 		packet->setSeqNum(sendInfo.sendSeq++);
 		packet->setTimestamp(stamp + getInitialTimestamp());
-		packet->setSSRCNetwork(htonl(getLocalSSRC()));
+		packet->setSSRCNetwork(getLocalSSRCNetwork());
 		if ( (0 == offset) && getMark() ) {
 			packet->setMarker(true); 
 			setMark(false);
