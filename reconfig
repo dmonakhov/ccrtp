@@ -10,6 +10,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+WANT_AUTOCONF_2_5=1
+export WANT_AUTOCONF_2_5
+
 rm -rf auto* libtool
 if test ! -d autoconf ; then mkdir autoconf ; fi
 
