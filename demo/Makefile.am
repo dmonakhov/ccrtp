@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2002 Open Source Telecom Corporation.
+# Copyright (C) 1999-2004 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -15,8 +15,8 @@ LT_VERSION=@LT_CCXX_VERSION@
 AM_CXXFLAGS = @WARN_FLAGS@ -I$(top_srcdir)/src
 ccxxincludedir=$(includedir)/cc++
 
-noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx
-#	ccrtptest
+noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx \
+	ccrtptest
 
 rtpsend_SOURCES = rtpsend.cpp
 rtpsend_LDFLAGS = ../src/libccrtp1.la
@@ -36,5 +36,5 @@ audiorx_LDFLAGS = ../src/libccrtp1.la
 audiotx_SOURCES = audiotx.cpp
 audiotx_LDFLAGS = ../src/libccrtp1.la
 
-#ccrtptest_SOURCES = ccrtptest.cpp
-#ccrtptest_LDFLAGS = ../src/libccrtp1.la
+ccrtptest_SOURCES = ccrtptest.cpp
+ccrtptest_LDFLAGS = ../src/libccrtp1.la

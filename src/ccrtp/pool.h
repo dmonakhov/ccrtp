@@ -95,7 +95,7 @@ public:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT RTPSessionPool: public RTPSessionBaseHandler
+class __EXPORT RTPSessionPool: public RTPSessionBaseHandler
 {
 public:
 	RTPSessionPool();
@@ -145,7 +145,7 @@ private:
 };
 
 
-class CCXX_CLASS_EXPORT SingleRTPSessionPool : 
+class __EXPORT SingleRTPSessionPool : 
 		public RTPSessionPool,
 		public Thread
 {

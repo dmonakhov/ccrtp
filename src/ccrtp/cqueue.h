@@ -80,8 +80,8 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT QueueRTCPManager : public RTPDataQueue,
-					   protected RTCPCompoundHandler
+class __EXPORT QueueRTCPManager : public RTPDataQueue, 
+	protected RTCPCompoundHandler
 {
 public:
 	/**

@@ -46,7 +46,10 @@
 #ifndef CCXX_RTP_EXT_H
 #define CCXX_RTP_EXT_H
 
+#ifndef	CCXX_SOCKET_H_
 #include <cc++/socket.h>
+#endif
+
 #include <ccrtp/ioqueue.h>
 #include <ccrtp/channel.h>
 
@@ -69,7 +72,7 @@ namespace ost {
  * @author David Sugar
  * @short RTP peer host over UDP.
  */
-class CCXX_CLASS_EXPORT RTPDuplex : public RTPDataQueue, 
+class __EXPORT RTPDuplex : public RTPDataQueue, 
 				    protected UDPReceive, public UDPTransmit
 {
 public:

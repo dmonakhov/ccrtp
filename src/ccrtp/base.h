@@ -41,8 +41,10 @@
 #ifndef	CCXX_RTP_BASE_H_
 #define CCXX_RTP_BASE_H_
 
+#ifndef	CCXX_SOCKET_H_
 #include <cc++/config.h>
 #include <cc++/socket.h>
+#endif
 
 #ifdef CCXX_NAMESPACES
 namespace ost {
@@ -71,7 +73,7 @@ typedef uint32 nanotimeout_t;
  * @param to time interval, in microseconds.
  * @return the same time interval, as a timeval value.
  **/
-CCXX_EXPORT(timeval)
+__EXPORT timeval 
 microtimeout2Timeval(microtimeout_t to);
 
 /**
@@ -106,9 +108,11 @@ const tpport_t DefaultRTPDataPort = 5004;
 /// registered default RTCP transport port
 const tpport_t DefaultRTCPPort = 5005;
 
-#ifdef WIN32
-CCXX_EXPORT(int)
+#ifndef	HAVE_GETTIMEOFDAY
+#ifdef	WIN32
+__EXPORT int
 gettimeofday(struct timeval *tv_, void *tz_);
+#endif
 #endif
 
 #ifdef  CCXX_NAMESPACES

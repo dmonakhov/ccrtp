@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT AppDataUnit
+class __EXPORT AppDataUnit
 {		
 public:
 	AppDataUnit(const IncomingRTPPkt& packet, const SyncSource& src);
@@ -126,7 +126,7 @@ public:
 	{ return *source; }
 
 	/**
-	 * Is this data unid marked?.
+	 * Is this data unit marked?.
 	 *
 	 * @return true if marked.
 	 **/
@@ -141,6 +141,22 @@ public:
 	getSeqNum() const
 	{ return datablock->getSeqNum(); }
 
+	/**
+	 * Get the number of contributing sources in the CSRC list.
+	 **/
+	inline uint8
+	getContributorsCount() const
+	{ return datablock->getCSRCsCount(); }
+
+	/**
+	 * Get the array of 32-bit CSRC identifiers.
+	 *
+	 * @return NULL if (getContributorsCount() == 0)
+	 **/
+	inline const uint32*
+	getContributorsID() const
+	{ return datablock->getCSRCs(); }
+
 private:
 	Pointer<const IncomingRTPPkt> datablock;
 	const SyncSource* source;
@@ -153,7 +169,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT RTPQueueBase
+class __EXPORT RTPQueueBase
 {
 public:
 	inline bool
@@ -226,7 +242,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT OutgoingDataQueueBase:
+class __EXPORT OutgoingDataQueueBase:
 	public virtual RTPQueueBase
 {
 public:
@@ -266,7 +282,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT IncomingDataQueueBase:
+class __EXPORT IncomingDataQueueBase:
 	public virtual RTPQueueBase
 {
 public:

@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT DestinationListHandler
+class __EXPORT DestinationListHandler
 {
 protected:
 	struct TransportAddress;
@@ -174,6 +174,20 @@ public:
 	forgetDestination(const InetMcastAddress& ia, 
 			  tpport_t dataPort = DefaultRTPDataPort,
 			  tpport_t controlPort = 0);
+
+	/**
+	 * Add csrc as the CSRC identifier of a new contributor. This
+	 * method adds the CSRC identifier to a list of contributors
+	 * that will be inserted in every packet enqueued from now on.
+	 **/
+	void
+	addContributor(uint32 csrc);
+
+	/**
+	 * Remove CSRC from the list of contributors.
+	 **/
+	bool
+	removeContributor(uint32 csrc);
 
  	/**
  	 * Determine if outgoing packets are waiting to send.

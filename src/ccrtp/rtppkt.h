@@ -71,7 +71,7 @@ namespace ost {
  *
  * @author David Sugar <dyfet@ostel.com>
  **/
-class  CCXX_CLASS_EXPORT RTPPacket
+class  __EXPORT RTPPacket
 {
 private:
 	struct RTPFixedHeader;
@@ -413,7 +413,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT OutgoingRTPPkt : public RTPPacket
+class __EXPORT OutgoingRTPPkt : public RTPPacket
 {
 public:
 	/**
@@ -572,7 +572,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  */
-class CCXX_CLASS_EXPORT IncomingRTPPkt : public RTPPacket
+class __EXPORT IncomingRTPPkt : public RTPPacket
 {
 public:
 	/**

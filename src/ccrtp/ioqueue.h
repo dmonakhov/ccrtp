@@ -77,7 +77,7 @@ namespace ost {
  * @author David Sugar <dyfet@ostel.com>
  * @short RTP data queue handler.  
  */
-class CCXX_CLASS_EXPORT RTPDataQueue : 
+class __EXPORT RTPDataQueue : 
 	public IncomingDataQueue,
 	public OutgoingDataQueue
 {
@@ -123,11 +123,10 @@ public:
 	{ typeOfService = tos; }
 
 	/**
-	 * Make Start public.
-	 *
-	 * Start queue service.
+	 * Enable packet queue processing in the stack. This method
+	 * will not any thread of execution.
 	 **/
-	inline void startStack()
+	inline void enableStack()
 	{ dataServiceActive = true; }
  
 	/**

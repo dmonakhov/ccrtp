@@ -67,7 +67,7 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT SDESItemsHolder
+class __EXPORT SDESItemsHolder
 {
 public:
 	const std::string&
@@ -127,7 +127,7 @@ private:
  * source is destroyed, we know if the Participant should be
  * destroyed.
  **/
-class CCXX_CLASS_EXPORT Participant : private SDESItemsHolder
+class __EXPORT Participant : private SDESItemsHolder
 {
 public:
 	/**
@@ -195,7 +195,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT SyncSource
+class __EXPORT SyncSource
 {
 public:
 	/**
@@ -367,7 +367,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT RTPApplication : private SDESItemsHolder
+class __EXPORT RTPApplication : private SDESItemsHolder
 {
 private:
 	struct ParticipantLink;

@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2003 Open Source Telecom Corporation.
+// Copyright (C) 1999-2004 Open Source Telecom Corporation.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ namespace ost {
 template <class RTPDataChannel = DualRTPUDPIPv4Channel, 
 	  class RTCPChannel = DualRTPUDPIPv4Channel, 
 	  class ServiceQueue = AVPQueue>
-class CCXX_CLASS_EXPORT TRTPSessionBase : public ServiceQueue
+class __EXPORT TRTPSessionBase : public ServiceQueue
 {
 public:
 	/**
@@ -403,7 +403,7 @@ template
 <class RTPDataChannel = DualRTPUDPIPv4Channel, 
  class RTCPChannel = DualRTPUDPIPv4Channel, 
  class ServiceQueue = AVPQueue>
-class CCXX_CLASS_EXPORT SingleThreadRTPSession : 
+class __EXPORT SingleThreadRTPSession : 
 	protected Thread,
 	public TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
 {
@@ -440,7 +440,7 @@ public:
 	 **/
 	void
 	startRunning()
-	{ startStack(); Thread::start(); }
+	{ enableStack(); Thread::start(); }
 
 protected:
 	/**
@@ -500,6 +500,16 @@ typedef SingleThreadRTPSession<> RTPSession;
  * Alias for RTPSession.
  **/
 typedef RTPSession RTPSocket;
+
+/**
+ * @typedef SymmetricRTPSession
+ *
+ * Uses one pair of sockets for RTP data and RTCP transmission/reception.
+ *
+ * @short Symmetric UDP/IPv4 RTP session scheduled by one thread of execution.
+ **/
+typedef SingleThreadRTPSession<SymmetricRTPChannel,
+			       SymmetricRTPChannel> SymmetricRTPSession;
 
 /** @}*/ // sessions
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002,2003 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2001-2004 Federico Montesino Pouzols <fedemp@altern.org>
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -79,8 +79,8 @@ namespace ost {
  * @class RTPBaseUDPIPv4Socket
  * @short A UDP/IPv4 socket class targetted at RTP stacks.
  *
- * This class provides a flat interface that all the services required
- * by an RTP stack.
+ * This class provides a flat interface that includes all the services
+ * required by an RTP stack.
  *
  * It can be used in two ways:
  *
@@ -266,6 +266,11 @@ typedef DualRTPChannel<RTPBaseUDPIPv4Socket> DualRTPUDPIPv4Channel;
  * sending and receiving is not a limitation.
  **/
 typedef RTPBaseUDPIPv4Socket SingleRTPChannel;
+
+/**
+ * Actually, RTP with a single channel can be called 'Symmetric RTP'
+ **/
+typedef SingleRTPChannel SymmetricRTPChannel;
 
 /** @}*/ // sockets
 

@@ -93,7 +93,7 @@ typedef enum
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  * @todo Improve the design to better encapsulate RTCP structures.
  **/
-class CCXX_CLASS_EXPORT RTCPCompoundHandler 
+class __EXPORT RTCPCompoundHandler 
 {
 public:
 	inline void setPathMTU(uint16 mtu)
@@ -373,7 +373,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT RTCPReceiverInfo
+class __EXPORT RTCPReceiverInfo
 {
 public:
 	RTCPReceiverInfo(void* ri)
@@ -448,7 +448,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT RTCPSenderInfo
+class __EXPORT RTCPSenderInfo
 {
 public:
 	RTCPSenderInfo(void* si)

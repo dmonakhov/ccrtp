@@ -132,7 +132,7 @@ typedef enum {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT PayloadFormat
+class __EXPORT PayloadFormat
 {
 public:
 	/**
@@ -200,7 +200,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/	
-class CCXX_CLASS_EXPORT StaticPayloadFormat : public PayloadFormat
+class __EXPORT StaticPayloadFormat : public PayloadFormat
 {
 public:
 	/**
@@ -234,7 +234,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/	
-class CCXX_CLASS_EXPORT DynamicPayloadFormat : public PayloadFormat
+class __EXPORT DynamicPayloadFormat : public PayloadFormat
 {
 public:
 	/**

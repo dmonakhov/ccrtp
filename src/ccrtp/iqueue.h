@@ -67,7 +67,7 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT Members
+class __EXPORT Members
 {
 public:
 	inline void
@@ -124,7 +124,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT SyncSourceHandler
+class __EXPORT SyncSourceHandler
 {
 public:
 	/**
@@ -179,7 +179,7 @@ protected:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT ParticipantHandler
+class __EXPORT ParticipantHandler
 {
 public:
 	inline void
@@ -205,7 +205,7 @@ protected:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT ApplicationHandler
+class __EXPORT ApplicationHandler
 {
 public:
 	inline void 
@@ -232,7 +232,7 @@ protected:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class CCXX_CLASS_EXPORT ConflictHandler
+class __EXPORT ConflictHandler
 { 
 public:
 	struct ConflictingTransportAddress
@@ -298,7 +298,7 @@ protected:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  */
-class CCXX_CLASS_EXPORT MembershipBookkeeping : 
+class __EXPORT MembershipBookkeeping : 
 	public SyncSourceHandler,
 	public ParticipantHandler,
 	public ApplicationHandler,
@@ -869,7 +869,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
  **/
-class CCXX_CLASS_EXPORT IncomingDataQueue: public IncomingDataQueueBase,
+class __EXPORT IncomingDataQueue: public IncomingDataQueueBase,
 	protected MembershipBookkeeping
 {
 public:
