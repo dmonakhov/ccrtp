@@ -36,8 +36,8 @@
 
 	* doc/ccrtp.texi: updated to new RFCs 355x
 
-	* demo/ccrtptest.cpp, demo/Makefile.am: added a simple test
-	program.
+	* demo/ccrtptest.cpp, demo/Makefile.am, src/private.h: added a
+	simple test program.
 	
 2003-12-26  David Sugar <dyfet@ostel.com>
 	* configure.in, w32/Makefile.am: support for new configure
