@@ -434,12 +434,9 @@ public:
 	 * valid for all packets but is too complex for the common
 	 * case, two simpler others are provided.
 	 **/
-	OutgoingRTPPkt::OutgoingRTPPkt(const uint32* const csrcs, 
-				       uint16 numcsrc, 
-				       const unsigned char* const hdrext,
-				       uint32 hdrextlen,
-				       const unsigned char* const data,
-				       size_t datalen);
+	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
+		       const unsigned char* const hdrext, uint32 hdrextlen,
+		       const unsigned char* const data, size_t datalen);
 
 	/**
 	 * Construct a new packet to be sent, containing several
@@ -453,10 +450,8 @@ public:
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
 	 **/
-	OutgoingRTPPkt::OutgoingRTPPkt(const uint32* const csrcs,
-				       uint16 numcsrc, 
-				       const unsigned char* const data,
-				       size_t datalen);
+	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
+		       const unsigned char* const data, size_t datalen);
 		
 	/**
 	 * Construct a new packet (with no contributing sources and no
@@ -466,8 +461,7 @@ public:
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
 	 **/
-	OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* const data,
-				       size_t datalen);
+	OutgoingRTPPkt(const unsigned char* const data, size_t datalen);
 
 	~OutgoingRTPPkt()
 	{ }

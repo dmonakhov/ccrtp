@@ -486,7 +486,7 @@ private:
 	findCNAME();
 
 	/// Hash table with sources of RTP and RTCP packets.
-	enum { defaultParticipantsNum };
+	static const size_t defaultParticipantsNum;
 	Participant** participants;
 	/// List of participants, ordered from older to newer.
 	ParticipantLink* firstPart, * lastPart;

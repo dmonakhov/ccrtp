@@ -10,7 +10,7 @@
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
-AM_CXXFLAGS= -Wall
+AM_CXXFLAGS= @WARN_FLAGS@
 LDFLAGS = @LDFLAGS@ 
 #ignored for programs
 #$(LT_VERSION) -release $(LT_RELEASE)

@@ -1,3 +1,17 @@
+2003-01-12  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/formats.h, src/ccrtp/rtppkt.h, src/ccrtp/rtcppkt.h,
+	src/ccrtp/iqueue.h, src/ccrtp/oqueue.h, src/queue.cpp: fixes for
+	ANSI C++ warnings.
+	* src/ccrtp/rtp.h, src/ccrtp/ext.h, src/socket.cpp,
+	src/ccrtp/channel.h, src/ccrtp/socket.h: socket.h renamed to
+	channel.h in order to avoid name conflict with cc++2/socket.h's
+	man page.
+	* src/queue.cpp: (RTPDataQueue::getCurrentTimestamp): fixed
+	signed/unsigned bug, reported by Guillaume Fraysse.
+	* configure.in, src/Makefile.am, demo/Makefile.am,
+	phone/Makefile.am: gcc flags for ANSI C++.
+
 2002-11-27 David Sugar <sugar@gnu.org>
 	* modify spec file for rpm build
 	* release 1.0pre1 prep work

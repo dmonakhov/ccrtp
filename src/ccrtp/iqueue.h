@@ -1031,7 +1031,7 @@ protected:
 	/**
 	 * @param size initial size of the membership table.
 	 **/
-	IncomingDataQueue::IncomingDataQueue(uint32 size);
+	IncomingDataQueue(uint32 size);
 
 	virtual ~IncomingDataQueue()
 	{ }
@@ -1048,9 +1048,9 @@ protected:
 	 *
 	 * @return whether the packet must not be discarded.
 	 **/
-	bool IncomingDataQueue::
-	checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink, bool is_new, 
-				  InetAddress& na, tpport_t tp);
+	bool checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink, 
+				       bool is_new, InetAddress& na, 
+				       tpport_t tp);
 
 	/**
 	 * Set the number of RTCP intervals that the stack will wait

@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
+// Copyright (C) 1999-2003 Open Source Telecom Corporation.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@
 #define CCXX_RTP_RTP_H_
 
 #include <ccrtp/cqueue.h>
-#include <ccrtp/socket.h>
+#include <ccrtp/channel.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

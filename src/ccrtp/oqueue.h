@@ -279,7 +279,7 @@ public:
 	{ return sendInfo.octetCount; }
 
 protected:
-	OutgoingDataQueue::OutgoingDataQueue();
+	OutgoingDataQueue();
 
 	virtual ~OutgoingDataQueue()
 	{ }

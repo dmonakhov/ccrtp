@@ -220,10 +220,8 @@ protected:
 	 *
 	 * @return whether the packet must not be discarded.
 	 **/
-	bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
-						  bool is_new,
-						  InetAddress& na,
-						  tpport_t tp);
+	bool checkSSRCInRTCPPkt(SyncSourceLink& sourceLink, bool is_new,
+				InetAddress& na, tpport_t tp);
 
 	void
 	endQueueRTCPManager();
@@ -259,7 +257,7 @@ protected:
 	 * @param pkt SDES RTCP packet received.
 	 **/		
 	bool
-	QueueRTCPManager::onGotSDES(SyncSource& source, RTCPPacket& pkt);
+	onGotSDES(SyncSource& source, RTCPPacket& pkt);
 
 	/**
 	 * Plug-in for handling of SDES chunks.
@@ -269,8 +267,7 @@ protected:
 	 * @param len Length of chunk, in octets.
 	 **/
 	virtual bool
-	QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
-					 size_t len);
+	onGotSDESChunk(SyncSource& source, SDESChunk& chunk, size_t len);
 
 	/**
 	 * Plug-in for handling of APP (application specific) RTCP

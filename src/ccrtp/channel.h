@@ -1,4 +1,4 @@
-// Copyright (C) 2001, 2002 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2001,2002,2003 Federico Montesino Pouzols <fedemp@altern.org>
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@
 // whether to permit this exception to apply to your modifications.
 // If you do not wish that, delete this exception notice.  
 
-#ifndef	CCXX_RTP_SOCKET_H_
-#define CCXX_RTP_SOCKET_H_
+#ifndef	CCRTP_CHANNEL_H_
+#define CCRTP_CHANNEL_H_
 
 #include <ccrtp/base.h>
 
@@ -63,7 +63,7 @@ namespace ost {
 #endif
 
 /**
- * @file socket.h
+ * @file channel.h
  *
  * Definition of socket classes for different underlying transport
  * and/or network protocols that can be used to instantiate the
@@ -273,7 +273,7 @@ typedef RTPBaseUDPIPv4Socket SingleRTPChannel;
 };
 #endif
 
-#endif  //CCXX_RTP_SOCKET_H_
+#endif  //CCRTP_CHANNEL_H_
 
 /** EMACS **
  * Local variables:

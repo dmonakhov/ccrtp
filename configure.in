@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2002 Open Source Telecom Corporation.
+# Copyright (C) 1999-2003 Open Source Telecom Corporation.
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
@@ -28,6 +28,13 @@ OST_AUTOMAKE_MODE
 OST_MAINTAINER_MODE
 OST_CCXX2_VERSION([$REQUIRES])
 OST_CC_ENDIAN
+# Are we using the GNU compiler?
+if test $GCC = yes ; then
+	WARN_FLAGS="-Wall -ansi -pedantic"
+else
+	WARN_FLAGS=""
+fi
+AC_SUBST(WARN_FLAGS)
 AC_CHECK_FILE(/dev/urandom,[AC_DEFINE(HAVE_DEV_URANDOM)])
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging],[

@@ -43,7 +43,7 @@
 //
 
 #include "private.h"
-#include <ccrtp/socket.h>
+#include <ccrtp/channel.h>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

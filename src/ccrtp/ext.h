@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2002 Open Source Telecom Corporation.
+// Copyright (C) 1999-2003 Open Source Telecom Corporation.
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@
 
 #include <cc++/socket.h>
 #include <ccrtp/ioqueue.h>
-#include <ccrtp/socket.h>
+#include <ccrtp/channel.h>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {
@@ -69,7 +69,8 @@ namespace ost {
  * @author David Sugar
  * @short RTP peer host over UDP.
  */
-class CCXX_CLASS_EXPORT RTPDuplex : public RTPDataQueue, protected UDPReceive, public UDPTransmit
+class CCXX_CLASS_EXPORT RTPDuplex : public RTPDataQueue, 
+				    protected UDPReceive, public UDPTransmit
 {
 public:
 	/**
@@ -123,9 +124,9 @@ protected:
 	size_t
 	recvData(unsigned char *buffer, size_t len, 
 		 InetHostAddress& na, tpport_t& tp)
-	{ na = UDPReceive::getPeer(&tp); 
+	{ /* na = UDPReceive::getPeer(&tp);  FIX name ambiguity */
 	return UDPReceive::receive(buffer, len); }
-
+	
 	/**
 	 * @param - peer host network address.
 	 * @param - peer host RTP data transport port.

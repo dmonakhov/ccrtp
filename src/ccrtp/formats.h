@@ -116,7 +116,7 @@ typedef enum {
 	// Types 35 - 71 are unassigned.
 	// Types 72 - 76 are reserved.
 	// Types 96 - 127 are dynamic.
-	lastStaticPayloadType = sptH263,
+	lastStaticPayloadType = sptH263
 }	StaticPayloadType;
 
 /**

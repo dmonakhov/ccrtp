@@ -10,7 +10,9 @@
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
-LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
+AM_CXXFLAGS= @WARN_FLAGS@
+LDFLAGS = @LDFLAGS@ 
+#$(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
 LIBS = ../src/libccrtp1.la @EXTLIBS@ @GNULIBS@
 ccxxincludedir=$(includedir)/ccrtp

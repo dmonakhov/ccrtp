@@ -140,6 +140,8 @@ Participant::~Participant()
 {
 }
 
+const size_t RTPApplication::defaultParticipantsNum = 11;
+
 RTPApplication& defaultApplication()
 {
 	// default application CNAME is automatically assigned.

@@ -53,7 +53,7 @@ static uint32 MD5BasedRandom32()
 {
 	// This is the input to the MD5 algorithm.
 	union {
-		uint8 array[0];
+		uint8 array[1];
 		struct {
 			timeval time;
 			uint32 address;
@@ -176,7 +176,7 @@ RTPDataQueue::getCurrentTimestamp() const
 	timeval now;
 	gettimeofday(&now,NULL);
 
-	uint32 result = now.tv_usec - getInitialTime().tv_usec;
+	int32 result = now.tv_usec - getInitialTime().tv_usec;
 	result *= (getCurrentRTPClockRate()/1000);
 	result /= 1000;
 	result += (now.tv_sec - getInitialTime().tv_sec) * 

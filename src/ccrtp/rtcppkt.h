@@ -142,7 +142,7 @@ public:
 	struct RecvReport
 	{
 		uint32 ssrc;                 ///< source identifier.
-		RRBlock blocks[0];           ///< receiver report blocks.
+		RRBlock blocks[1];           ///< receiver report blocks.
 	};
 	
 	/**
@@ -169,7 +169,7 @@ public:
 	{
 		uint32 ssrc;       ///< source identifier.
 		SenderInfo sinfo;  ///< actual sender info.
-		RRBlock blocks[0]; ///< possibly several receiver info blocks.
+		RRBlock blocks[1]; ///< possibly several receiver info blocks.
 	};
 	
 	/**
@@ -181,7 +181,7 @@ public:
 	{
 		uint8 type;       ///< item identifier.
 		uint8 len;        ///< item len in octets.
-		char data[0];     ///< item content.
+		char data[1];     ///< item content.
 	};
 
 	/**
@@ -220,7 +220,7 @@ public:
 		char name [4];         ///< Name of the APP packet,
 				       ///interpreted as a sequence of
 				       ///four characters.
-		unsigned char data[0]; ///< application dependent data.
+		unsigned char data[1]; ///< application dependent data.
 	};
 
 	/**
