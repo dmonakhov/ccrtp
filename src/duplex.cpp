@@ -44,6 +44,10 @@
 
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 RTPDuplex::RTPDuplex(const InetAddress &ia, tpport_t local, tpport_t remote, int pri) :
 RTPQueue(pri), UDPReceive(ia, local), UDPTransmit(ia, local + 1)
 {
@@ -78,6 +82,10 @@ sockerror_t RTPDuplex::Connect(const InetHostAddress &ia, tpport_t port)
 
 	return SOCKET_SUCCESS;
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

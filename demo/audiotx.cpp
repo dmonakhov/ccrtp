@@ -28,12 +28,16 @@
 
 // In order to use ccRTP, the RTP stack of CommonC++, you only need to
 // include ...
-#include <cc++/rtp.h>
+#include "rtp.h"
 
 // Some consts common to audiotx and audiorx
 #include <audio.h>
 #include <cstdio>
 #include <cstdlib>
+
+#ifdef	__NAMESPACES__
+using namespace ost;
+#endif
 
 /**
  * @class ccRTP_AudioTransmitter

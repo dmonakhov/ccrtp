@@ -43,6 +43,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 const RTPSource MembershipControl::dummysource(0);
 
 MembershipControl::MembershipControl(uint32 initial_size = 7):
@@ -179,6 +183,10 @@ MembershipControl::removeSource(uint32 ssrc)
 	}
 	return removed;
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

@@ -44,6 +44,10 @@
 
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 sockerror_t 
 UDPIPv4Socket::Connect(const InetAddress& ia, tpport_t port)
 {
@@ -57,6 +61,10 @@ UDPIPv4Socket::Connect(const InetAddress& ia, tpport_t port)
 	else
 		return SOCKET_SUCCESS;
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

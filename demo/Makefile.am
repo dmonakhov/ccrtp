@@ -12,6 +12,7 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 LDFLAGS = @LDFLAGS@ $(LT_VERSION) -release $(LT_RELEASE)
 CXXFLAGS = @CXXFLAGS@ -I$(top_srcdir)/src
+LIBS = @GNULIBS@
 ccxxincludedir=$(includedir)/cc++
 
 noinst_PROGRAMS = rtphello rtpduphello audiorx audiotx

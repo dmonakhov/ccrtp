@@ -44,6 +44,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 static uint32 random32();
 static uint16 random16();
 
@@ -108,13 +112,13 @@ RTPQueue::payload_rate[] = {
 };
 
 RTPQueue::RTPQueue(int pri, uint32 size) :
-	Thread(NULL, pri), MembershipControl(size) 
+	Thread(pri), MembershipControl(size) 
 {
 	initQueue(random32());
 } 
 
 RTPQueue::RTPQueue(uint32 ssrc, int pri, uint32 size):
-	Thread(NULL, pri), MembershipControl(size),
+	Thread(pri), MembershipControl(size),
 	active(false),
 	sendcount(0),
 	octetcount(0),
@@ -1008,6 +1012,10 @@ RTPQueue::RTPService(microtimeout_t &wait)
 		wait = 0;
 	}
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

@@ -43,6 +43,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 RTPData::dataCounter::dataCounter(const unsigned char *data, size_t size, rtp_payload_t pt): 
 	count(1), data(data), size(size), pt(pt)
 {
@@ -95,6 +99,10 @@ RTPData::operator=(const RTPData &source)
 
 	return *this;
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

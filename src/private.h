@@ -49,6 +49,9 @@
 #include "config.h"
 #undef	PACKAGE
 #undef	VERSION
+#include <cc++/config.h>
+#include <cc++/socket.h>
+#include <cc++/export.h>
 #include "rtp.h"
 #include "rtpext.h"
 
@@ -80,7 +83,9 @@
 #   error "Portability problem: you do not have sys/utsname.h"
 #endif
 
-
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
 
 
 // This is for the main page in Doxygen documentation
@@ -223,6 +228,10 @@ typedef struct {
 	char name[4];
 }       RTCPAPPHeader;
 #pragma pack()
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

@@ -1,3 +1,6 @@
+2001-11-02  David Sugar <dyfet@ostel.com> (from 0.6.2 to 0.7.0)
+	* addition of namespace support and changes for Common C++ 1.9.0.
+
 2001-10-15  David Sugar <dyfet@ostel.com> (from 0.6.1 to 0.6.2)
         * fixed include files in demo apps.
 

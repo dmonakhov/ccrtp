@@ -28,9 +28,13 @@
 
 // In order to use ccRTP, the RTP stack of CommonC++, you only need to
 // include ...
-#include <cc++/rtp.h>
+#include "rtp.h"
 #include <cstdio>
 #include <cstdlib>
+
+#ifdef	__NAMESPACES__
+using namespace ost;
+#endif
 
 /**
  * @class ccRTP_dupHello

@@ -1,4 +1,5 @@
 # Doxyfile 0.0.1
+# Generate doxy documentation in man format.
 
 # This file describes the settings to be used by doxygen for a project
 #
@@ -14,7 +15,7 @@
 # The PROJECT_NAME tag is a single word (or a sequence of word surrounded
 # by quotes) that should identify the project. 
 
-PROJECT_NAME         =CommonC++
+PROJECT_NAME         =ccRTP
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or 
@@ -201,7 +202,7 @@ EXCLUDE              =
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude
 # certain files from those directories.
 
-EXCLUDE_PATTERNS     =
+EXCLUDE_PATTERNS     = config.h macros.h namespace.h
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
@@ -364,13 +365,13 @@ MAN_EXTENSION        = .3cc
 # evaluate all C-preprocessor directives found in the sources and include
 # files.
 
-ENABLE_PREPROCESSING = NO
+ENABLE_PREPROCESSING = YES
 
 # If the MACRO_EXPANSION tag is set to YES Doxygen will expand all macro
 # names in the source code. If set to NO (the default) only conditional 
 # compilation will be performed.
 
-MACRO_EXPANSION      = NO
+MACRO_EXPANSION      = YES
 
 # If the SEARCH_INCLUDES tag is set to YES (the default) the includes files
 # in the INCLUDE_PATH (see below) will be search if a #include is found.
@@ -381,7 +382,7 @@ SEARCH_INCLUDES      = YES
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH         =
+INCLUDE_PATH         = .
 
 # The PREDEFINED tag can be used to specify one or more macro names that
 # are defined before the preprocessor is started (similar to the -D option of

@@ -45,14 +45,15 @@
  */
 
 #ifndef	__CCXX_RTP_H__
-#   define   __CCXX_RTP_H__
-#   ifndef   __CCXX_SOCKET_H__
-#      include <cc++/socket.h>
-#   else
-#      ifdef   __CCXX_NAMESPACE_H__
-#         include <cc++/macros.h>
-#      endif //__CCXX_NAMESPACE_H__
-#   endif  //__CCXX_SOCKET_H__
+#define	__CCXX_RTP_H__
+
+#ifndef	__CCXX_SOCKET_H__
+#include <cc++/socket.h>
+#endif
+
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
 
 // RTP version
 const uint8 RTP_VERSION = 2;
@@ -204,11 +205,11 @@ typedef enum {
 	CAST_UCAST
 }       rtp_cast_t;
 
-class IncomingRTPPkt;
-class OutgoingRTPPkt;
-class RTPQueue;
-class QueueRTCPManager;
-class RTPSource;
+class CCXX_CLASS_EXPORT IncomingRTPPkt;
+class CCXX_CLASS_EXPORT OutgoingRTPPkt;
+class CCXX_CLASS_EXPORT RTPQueue;
+class CCXX_CLASS_EXPORT QueueRTCPManager;
+class CCXX_CLASS_EXPORT RTPSource;
 
 /** 
  * @class RTPData rtp.h cc++/rtp.h
@@ -222,7 +223,7 @@ class RTPSource;
  *
  * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> 
  */
-class __EXPORT RTPData
+class CCXX_CLASS_EXPORT RTPData
 {
 
 public:
@@ -294,7 +295,7 @@ private:
  * leave the current session. 
  * 
  * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> */
-class __EXPORT RTPSource
+class CCXX_CLASS_EXPORT RTPSource
 {
 
 public:
@@ -584,7 +585,7 @@ private:
 };
 
 // TODO: implement this idea
-class Members
+class CCXX_CLASS_EXPORT Members
 {
 public:
 
@@ -668,7 +669,7 @@ public:
  *
  * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> 
  */
-class __EXPORT MembershipControl : public Members
+class CCXX_CLASS_EXPORT MembershipControl : public Members
 {
 public:
 	/**
@@ -802,7 +803,7 @@ private:
  * @author David Sugar <dyfet@ostel.com>
  * @short RTP protocol queue handler.  
  */
-class __EXPORT RTPQueue : protected Thread, protected MembershipControl
+class CCXX_CLASS_EXPORT RTPQueue : protected Thread, protected MembershipControl
 {
 public:
 	/**
@@ -1604,7 +1605,7 @@ private:
  * @author Federico Montesino <p5087@quintero.fie.us.es>
  * @short Management of RTCP functions.  
  */
-class __EXPORT QueueRTCPManager : public RTPQueue
+class CCXX_CLASS_EXPORT QueueRTCPManager : public RTPQueue
 {
 public:
 	/**
@@ -2037,7 +2038,7 @@ private:
  * @author Federico Montesino <p5087@quintero.fie.us.es>
  * @short Socket for RTP stack based on UDP and IPv4.
  */
-class __EXPORT UDPIPv4Socket: protected UDPSocket 
+class CCXX_CLASS_EXPORT UDPIPv4Socket: protected UDPSocket 
 {
 public:
 	/**
@@ -2387,7 +2388,7 @@ typedef T_RTPSocket<QueueRTCPManager,UDPIPv4Socket,UDPIPv4Socket> RTPSocket;
  * @author David Sugar
  * @short RTP peer host over UDP.
  */
-class __EXPORT RTPDuplex : public RTPQueue, protected UDPReceive, public UDPTransmit
+class CCXX_CLASS_EXPORT RTPDuplex : public RTPQueue, protected UDPReceive, public UDPTransmit
 {
 
 public:
@@ -2452,6 +2453,10 @@ private:
 
 	tpport_t base;
 };
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 #endif  //__CCXX_RTP_H__
 

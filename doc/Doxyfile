@@ -1,4 +1,5 @@
 # Doxyfile 0.0.1
+# Generate doxy documentation in html and latex format.
 
 # This file describes the settings to be used by doxygen for a project
 #
@@ -62,7 +63,7 @@ EXTRACT_ALL          = YES
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
 # will be included in the documentation.
 
-EXTRACT_PRIVATE      = YES
+EXTRACT_PRIVATE      = NO
 
 # If the HIDE_UNDOC_MEMBERS tag is set to YES, Doxygen will hide all
 # undocumented members inside documented classes or files.
@@ -123,7 +124,7 @@ CLASS_DIAGRAMS       = YES
 # If the SOURCE_BROWSER tag is set to YES then a list of source files will
 # be generated. Documented entities will be cross-referenced with these sources.
 
-SOURCE_BROWSER       = YES
+SOURCE_BROWSER       = NO
 
 # Setting the INLINE_SOURCES tag to YES will include the body
 # of functions and classes directly in the documentation.
@@ -136,7 +137,7 @@ INLINE_SOURCES       = NO
 # classes or files whose names only differ in case and if your file system
 # supports case sensitive file names.
 
-CASE_SENSE_NAMES     = YES
+CASE_SENSE_NAMES     = NO
 
 # If the VERBATIM_HEADERS tag is set to YES (the default) then Doxygen
 # will generate a verbatim copy of the header file for each class for
@@ -149,7 +150,7 @@ VERBATIM_HEADERS     = YES
 # comment as the brief description. If set to NO, the Javadoc-style will
 # behave just like the Qt-style comments.
 
-JAVADOC_AUTOBRIEF    = NO
+JAVADOC_AUTOBRIEF    = YES
 
 # if the INHERIT_DOCS tag is set to YES (the default) then an undocumented
 # member inherits the documentation from any documented member that it
@@ -176,7 +177,7 @@ TAB_SIZE             = 8
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                = ../src 
+INPUT                = ../src
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -201,20 +202,20 @@ EXCLUDE              =
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude
 # certain files from those directories.
 
-EXCLUDE_PATTERNS     =
+EXCLUDE_PATTERNS     = config.h macros.h namespace.h
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH         = ../demo ../
+EXAMPLE_PATH         =
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
 # and *.h) to filter out the source-files in the directories. If left 
 # blank all files are included.
 
-EXAMPLE_PATTERNS     = 
+EXAMPLE_PATTERNS     =
 
 # The IMAGE_PATH tag can be used to specify one or more files or 
 # directories that contain image that are included in the documentation (see 
@@ -334,9 +335,8 @@ LATEX_HEADER         =
 # contain links (just like the HTML output) instead of page references
 # This makes the output suitable for online browsing using a pdf viewer.
 
-PDF_HYPERLINKS       = YES
+PDF_HYPERLINKS       = NO
 
-LATEX_BATCHMODE      = YES
 #---------------------------------------------------------------------------
 # configuration options related to the man page output
 #---------------------------------------------------------------------------
@@ -365,13 +365,13 @@ MAN_EXTENSION        = .3
 # evaluate all C-preprocessor directives found in the sources and include
 # files.
 
-ENABLE_PREPROCESSING = NO
+ENABLE_PREPROCESSING = YES
 
 # If the MACRO_EXPANSION tag is set to YES Doxygen will expand all macro
 # names in the source code. If set to NO (the default) only conditional 
 # compilation will be performed.
 
-MACRO_EXPANSION      = NO
+MACRO_EXPANSION      = YES
 
 # If the SEARCH_INCLUDES tag is set to YES (the default) the includes files
 # in the INCLUDE_PATH (see below) will be search if a #include is found.
@@ -382,7 +382,7 @@ SEARCH_INCLUDES      = YES
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH         =
+INCLUDE_PATH         = .
 
 # The PREDEFINED tag can be used to specify one or more macro names that
 # are defined before the preprocessor is started (similar to the -D option of
@@ -465,7 +465,3 @@ BIN_ABSPATH          = /usr/local/bin/
 # the documentation for these projects as well.
 
 EXT_DOC_PATHS        =
-
-GRAPHICAL_HIERARCHY = YES
-
-CLASS_GRAPH = YES

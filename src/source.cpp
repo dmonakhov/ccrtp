@@ -43,6 +43,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 const char *const RTPSource::unknown("unknown");
 
 RTPSource::RTPSource(uint32 ssrc):
@@ -146,6 +150,10 @@ RTPSource::setSDESItem(sdes_item_type_t type, const char *const value)
 		I ( false );
 	// FIX: exception
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

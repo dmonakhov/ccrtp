@@ -44,6 +44,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 // constructor commonly used for outgoing packets
 RTPPacket::RTPPacket(const unsigned char* const block, size_t len, 
 		     bool duplicate = false):
@@ -184,6 +188,10 @@ IncomingRTPPkt::IncomingRTPPkt(RTPQueue &queue, const unsigned char* const block
 IncomingRTPPkt::~IncomingRTPPkt()
 {
 };
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

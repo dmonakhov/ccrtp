@@ -49,6 +49,10 @@
 #ifndef  CCXX_RTPEXT_H
 #   define   CCXX_RTPEXT_H
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 /**
  * @class RTPPacket rtpext.h cc++/rtpext.h 
  *
@@ -58,7 +62,7 @@
  *
  * @author David Sugar <dyfet@ostel.com>
  **/
-class RTPPacket
+class CCXX_CLASS_EXPORT RTPPacket
 {
 protected:
 #pragma pack(1)
@@ -319,7 +323,7 @@ protected:
  *
  * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> 
  */
-class OutgoingRTPPkt: public RTPPacket
+class CCXX_CLASS_EXPORT OutgoingRTPPkt: public RTPPacket
 {
 public:
 	/**
@@ -471,7 +475,7 @@ private:
  *
  * @author Federico Montesino Pouzols <p5087@quintero.fie.us.es> 
  */
-class IncomingRTPPkt : public RTPPacket
+class CCXX_CLASS_EXPORT IncomingRTPPkt : public RTPPacket
 {
 public:
 	/**
@@ -669,6 +673,10 @@ typedef struct
 	uint16 length;           ///< number of 32-bit words in the packet
 }       RTCPFixedHeader;
 #pragma pack()
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 #endif //CCXX_RTPEXT_H
 

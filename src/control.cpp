@@ -43,6 +43,10 @@
 //
 #include "private.h"
 
+#ifdef	__NAMESPACES__
+namespace ost {
+#endif
+
 QueueRTCPManager::QueueRTCPManager(int pri):
 	RTPQueue(pri), 
 	pathMTU(1500),
@@ -755,6 +759,10 @@ QueueRTCPManager::tryAnotherRR(RTCPPacket *&pkt, uint16 &len, uint16 &blocks)
 	} 
 	return result;
 }
+
+#ifdef	__NAMESPACES__
+};
+#endif
 
 /** EMACS **
  * Local variables:

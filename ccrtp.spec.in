@@ -1,14 +1,14 @@
 Summary: ccrtp - a Common C++ class framework for RTP packets
 Name: ccrtp
 Version: @VERSION@
-Release: 2
+Release: 3
 Group: Development/Libraries
 Source: ccrtp-%{PACKAGE_VERSION}.tar.gz
 Prefix: %{_prefix}
 Copyright: GPL
 BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
-Requires: CommonC++ >= 1.6.0
+Requires: CommonC++ >= 1.9.0
 
 %description
 The ccrtp package offers a generic framework for sending and receiving of
