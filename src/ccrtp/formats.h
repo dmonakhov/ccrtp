@@ -173,7 +173,7 @@ protected:
 	 * @param pt payload type number.
 	 **/
 	inline void setPayloadType(PayloadType pt)
-	{ payloadType = (pt <= lastStaticPayloadType)? pt : 0; }
+	{ payloadType = pt; }
 
 	/**
 	 * Set RTP clock rate.
