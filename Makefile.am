@@ -15,8 +15,8 @@ EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in ccrtp.proto \
 PKGBASE = "/opt/OSTrtp"
 PKGNAME = "OSTrtp"
 
-SUBDIRS = src
-DIST_SUBDIRS = m4 config src doc demo
+SUBDIRS = src phone
+DIST_SUBDIRS = m4 config src doc demo phone
 
 kdoc:
 	(cd src ; make kdoc)

@@ -48,7 +48,8 @@ KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
 AC_SUBST(KDOC_DIR)
 AC_OUTPUT(src/Makefile config/Makefile m4/Makefile doc/Makefile demo/Makefile
-Makefile pkginfo ccrtp.spec freebsd/Makefile freebsd/pkg-plist)
+phone/Makefile Makefile pkginfo ccrtp.spec freebsd/Makefile 
+freebsd/pkg-plist)
 
 if test -d doc/man3 ; then
       ls doc/man3/*.3cc | sed -e 's:^doc/man3/:man/man3/:' >> freebsd/pkg-plist ; fi
