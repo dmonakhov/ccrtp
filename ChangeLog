@@ -1,3 +1,6 @@
+2004-04-21  David Sugar <dyfet@ostel.com>
+	* all sources; fixed namespace ending on }; for pedonic gcc-3.4
+
 2004-04-15  David Sugar <dyfet@ostel.com>
 
 	* src/Makefile.am: changes for unsupported autoconf AM_LDFLAGS.

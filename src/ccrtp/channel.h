@@ -275,7 +275,7 @@ typedef SingleRTPChannel SymmetricRTPChannel;
 /** @}*/ // sockets
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  //CCRTP_CHANNEL_H_

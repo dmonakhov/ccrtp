@@ -144,7 +144,7 @@ uint32 random32();
 uint16 random16();
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif // ifndef CCXX_RTP_PRIVATE_H_

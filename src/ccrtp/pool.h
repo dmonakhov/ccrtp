@@ -173,7 +173,7 @@ protected:
 };
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif //CCXX_RTP_POOL_H

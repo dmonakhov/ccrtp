@@ -152,7 +152,7 @@ SingleRTPSessionPool::run()
 }
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

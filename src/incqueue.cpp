@@ -703,7 +703,7 @@ IncomingDataQueue::recordExtraction(const IncomingRTPPkt&)
 }
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

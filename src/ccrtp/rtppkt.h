@@ -656,7 +656,7 @@ private:
 /** @}*/ // rtppacket
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  // ndef CCXX_RTP_RTPPKT_H_

@@ -509,7 +509,7 @@ RTPApplication& defaultApplication();
 /** @}*/ // sources
 
 #ifdef CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif //CCXX_RTP_SOURCES_H_

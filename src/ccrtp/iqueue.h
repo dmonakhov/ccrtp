@@ -1225,7 +1225,7 @@ private:
 /** @}*/ // iqueue
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  //CCXX_RTP_IQUEUE_H_

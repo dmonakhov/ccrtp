@@ -187,7 +187,7 @@ RTPDataQueue::getCurrentTimestamp() const
 }
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

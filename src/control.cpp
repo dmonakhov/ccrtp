@@ -1098,7 +1098,7 @@ QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t len)
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

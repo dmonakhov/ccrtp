@@ -141,7 +141,7 @@ RTCPCompoundHandler::checkCompoundRTCPHeader(size_t len)
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

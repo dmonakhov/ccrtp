@@ -240,7 +240,7 @@ RTPApplication::findCNAME()
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

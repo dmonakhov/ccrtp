@@ -516,7 +516,7 @@ timevalIntervalTo65536(timeval& t);
 /** @}*/ // rtcppacket
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  // ndef CCXX_RTP_RTCPPKT_H_

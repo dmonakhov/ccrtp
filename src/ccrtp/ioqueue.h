@@ -320,7 +320,7 @@ private:
 /** @}*/ // ioqueue
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  //CCXX_RTP_IOQUEUE_H_

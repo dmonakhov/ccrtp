@@ -425,7 +425,7 @@ private:
 /** @}*/ // oqueue
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  //CCXX_RTP_OQUEUE_H_

@@ -82,7 +82,7 @@ UDPSocket::Error RTPDuplex::connect(const InetHostAddress &ia, tpport_t port)
 }
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

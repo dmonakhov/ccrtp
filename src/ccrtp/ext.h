@@ -165,7 +165,7 @@ private:
 /*@}*/ // rtpext
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif //CCXX_RTP_EXT_H

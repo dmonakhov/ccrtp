@@ -460,7 +460,7 @@ OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data,
 }
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

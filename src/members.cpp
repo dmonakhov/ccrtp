@@ -331,7 +331,7 @@ MembershipBookkeeping::removeSource(uint32 ssrc)
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

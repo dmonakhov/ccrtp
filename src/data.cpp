@@ -71,7 +71,7 @@ AppDataUnit::operator=(const AppDataUnit &rhs)
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **

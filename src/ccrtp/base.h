@@ -116,7 +116,7 @@ gettimeofday(struct timeval *tv_, void *tz_);
 #endif
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  // ndef CCXX_RTP_BASE_H_

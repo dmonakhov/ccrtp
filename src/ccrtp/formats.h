@@ -253,7 +253,7 @@ public:
 /** @}*/ // payload 
 
 #ifdef  CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif  // ndef CCXX_RTP_FORMATS_H_

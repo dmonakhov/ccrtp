@@ -50,7 +50,7 @@ namespace ost {
 #endif
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 /** EMACS **
