@@ -7,7 +7,7 @@ Description:	An experimental packet queue based RTP stack for use with
 Keywords:       c++ rtp telephony voip		
 Author:         David Sugar <dyfet@ostel.com>
 Maintained-by:  David Sugar <dyfet@ostel.com>
-Primary-Site	www.voxilla.org /pub/ccrtp
+Primary-Site	ftp.gnu.org /gnu/ccrtp
 		SIZEk ccrtp-VERSION.tar.gz
 Copying-policy: lgpl
 End
