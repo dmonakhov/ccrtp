@@ -112,8 +112,11 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 			result = true;
 			if ( prev )
 				prev->setNext(ta->getNext());
+			if ( getFirstDestination() == ta ) 
+				firstDestination = NULL;
 			destinationCounter--;
 			delete ta;
+			ta = NULL;
 		} else {
 			prev = ta;
 			ta = ta->getNext();

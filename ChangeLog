@@ -1,3 +1,19 @@
+2004-11-22  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtp.h: fixed bug in error handling,
+	TRTPSessionbase::leaveGroup
+
+	* src/ccrtp/channel.h: fixed to compile with cc++ ipv6 support.
+
+	* src/outqueue.cpp: fixed two bugs in
+	DestinationListHandler::removeDestinationFromList (reported by
+	Sigrid Thijs).
+	
+	* src/ccrtp/formats.h, src/rtppkt.cpp: fixed
+	PayloadFormat::setPayloadType (reported by Sigrid Thijs) that
+	failed with dynamic types.  The static range is now enforced in
+	StaticPayloadFormat::StaticPayloadFormat.
+
 2004-11-14  David Sugar <dyfet@ostel.com>
 	* configure.ac: standardized autoconfiguring a bit including
 	shell issues with freebsd.

@@ -91,16 +91,14 @@ uint32 StaticPayloadFormat::staticAudioTypesRates[] = {
 
 StaticPayloadFormat::StaticPayloadFormat(StaticPayloadType type)
 { 
-	setPayloadType(type);
+	setPayloadType( (type <= lastStaticPayloadType)? type : 0);
 	if ( type <= sptG729 ) {
 		// audio static type
 		setRTPClockRate(staticAudioTypesRates[type]);
-	} else if ( type <= lastStaticPayloadType ) {
+	} else {
 		// video static type
 		setRTPClockRate(90000);
-	} else {
-		setRTPClockRate(defaultRTPClockRate);
-	}
+	} 
 }
 
 DynamicPayloadFormat::DynamicPayloadFormat(PayloadType type, uint32 rate)

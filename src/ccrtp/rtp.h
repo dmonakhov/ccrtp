@@ -342,7 +342,7 @@ private:
 		error = dso->leaveGroup(ia);
 		if ( error ) return error;
 		error = cso->setMulticast(false);
-		if ( error ) return errror;
+		if ( error ) return error;
 		return cso->leaveGroup(ia);
 	}
 
