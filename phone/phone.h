@@ -131,6 +131,10 @@ public:
  */
 class RTPAudio : public RTPSocket
 {
+private:
+	unsigned groups;	// multicast groups joined
+	bool	unicast;	// indicate if in unicast call
+
 public:
 	RTPAudio();
 };

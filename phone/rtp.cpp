@@ -27,6 +27,8 @@ RTPSocket(keyrtp.getInterface(), keyrtp.getPort(), keythreads.priRTP())
 	rtp = this;
 	setTimeout(keyrtp.getTimer());
 	setExpired(keyrtp.getExpire());
+	groups = 0;
+	unicast = false;
 }
 
 RTPAudio *rtp;
