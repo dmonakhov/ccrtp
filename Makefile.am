@@ -18,7 +18,7 @@ EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in ccrtp.proto \
 PKGBASE = "/opt/OSTrtp"
 PKGNAME = "OSTrtp"
 
-SUBDIRS = src phone win32
+SUBDIRS = src phone
 DIST_SUBDIRS = m4 config src win32 doc demo phone
 
 kdoc:
