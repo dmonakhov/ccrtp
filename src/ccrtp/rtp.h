@@ -424,7 +424,16 @@ public:
 			       int pri = 0,
 			       uint32 memberssize = 
 			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication());
+			       RTPApplication& app = defaultApplication()
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+				   );
+#else
+				   ):
+			Thread(pri),
+		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app)
+	{ }
+#endif
 	
 	SingleThreadRTPSession(const InetMcastAddress& ia, 
 			       tpport_t dataPort = DefaultRTPDataPort, 
@@ -433,7 +442,16 @@ public:
 			       uint32 memberssize = 
 			       MembershipBookkeeping::defaultMembersHashSize,
 			       RTPApplication& app = defaultApplication(),
-			       uint32 iface = 0); 
+			       uint32 iface = 0)
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+				   ;
+#else
+				   :
+			Thread(pri),
+		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app,iface)
+	{ }
+#endif
 
 	~SingleThreadRTPSession()
 	{ terminate(); }
@@ -464,22 +482,66 @@ protected:
 	inline size_t dispatchDataPacket(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
 
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+	virtual void run(void);
+
 	virtual void timerTick(void);
 
 	virtual bool isPendingData(microtimeout_t timeout); 
+#else
+
+	virtual void timerTick(void)
+		{return;}
+
+	virtual bool isPendingData(microtimeout_t timeout)
+		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
+
+	/**
+	 * Single runnable method for this RTP stacks, schedules
+	 * outgoing and incoming RTP data and RTCP packets.
+	 **/
+	virtual void run(void)
+	{
+		microtimeout_t timeout = 0;
+		while ( ServiceQueue::isActive() ) {
+			if ( timeout < 1000 ){ // !(timeout/1000)
+				timeout = getSchedulingTimeout();
+			}
+			setCancel(cancelDeferred);
+			controlReceptionService();
+			controlTransmissionService();
+			setCancel(cancelImmediate);
+			microtimeout_t maxWait = 
+				timeval2microtimeout(getRTCPCheckInterval());
+			// make sure the scheduling timeout is
+			// <= the check interval for RTCP
+			// packets
+			timeout = (timeout > maxWait)? maxWait : timeout;
+			if ( timeout < 1000 ) { // !(timeout/1000)
+				setCancel(cancelDeferred);
+				dispatchDataPacket();
+				setCancel(cancelImmediate);
+				timerTick();
+			} else {
+				if ( isPendingData(timeout/1000) ) {
+					setCancel(cancelDeferred);
+					takeInDataPacket();
+					setCancel(cancelImmediate);
+				}
+				timeout = 0;
+			}
+		}
+		dispatchBYE("GNU ccRTP stack finishing.");
+		sleep(~0);
+	}
+
+#endif
 
 	inline size_t takeInDataPacket(void)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
 
 	inline size_t dispatchBYE(const std::string &str)
 		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
-
-
-	/**
-	 * Single runnable method for this RTP stacks, schedules
-	 * outgoing and incoming RTP data and RTCP packets.
-	 **/
-	virtual void run();
 };
 
 /**

@@ -148,6 +148,7 @@ SingleRTPSessionPool::run()
 #endif // ndef WIN32
 }
 
+#if defined(_MSC_VER) && _MSC_VER >= 1300
 SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
 		const InetHostAddress& ia, 
 			       tpport_t dataPort, 
@@ -217,8 +218,7 @@ void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue
 		sleep(~0);
 }
 
-
-
+#endif
 
 #ifdef  CCXX_NAMESPACES
 }
