@@ -64,6 +64,12 @@
  * A basic example of how to use RTPPacket
  **/
 /**
+ * @example rtpsend.cpp
+ */
+/**
+ * @example rtplisten.cpp
+ */
+/**
  * @example audio.h
  */
 /**

@@ -560,15 +560,15 @@ protected:
 		void setPrevConflict(InetAddress& addr, tpport_t dataPort,
 				     tpport_t controlPort);
 		
-		void* getSenderInfo()
+		unsigned char* getSenderInfo()
 		{ return senderInfo; }
 		
-		void setSenderInfo(void* si);
+		void setSenderInfo(unsigned char* si);
 
-		void* getReceiverInfo()
+		unsigned char* getReceiverInfo()
 		{ return receiverInfo; }
 		
-		void setReceiverInfo(void* ri);
+		void setReceiverInfo(unsigned char* ri);
 
 		inline timeval getLastPacketTime() const
 		{ return lastPacketTime; }
@@ -744,8 +744,8 @@ protected:
 		// Prev and next inside the hash table collision list.
 		SyncSourceLink* nextCollis;
 		ConflictingTransportAddress* prevConflict;
-		void* senderInfo; 
-		void* receiverInfo;
+		unsigned char* senderInfo; 
+		unsigned char* receiverInfo;
 		// time the last RTP packet from this source was
 		// received at.
 		timeval lastPacketTime;

@@ -142,19 +142,21 @@ recordInsertion(const IncomingRTPPktLink& pkt)
 
 void
 MembershipBookkeeping::SyncSourceLink::
-setSenderInfo(void* si)
+setSenderInfo(unsigned char* si)
 {
 	if ( NULL == senderInfo )
-		senderInfo = reinterpret_cast<void*>(new RTCPCompoundHandler::SenderInfo);
+		senderInfo = reinterpret_cast<unsigned char*>
+			(new RTCPCompoundHandler::SenderInfo);
 	memcpy(senderInfo,si,sizeof(RTCPCompoundHandler::SenderInfo));
 }
 
 void
 MembershipBookkeeping::SyncSourceLink::
-setReceiverInfo(void* ri)
+setReceiverInfo(unsigned char* ri)
 {
 	if ( NULL == receiverInfo )
-		receiverInfo = reinterpret_cast<void*>(new RTCPCompoundHandler::ReceiverInfo);
+		receiverInfo = reinterpret_cast<unsigned char*>
+			(new RTCPCompoundHandler::ReceiverInfo);
 	memcpy(receiverInfo,ri,sizeof(RTCPCompoundHandler::ReceiverInfo));
 }
 

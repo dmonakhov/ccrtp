@@ -226,7 +226,7 @@ Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 
 @item Generic and extensible @acronym{RTP} and @acronym{RTCP} header validity checks.
 
-@item Handles source states and information as well as statistic recording.
+@item Handles source states and information as well as statistics recording.
 
 @cindex SSRC collision
 @cindex loop detection
@@ -240,7 +240,7 @@ Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 @cindex Random numbers
 @cindex /dev/urandom
 @cindex MD5
-@item Provides good random numbers, based on @file{/dev/urandom} or MD5.
+@item Provides good random numbers, based on @file{/dev/urandom} or, alternatively, on MD5.
 
 @end itemize
 
@@ -250,18 +250,20 @@ Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 @tindex RTPSession
 @findex onGotSR
 @findex getMRSenderInfo
+@cindex SR
+@cindex RTCP SR
 There are several levels of interface (public interface, public or
 protected inheritance, etc) in ccRTP. For instance, the
 @code{rtphello} demo program distributed with ccRTP just uses the
 public interface of the @code{RTPSession} class and does not redefine
 the virtual method @code{onGotSR}, thus what this program knows about
-SR report is the information conveyed in the last sender report from
-any source, which can be retrieved via the getMRSenderInfo method. On
-the contrary, the @code{rtplisten} demo program redefines
-@code{onGotSR} by means of inheritance and could do specialized
-processing of these RTCP packets. Generally, both data and control
-packets are not directly accessible through the most external
-interface.
+SR reports is the information conveyed in the last sender report from
+any source, which can be retrieved via the @code{getMRSenderInfo}
+method of the @code{SyncSource} class. On the contrary, the
+@code{rtplisten} demo program redefines @code{onGotSR} by means of
+inheritance and could do specialized processing of these RTCP
+packets. Generally, both data and control packets are not directly
+accessible through the most external interface.
 
 @tindex StaticPayloadType
 @tindex StaticPayloadFormat
@@ -792,18 +794,27 @@ RTCP packets.
 
 @itemize
 
+@cindex SR
+@cindex RTCP SR
 @findex QueueRTCPManager::onGotSR
 @item @code{onGotSR}
 
+@cindex RR
+@cindex RTCP RR
 @findex QueueRTCPManager::onGotRR
 @item @code{onGotRR}
 
+@cindex SDES
+@cindex RTCP SDES
 @findex QueueRTCPManager::onGotSDESChunk
 @item @code{onGotSDESChunk}
 
+@cindex APP
+@cindex RTCP APP
 @findex QueueRTCPManager::onGotAPP
 @item @code{onGotAPP}
 
+@cindex SRE Extension
 @findex QueueRTCPManager::onGotRRSRExtension
 @item @code{onGotRRSRExtension}
 
@@ -830,6 +841,8 @@ more thatn one of these events.
 @subsection SSRC Collisions 
 @cindex SSRC Collision
 
+@cindex collision
+@cindex SSRC collision
 @findex QueueRTCPManager::onSSRCCollision
 @code{onSSRCCollision}.
 
@@ -870,6 +883,8 @@ more thatn one of these events.
 
 @itemize
 
+@cindex SRTP
+@cindex Secure RTP
 @item @cite{The Secure Real-time Transport Protocol}. SRTP provile.
 
 @item @cite{Extended RTP Profile for RTCP-based Feedback (RTP/AVPF)}.
