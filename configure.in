@@ -14,6 +14,7 @@ REQUIRES="0.99.0"
 LT_RELEASE="0.9"
 LT_VERSION="0:1"
 AC_CONFIG_AUX_DIR(config)
+AC_CANONICAL_SYSTEM
 OST_PROG_CC_POSIX
 AC_PROG_CXX
 AC_PROG_CXXCPP
@@ -28,13 +29,13 @@ OST_MAINTAINER_MODE
 OST_CCXX2_VERSION([$REQUIRES])
 OST_CC_ENDIAN
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
-AC_MSG_CHECKING([if libnana is installed])
-AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging [default=no]], 
-	if test "$with_nana" = yes; then 
-		AC_CHECK_HEADER(nana.h, 
-			AC_CHECK_HEADERS(DL.h, 
-				AC_CHECK_LIB(nana, main)))
-	fi;)
+AC_ARG_WITH(nana,[  --with-nana         use GNU nana for asserts and logging],[
+	AC_CHECK_HEADER(nana.h, [
+		AC_CHECK_HEADERS(DL.h, [
+			AC_CHECK_LIB(nana, main)
+			])
+	])
+])
 dnl needed to construct the CNAME with getenv(2)
 dnl AC_CHECK_HEADERS(cstdlib,[AC_DEFINE(HAVE_CSTDLIB)],
 dnl 		[AC_CHECK_HEADERS(stdlib.h,[AC_DEFINE(HAVE_STDLIB_H)],
