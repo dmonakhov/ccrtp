@@ -35,7 +35,6 @@ else
 	WARN_FLAGS=""
 fi
 AC_SUBST(WARN_FLAGS)
-AC_CHECK_FILE(/dev/urandom,[AC_DEFINE(HAVE_DEV_URANDOM)])
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging],[
 	AC_CHECK_HEADER(nana.h, [

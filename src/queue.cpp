@@ -90,10 +90,8 @@ static uint32 MD5BasedRandom32()
 
 uint32 random32()
 {
-#ifdef HAVE_DEV_URANDOM
-	// If there is /dev/urandom, try to read from it. If
-	// /dev/urandom fails, default to the MD5 based algorithm
-	// given in the specification.
+	// If /dev/urandom fails, default to the MD5 based algorithm
+	// given in the RTP specification.
 	uint32 number;
 	bool success = true;
 	int fd = open("/dev/urandom",O_RDONLY);
@@ -108,9 +106,6 @@ uint32 random32()
 	if ( !success )
 		number = MD5BasedRandom32();
         return number;
-#else
-	return MD5BasedRandom32();
-#endif
 }
 
 uint16 random16()

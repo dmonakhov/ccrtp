@@ -1,5 +1,7 @@
 2003-05-10  Federico Montesino Pouzols  <fedemp@altern.org>
 
+	* configure.in, acconfig.h, src/queue.cpp: removed the
+	AC_CHECK_FILE for /dev/urandom so as to allow cross-compilation.
 	* demo/rtplisten.cpp: modified to recognize mcast addresses.
 	* src/ccrtp/ext.h: fixed RTPDuplex::getNextDataPacketSize so that
 	it compiles even though UDPReceive::getReceiver is not const,
