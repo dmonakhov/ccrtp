@@ -12,7 +12,7 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ccxxincludedir=$(includedir)/cc++2/cc++/rtp
 
 ccxxinclude_HEADERS = base.h formats.h rtppkt.h rtcppkt.h sources.h socket.h \
-	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h
+	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h rtp.h pool.h
 
 kdoc_headers = base.h formats.h rtppkt.h rtcppkt.h sources.h socket.h \
 	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h

@@ -28,7 +28,7 @@ uname -a|grep SMP && make -j 2 || make
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
 make prefix=$RPM_BUILD_ROOT/%{_prefix} \
-	mandir=$RPM_BUILD_ROOT/%{_mandir} \ 
+	mandir=$RPM_BUILD_ROOT/%{_mandir} \
 	infodir=$RPM_BUILD_ROOT/%{_infodir} install
 make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 	mandir=$RPM_BUILD_ROOT/%{_mandir} man
@@ -37,10 +37,10 @@ make prefix=$RPM_BUILD_ROOT/%{_prefix} \
 %defattr(-,root,root,0755)
 %doc AUTHORS COPYING NEWS README TODO ChangeLog 
 %{_prefix}/lib/libcc*
-%{_prefix}/include/cc++2/cc++/rtp*.h
+%{_prefix}/include/cc++2/cc++/phone.h
 %{_prefix}/include/cc++2/cc++/rtp
 %{_mandir}/man3/*.3cc*
-%{_infodir}/info/ccrtp*
+#%{_infodir}/info/ccrtp*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
