@@ -10,7 +10,7 @@
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 EXTRA_DIST = reconfig ccrtp.spec ccrtp.spec.in ccrtp.proto \
-	pkginfo.in freebsd/Makefile.in freebsd/pkg-*
+	pkginfo.in freebsd/Makefile.in freebsd/pkg-* acconfig.h
 
 PKGBASE = "/opt/OSTrtp"
 PKGNAME = "OSTrtp"

@@ -9,5 +9,6 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies
-EXTRA_DIST = Doxyfile Doxyman man3/*.3cc html/* latex/*
+EXTRA_DIST = Doxyfile Doxyman 
+#man3/*.3cc html/* latex/*
 
