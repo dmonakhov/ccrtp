@@ -467,18 +467,14 @@ protected:
 			timeout = (timeout > maxWait)? maxWait : timeout;
 			if ( !timeout ) {
 				setCancel(cancelDeferred);
-				size_t r = dispatchDataPacket();
+				dispatchDataPacket();
 				setCancel(cancelImmediate);
-				if ( r < 0 )
-					timeout = timeout;
 				timerTick();
 			} else {
 				if ( isPendingData(timeout/1000) ) {
 					setCancel(cancelDeferred);
-					size_t r = takeInDataPacket();
+					takeInDataPacket();
 					setCancel(cancelImmediate);
-					if ( r < 0 )
-						return;
 				}
 				timeout = 0;
 			}

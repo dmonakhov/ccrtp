@@ -1,3 +1,8 @@
+2003-09-23  Federico Montesino Pouzols  <fedemp@altern.org>
+	
+	* src/ccrtp/rtp.h, src/incqueue.cpp, src/outqueue.cpp: fixed minor
+	signed/unsigned inconsistencies
+
 2003-07-03  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtp.h: (TRTPSessionBase::build, mcast version): fixed

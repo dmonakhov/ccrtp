@@ -383,39 +383,37 @@ OutgoingDataQueue::dispatchDataPacket(void)
 	}
 	
 	OutgoingRTPPkt* packet = packetLink->getPacket();
-	int32 rtn = packet->getPayloadSize();
-	if ( rtn ) {
-		lockDestinationList();
-		if ( isSingleDestination() ) {
+	uint32 rtn = packet->getPayloadSize();
+	lockDestinationList();
+	if ( isSingleDestination() ) {
+		sendData(packet->getRawPacket(),
+			 packet->getRawPacketSize());
+	} else {
+		// when no destination has been added, NULL == dest.
+		TransportAddress* dest = getFirstDestination();
+		while ( dest ) {
+			setDataPeer(dest->getNetworkAddress(),
+				    dest->getDataTransportPort());
 			sendData(packet->getRawPacket(),
 				 packet->getRawPacketSize());
-		} else {
-			// when no destination has been added, NULL == dest.
-			TransportAddress* dest = getFirstDestination();
-			while ( dest ) {
-				setDataPeer(dest->getNetworkAddress(),
-					    dest->getDataTransportPort());
-				sendData(packet->getRawPacket(),
-					 packet->getRawPacketSize());
-				dest = dest->getNext();
-			}
+			dest = dest->getNext();
 		}
-		unlockDestinationList();
 	}
+	unlockDestinationList();
+
 	// unlink the sent packet from the queue and destroy it. Also
 	// record the sending.
-	if ( rtn > -1 ) {
-		sendFirst = sendFirst->getNext();
-		if ( sendFirst ) {
-			sendFirst->setPrev(NULL);
-		} else {
-			sendLast = NULL;
-		}
-		// for general accounting and RTCP SR statistics 
-		sendInfo.packetCount++;
-		sendInfo.octetCount += packet->getPayloadSize();
-		delete packetLink;
+	sendFirst = sendFirst->getNext();
+	if ( sendFirst ) {
+		sendFirst->setPrev(NULL);
+	} else {
+		sendLast = NULL;
 	}
+	// for general accounting and RTCP SR statistics 
+	sendInfo.packetCount++;
+	sendInfo.octetCount += packet->getPayloadSize();
+	delete packetLink;
+
 	sendLock.unlock();
 	return rtn;
 }

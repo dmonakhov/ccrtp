@@ -192,7 +192,7 @@ IncomingDataQueue::takeInDataPacket(void)
 	int32 rtn = recvData(buffer,nextSize,network_address,transport_port);
 	if ( (rtn < 0) || ((uint32)rtn > getMaxRecvPacketSize()) ){
 		delete buffer;
-		return rtn;
+		return 0;
 	}
 
 	// get time of arrival
