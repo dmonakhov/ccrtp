@@ -14,29 +14,26 @@
 // along with this program; if not, write to the Free Software 
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
-// As a special exception to the GNU General Public License, permission is 
-// granted for additional uses of the text contained in its release 
-// of ccRTP.
-// 
-// The exception is that, if you link the ccRTP library with other
-// files to produce an executable, this does not by itself cause the
-// resulting executable to be covered by the GNU General Public License.
-// Your use of that executable is in no way restricted on account of
-// linking the ccRTP library code into it.
-// 
-// This exception does not however invalidate any other reasons why
-// the executable file might be covered by the GNU General Public License.
-// 
-// This exception applies only to the code released under the 
-// name ccRTP.  If you copy code from other releases into a copy of
+// As a special exception, you may use this file as part of a free software
+// library without restriction.  Specifically, if other files instantiate
+// templates or use macros or inline functions from this file, or you compile
+// this file and link it with other files to produce an executable, this
+// file does not by itself cause the resulting executable to be covered by
+// the GNU General Public License.  This exception does not however    
+// invalidate any other reasons why the executable file might be covered by
+// the GNU General Public License.    
+//
+// This exception applies only to the code released under the name GNU
+// ccRTP.  If you copy code from other releases into a copy of GNU
 // ccRTP, as the General Public License permits, the exception does
 // not apply to the code that you add in this way.  To avoid misleading
 // anyone as to the status of such modified files, you must delete
 // this exception notice from them.
-// 
-// If you write modifications of your own for ccRTP, it is your choice
+//
+// If you write modifications of your own for GNU ccRTP, it is your choice
 // whether to permit this exception to apply to your modifications.
-// If you do not wish that, delete this exception notice.  
+// If you do not wish that, delete this exception notice.
+//
 
 /** 
  * @file cqueue.h 
