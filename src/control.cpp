@@ -118,6 +118,7 @@ QueueRTCPManager::endQueueRTCPManager()
 {
 	controlServiceActive = false;
 	controlBwFract = sendControlBwFract = 0;
+	dispatchBYE("ccRTP stack finishing session");
 }
 
 bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
@@ -685,51 +686,43 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 		}
 	}
 
-	
-	// build and send BYE packet
-	// FIX: the packet must be compound (a SR/RR must go first -at
-	// least an empty one).
+
+	unsigned char buffer[500];
+	// Build an empty RR as first packet in the compound.
+	// TODO: provide more information if available.
+	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(buffer);
+	pkt->fh.version = CCRTP_VERSION;
+	pkt->fh.padding = 0;
+	pkt->fh.block_count = 0;
+	pkt->fh.type = RTCPPacket::tRR;
+	pkt->info.RR.ssrc= htonl(getLocalSSRC());
+	uint16 len1 = sizeof(RTCPFixedHeader) + sizeof(uint32); // 1st pkt len.
+	pkt->fh.length = htons((len1 >> 2) - 1);
+	uint16 len = len1; // whole compound len.
+	// build a BYE packet
 	uint16 padlen = 0;
-	uint16 len = sizeof(RTCPFixedHeader);
-	// build the fixed header (but lenght and padding are not known yet)
-	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(rtcpSendBuffer);
+        pkt = reinterpret_cast<RTCPPacket*>(buffer);
 	pkt->fh.version = CCRTP_VERSION;
 	pkt->fh.block_count = 1;
 	pkt->fh.type = RTCPPacket::tBYE;
 	// add the SSRC identifier
 	pkt->info.BYE.ssrc = htonl(getLocalSSRC());
+	len += sizeof(RTCPFixedHeader) + sizeof(BYEPacket);
 	// add the optional reason
 	if ( reason.c_str() != NULL ){
 		pkt->info.BYE.length = strlen(reason.c_str());
-		memcpy(rtcpSendBuffer + sizeof(BYEPacket),
-		       reason.c_str(),pkt->info.BYE.length);
-		len += sizeof(BYEPacket) + pkt->info.BYE.length;
-		padlen = 4 - (len & 0x03);
-		if ( padlen )
-			memset(rtcpSendBuffer + sizeof(BYEPacket) 
-			       + pkt->info.BYE.length,
-			       0,padlen);
-	}
-	pkt->fh.length = htons((len >> 2) - 1);
-	pkt->fh.padding = (padlen > 0);
-	
-	size_t count = 0;
-	lockDestinationList();
-	if ( isSingleDestination() ) {
-		count = sendControl(rtcpSendBuffer,len);
-	} else {
-		// when no destination has been added, NULL == dest.
-		TransportAddress* dest = getFirstDestination();
-		while ( dest ) {
-			setControlPeer(dest->getNetworkAddress(),
-				       dest->getControlTransportPort());
-			count += sendControl(rtcpSendBuffer,len);
-			dest = dest->getNext();
+		memcpy(buffer + len,reason.c_str(),pkt->info.BYE.length);
+		len += pkt->info.BYE.length;
+		padlen = 4 - ((len - len1) & 0x03);
+		if ( padlen ) {
+			memset(buffer + len,0,padlen);
+			len += padlen;
 		}
 	}
-	unlockDestinationList();
-
-	return len;
+	pkt->fh.length = htons(((len - len1) >> 2) - 1);
+	pkt->fh.padding = (padlen > 0);
+	
+	return sendControlToDestinations(buffer,len);
 }
 
 void
@@ -886,24 +879,8 @@ QueueRTCPManager::dispatchControlPacket(void)
 
 	// TODO: virtual for sending APP RTCP packets
 
-	// actually send the packet. TODO: move to a protected method
-	// and use it also in dispatchBYE.
-	size_t count = 0;
-	lockDestinationList();
-	if ( isSingleDestination() ) {
-		count = sendControl(rtcpSendBuffer,len);
-	} else {
-		// when no destination has been added, NULL == dest.
-		TransportAddress* dest = getFirstDestination();
-		while ( dest ) {
-			setControlPeer(dest->getNetworkAddress(),
-				       dest->getControlTransportPort());
-			count += sendControl(rtcpSendBuffer,len);
-			dest = dest->getNext();
-		}
-	}
-	unlockDestinationList();
-
+	// actually send the packet.
+	size_t count = sendControlToDestinations(rtcpSendBuffer,len);
 	ctrlSendCount++;
 	// Everything went right, update the RTCP average size
 	updateAvgRTCPSize(len);
@@ -1068,6 +1045,28 @@ QueueRTCPManager::nextSDESType(SDESItemType t)
 	if ( t > lastSchedulable )
 		t = firstSchedulable;
 	return t;
+}
+
+size_t
+QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t len)
+{
+	size_t count = 0;
+	lockDestinationList();
+	if ( isSingleDestination() ) {
+		count = sendControl(buffer,len);
+	} else {
+		// when no destination has been added, NULL == dest.
+		TransportAddress* dest = getFirstDestination();
+		while ( dest ) {
+			setControlPeer(dest->getNetworkAddress(),
+				       dest->getControlTransportPort());
+			count += sendControl(buffer,len);
+			dest = dest->getNext();
+		}
+	}
+	unlockDestinationList();
+
+	return count;
 }
 
 #ifdef	CCXX_NAMESPACES

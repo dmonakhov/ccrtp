@@ -104,7 +104,7 @@ public:
 
 protected:
 	Members() :	
-		members(0), 
+		members(1), 
 		activeSenders(0)
 	{ }
 

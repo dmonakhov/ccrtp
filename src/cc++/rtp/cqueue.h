@@ -330,6 +330,9 @@ protected:
 	size_t
 	dispatchBYE(const std::string& reason);
 
+	size_t
+	sendControlToDestinations(unsigned char* buffer, size_t len);
+
 private:
 	QueueRTCPManager(const QueueRTCPManager &o);
 	
@@ -379,14 +382,6 @@ private:
 	 * new RTCP packet.
 	 *
 	 * @return type of the next SDES item to be sent
-	 *
-	 * @note profile particularization of the SDES items bandwith
-	 * allocation is done through the use of the method
-	 * **setSDESItemFraction***. This class defines the default
-	 * values given as an example in *RFC 1889*, which happen to
-	 * be the defaults suggested for AVP profile in *RFC 1890*. So
-	 * AVPQueue does not need to change these values. Queues for
-	 * other profiles may need to do so.
 	 **/
 	virtual SDESItemType
 	scheduleSDESItem();

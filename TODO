@@ -1,7 +1,5 @@
 TODO before 1.0.0:
 
-- BYE packets do not have correct format
-
 - really handle application participant list
 
 Other TODOs:
@@ -22,6 +20,9 @@ sources.
 - add separated collision and loop counters?
 
 - check robust handling of payload change
+
+- BYE packets are always sent with a preceding _empty_ RR. Add more info.
+
 
 API additions:
 
