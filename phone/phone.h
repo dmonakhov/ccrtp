@@ -66,6 +66,22 @@ public:
 };
 
 /**
+ * Load /etc/phone.conf [audio] key value pairs.  Has internal defaults
+ * if section or file is missing.
+ *
+ * @author David Sugar <dyfet@ostel.com>
+ * @short Load keythreads priority and session count configuration.
+ */
+class KeyAudio : public Keydata
+{
+public:
+        /**
+         * Initialize keythread data.
+         */
+        KeyAudio();
+};
+
+/**
  * Load /etc/phone.conf [thread] key value pairs.  Has internal defaults
  * if section or file is missing.
  *
@@ -169,11 +185,29 @@ public:
 	void Exit(const char *reason);
 };
 
+/**
+ * This is the base interface for DSO loadable audio devices.
+ *
+ * @author David Sugar <dyfet@ostel.com>
+ * @short base class for Audio devices. 
+ */
+class DevAudio 
+{
+protected:
+	DevAudio();
+
+public:
+	virtual void Open(void) = 0;	// open device channel
+	virtual void Close(void) = 0;	// close device channel
+};
+
 extern bool multicast;
 extern bool daemon;
 extern KeyThreads keythreads;
 extern KeyRTP keyrtp;
+extern KeyAudio keyaudio;
 extern RTPAudio *rtp;
+extern DevAudio *audio;
 
 #ifdef	__NAMESPACES__
 };

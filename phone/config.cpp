@@ -54,7 +54,22 @@ Keydata("/phone/rtp")
 	Load(defkeys);
 }
 
+KeyAudio::KeyAudio() :
+Keydata("/phone/audio")
+{
+	static KEYDEF defkeys[] = {
+	{"interface", "oss"},
+	{"device", "/dev/audio"},
+	{"mike", "80"},
+	{"speaker", "80"},
+	{NULL, NULL}};
+	
+	Load("~phone/audio");
+	Load(defkeys);
+}
+
 KeyThreads keythreads;
+KeyAudio keyaudio;
 KeyRTP keyrtp;
 
 #ifdef	__NAMESPACES__
