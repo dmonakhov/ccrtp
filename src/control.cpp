@@ -1012,7 +1012,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 				       );
 			timeval now, diff;
 			gettimeofday(&now,NULL);
-			timeval last = srcLink->getLastRTCPSRTime();
+			timeval last = srcLink.getLastRTCPSRTime();
 			timersub(&now,&last,&diff);
 			blocks[j].rinfo.dlsr = 
 				htonl(timevalIntervalTo65536(diff));
