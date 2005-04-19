@@ -571,6 +571,12 @@ protected:
 		inline timeval getLastPacketTime() const
 		{ return lastPacketTime; }
 
+		inline timeval getLastRTCPPacketTime() const
+		{ return lastRTCPPacketTime; }
+
+		inline timeval getLastRTCPSRTime() const
+		{ return lastRTCPSRTime; }
+
 		/**
 		 * Get the total number of RTP packets received from this
 		 * source.
@@ -747,6 +753,11 @@ protected:
 		// time the last RTP packet from this source was
 		// received at.
 		timeval lastPacketTime;
+		// time the last RTCP packet was received.
+		timeval lastRTCPPacketTime;
+		// time the lasrt RTCP SR was received. Required for
+		// DLSR computation.
+		timeval lastRTCPSRTime;
 
 		// for outgoing RR reports.
 		// number of packets received from this source.

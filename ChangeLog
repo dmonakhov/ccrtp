@@ -1,3 +1,20 @@
+2005-04-19  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* doc/ccrtp.texi: notes on padding and redundancy. Added
+	clarification on linking exception.
+
+	* src/rtcppkt.cpp: (NTP2Timeval) fixed conversion (-
+	NTP_EPOCH_OFFSET instead of +), reported by Takegami Takashi.
+
+	* fixed dlsr computation (reported by Takegami Takashi):
+	
+	* src/ccrtp/iqueue.h, src/members.cpp: added lastRTCPPacketTime
+	and lastRTCPSRTime to SyncSourceLink
+
+	* src/control.cpp: (QueueRTCPManager::takeInControlPacket) record
+	lastRTCPPacketTime and lastRTCPSRTime. (packReportBlocks) use
+	lastRTCPSRTime to compute dlsr (instead of NTP time)
+
 2005-03-24  David Sugar <dyfet@ostel.com>
 
     * src/queue.cpp: some fix on digest to kill embedded class export

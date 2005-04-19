@@ -46,7 +46,7 @@ Copyright @copyright{} 2001, 2002, 2003, 2004 Federico Montesino Pouzols
 
 @page
 @vskip 0pt plus 1filll
-@center{Copyright @copyright{} 2001, 2002, 2003, 2004 Federico Montesino Pouzols}
+@center{Copyright @copyright{} 2001, 2002, 2003, 2004, 2005 Federico Montesino Pouzols}
 @include fdlnotice.texi
 @page
 @end titlepage
@@ -144,6 +144,23 @@ mechanisms. ccRTP aims to provide a framework for the @acronym{RTP}
 framework, rather than being just an @acronym{RTP} packet manipulation
 library.
 
+@cindex signalization
+@cindex RTSP
+@cindex SIP
+@cindex H.323
+As a clarification of the scope of the ccRTP library and the
+@acronym{RTP} protocol, we note that ccRTP exclusively deals with the
+transport of data over the @acronym{RTP} protocol. Once parameters such
+as destination IP address and transport port, payload type identifier
+and timestamp frequency are known, ccRTP can be used to open an
+@acronym{RTP} session and send and receive RTP and RTCP packets. A
+multimedia application will have those parameters previously set or,
+more usually, they can be fetched for example from SDP multimedia
+session descriptions, which can be interchanged (and negotiated) between
+servers and clients by means of some signaling protocol: @acronym{SIP},
+@acronym{RTSP}, or even H.323. Signaling functions are not handled by
+ccRTP.
+
 This document is an introductory programmer's manual, for a more
 exhaustive reference see the reference manual distributed with GNU
 ccRTP. In @ref{ccRTP Overview}, the most important concepts and some
@@ -172,9 +189,20 @@ team. Bug reports, suggestions and criticisms are gladly accepted.
 @url{http://www.gnu.org/philosophy/philosophy.html}. It is licensed
 under the terms of the @acronym{GNU} General Public License, @xref{GNU
 General Public License}, plus a linking exception, @xref{GNU ccRTP
-Linking Exception}. This manual is licensed under the terms of the
-@acronym{GNU} Free Documentation License, @xref{GNU Free Documentation
-License}.
+Linking Exception}. 
+
+The linking exception is the same that is used for gcc libstdc++.  This
+was done in the case of libstdc++ because the language of the LGPL is
+neither clear nor correct if one uses C++ features such as templates and
+method implimentation directly in headers, as the division between the
+C++ library and another's application is no longer purely a linking one.
+From the practical standpoint, the exact effect is the same as the LGPL,
+but with language that matches these C++ features.  This is all
+explained at
+@url{http://gcc.gnu.org/onlinedocs/libstdc++/17_intro/license.html}.
+
+This manual is licensed under the terms of the @acronym{GNU} Free
+Documentation License, @xref{GNU Free Documentation License}.
 
 There are several ways to get @acronym{GNU} ccRTP, refer to
 @url{http://www.gnu.org} and
@@ -468,6 +496,10 @@ set as follows:
 @findex RTPApplication::setPRIVPrefix
 @findex defaultApplication
 @item Set local SDES Items. For common applications, the CNAME item value is automatically guessed as user@@host. Other items have no default value and are not sent in RTCP packets unless a value is specified by the application. For those items that should be sent in @acronym{RTCP} packets along with the mandatory CNAME, its values can be set calling the @code{setSDESItem}  and @code{setPRIVPrefix} methods over the object returned by the @code{defaultApplication} global function.
+
+@findex OutgoingDataQueue::setPadding
+@cindex padding
+@item Enable padding of data packets. Calling setPadding(uint8) on outgoing data queues enables transparent padding of data packets to a multiple of the padding maximum length specified. By default, padding is off (maximum length of padding is 0).
 
 @item setting addresses: 
 
@@ -1093,11 +1125,17 @@ the name of a static payload object that binds an statically assigned
 the audio format PCMU, see @cite{RFC 3550}.}. to its corresponding
 @acronym{RTP} clock rate@footnote{8 khz.}.
 
+@cindex destination
+@cindex redundancy
 @item RTPSocket::Connect
 The call connect has been removed. Now, in order to send packets to a
 destination @code{OutgoingDataQueue::addDestination} must be used. It
-allows for setting more than one destination, although this feature
-should be used in particular network configurations only.
+allows for setting more than one destination. Any destination can
+actually be added more than one time with addDestination, which can be
+used a simple trick to perform redundant transmission: each packet -both
+RTP and RTCP- will be transmitted to the destination as many times as it
+has been added to the list of destinations through calling
+addDestination.
 
 @item RTPQueue::getCurrentRate
 @findex RTPQueue::getCurrentRate

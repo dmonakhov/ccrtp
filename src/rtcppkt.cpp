@@ -60,7 +60,7 @@ timeval
 NTP2Timeval(uint32 msw, uint32 lsw)
 {
 	struct timeval t; 
-	t.tv_sec = msw + NTP_EPOCH_OFFSET;
+	t.tv_sec = msw - NTP_EPOCH_OFFSET;
 	t.tv_usec = (uint32)(((double)lsw) * 1000000.0) / ((uint32)(~0));
 	return t;
 }

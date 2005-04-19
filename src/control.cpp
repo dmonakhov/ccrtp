@@ -307,6 +307,9 @@ QueueRTCPManager::takeInControlPacket()
 		// is the first control packet from this source.
 		setControlTransportPort(*s,transport_port);
 	}
+	// record reception time
+	sourceLink->lastRTCPPacketTime = recvtime;
+	sourceLink->lastRTCPSRTime = recvtime;
 
 	size_t pointer = 0;
 	// Check the first packet is a report and do special
@@ -319,6 +322,7 @@ QueueRTCPManager::takeInControlPacket()
 		if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
 					network_address,
 					transport_port) )
+			sourceLink->lastRTCPSRTime = recvtime;
 			onGotSR(*s,pkt->info.SR,pkt->fh.block_count);
 		// Advance to the next packet in the compound.
 		pointer += pkt->getLength();
@@ -1008,8 +1012,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 				       );
 			timeval now, diff;
 			gettimeofday(&now,NULL);
-			timeval last = NTP2Timeval(ntohl(si->NTPMSW),
-						   ntohl(si->NTPLSW));
+			timeval last = srcLink->getLastRTCPSRTime();
 			timersub(&now,&last,&diff);
 			blocks[j].rinfo.dlsr = 
 				htonl(timevalIntervalTo65536(diff));

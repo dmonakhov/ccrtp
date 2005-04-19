@@ -74,6 +74,9 @@ void
 MembershipBookkeeping::SyncSourceLink::initStats()
 {
 	lastPacketTime.tv_sec = lastPacketTime.tv_usec = 0;
+	lastRTCPPacketTime.tv_sec = lastRTCPPacketTime.tv_usec = 0;
+	lastRTCPSRTime.tv_sec = lastRTCPSRTime.tv_usec = 0;
+
 	senderInfo = NULL;
 	receiverInfo = NULL;
 
