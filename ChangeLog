@@ -1,3 +1,11 @@
+2005-04-27  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/control.cpp: (packReportBlocks) use correct SSRC from remote
+	source, fix from Takegami takashi.
+	
+	* src/rtcppkt.cpp: (timevalIntervalTo65536) fixed signed/unsigned
+	issue, reported by Takegami Takashi.
+
 2005-04-19  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* doc/ccrtp.texi: notes on padding and redundancy. Added

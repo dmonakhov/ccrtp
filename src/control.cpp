@@ -977,10 +977,8 @@ uint8
 QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len, 
 				   uint16& available)
 {
-
 	uint8 j = 0;
 	// pack as many report blocks as we can
-	uint32 Nssrc = getLocalSSRCNetwork();
 	SyncSourceLink* i = getFirst();
 	for ( ;
 	      ( ( i != NULL ) && 
@@ -990,7 +988,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 		SyncSourceLink& srcLink = *i;
 		// update stats.
 		srcLink.computeStats();
-		blocks[j].ssrc = Nssrc;
+		blocks[j].ssrc = srcLink.getSource()->getID();
 		blocks[j].rinfo.fractionLost = srcLink.getFractionLost();
 		blocks[j].rinfo.lostMSB = 
 			(srcLink.getCumulativePacketLost() & 0xFF0000) >> 16;
