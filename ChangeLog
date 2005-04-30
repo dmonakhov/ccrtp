@@ -1,3 +1,7 @@
+2005-04-29  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/rtp.h: gcc 4.0 pickyness and passing of ~0 to sleep.
+
 2005-04-27  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (packReportBlocks) use correct SSRC from remote

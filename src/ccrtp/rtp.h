@@ -536,7 +536,7 @@ protected:
 			}
 		}
 		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep(~0);
+		sleep((timeout_t)~0);
 	}
 
 #endif
