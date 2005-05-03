@@ -394,6 +394,7 @@ private:
 	 * use this by recasing the pointer returned by getPayload().
 	 */
 
+public:
 	struct RFC2833Payload
 	{
 #if __BYTE_ORDER == __BIG_ENDIAN
@@ -410,7 +411,8 @@ private:
         	uint16 duration : 16;
 #endif
 	};	
-	
+
+private:	
 	/**
 	 * @struct RTPHeaderExt
 	 *
@@ -427,6 +429,7 @@ private:
 
 	/* definitions for access to most common 2833 fields... */
 
+public:
 	/**
 	 * Fetch a raw 2833 packet.
 	 *

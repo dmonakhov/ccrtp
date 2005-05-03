@@ -1,3 +1,7 @@
+2005-05-03  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/rtppkt.h: 2833 methods must be public
+
 2005-05-01  David Sugar <dyfet@gnutelephony.org>
 
 	* configure.ac: updated for May 1 release, 1.3.1.
