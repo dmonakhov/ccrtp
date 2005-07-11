@@ -1,3 +1,8 @@
+2005-06-11  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/base.h, src/ccrtp/rtppkt.h, src/ccrtp/rtcpptk.h:
+	use of CCXX_PACKED to control use of pack() pragma.
+
 2005-05-03  David Sugar <dyfet@gnutelephony.org>
 
 	* src/ccrtp/rtppkt.h: 2833 methods must be public

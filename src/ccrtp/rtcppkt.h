@@ -98,7 +98,9 @@ public:
 	inline uint16 getPathMTU()
 	{ return pathMTU; }
 
+#ifdef	CCXX_PACKED
 #pragma pack(1)	
+#endif
 	/**
 	 * @struct ReceiverInfo
 	 *
@@ -323,7 +325,9 @@ public:
 			FIRPacket FIR;
 		}       info;        ///< Union for SR, RR, SDES, BYE and APP
 	};
+#ifdef	CCXX_PACKED
 #pragma pack()
+#endif
 
 protected:
 	enum { defaultPathMTU = 1500 };

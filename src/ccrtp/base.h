@@ -43,6 +43,14 @@
 #include <cc++/socket.h>
 #endif
 
+#ifndef	CCXX_PACKED
+#if defined(__GNUC__)
+#define CCXX_PACKED
+#elif !defined(__hpux) && !defined(_AIX)
+#define CCXX_PACKED        
+#endif 
+#endif
+
 #ifdef CCXX_NAMESPACES
 namespace ost {
 #endif

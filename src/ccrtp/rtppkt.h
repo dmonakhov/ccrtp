@@ -351,7 +351,9 @@ private:
 	/// whether the object was contructed with duplicated = true
 	bool duplicated;
 
+#ifdef	CCXX_PACKED
 #pragma pack(1)
+#endif
 	/**
 	 * @struct RTPFixedHeader
 	 * @short RTP fixed header as it is send through the network.
@@ -425,7 +427,9 @@ private:
 		uint16 undefined; ///< to be defined 
 		uint16 length;    ///< number of 32-bit words in the extension
 	};
+#ifdef	CCXX_PACKED
 #pragma pack()
+#endif
 
 	/* definitions for access to most common 2833 fields... */
 
