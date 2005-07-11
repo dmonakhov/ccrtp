@@ -43,7 +43,7 @@
 #include <cc++/socket.h>
 #endif
 
-#ifndef	CCXX_PACKED
+#ifndef	CCXX_PACKING
 #if defined(__GNUC__)
 #define CCXX_PACKED
 #elif !defined(__hpux) && !defined(_AIX)
