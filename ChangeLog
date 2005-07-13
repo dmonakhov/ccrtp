@@ -1,3 +1,7 @@
+2005-06-13  David Sugar <dyfet@gnutelephony.org>
+
+	* configure.ac: updated for release 1.3.2.
+
 2005-06-11  David Sugar <dyfet@gnutelephony.org>
 
 	* src/ccrtp/base.h, src/ccrtp/rtppkt.h, src/ccrtp/rtcpptk.h:

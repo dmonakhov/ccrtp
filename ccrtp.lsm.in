@@ -14,6 +14,6 @@ Maintained-by:  dyfet@gnu.org (David Sugar)
 Platforms:	GNU/Linux, other Unices, W32
 Home-page:	http://www.gnu.org/software/ccrtp
 Primary-Site	www.gnu.org /gnu/ccrtp
-		SIZEk ccrtp-VERSION.tar.gz
+		SIZE ccrtp-VERSION.tar.gz
 Copying-policy: GPL
 End
