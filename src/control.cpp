@@ -334,7 +334,7 @@ QueueRTCPManager::takeInControlPacket()
 	}
 
 	// Process all RR reports.
-	while ( (RTCPPacket::tRR == pkt->fh.type) ) {
+	while ( (pointer < len) && (RTCPPacket::tRR == pkt->fh.type) ) {
 		sourceLink = getSourceBySSRC(pkt->getSSRC(),
 					     source_created);
 		if ( checkSSRCInRTCPPkt(*sourceLink,source_created,
@@ -348,7 +348,8 @@ QueueRTCPManager::takeInControlPacket()
 	// SDES, APP and BYE. process first everything but the
 	// BYE packets.
 	bool cname_found = false;
-	while ( (pkt->fh.type == RTCPPacket::tSDES ||
+	while ( (pointer < len ) &&
+	        (pkt->fh.type == RTCPPacket::tSDES ||
 		 pkt->fh.type == RTCPPacket::tAPP) ) {
 		I ( cname_found || !pkt->fh.padding );
 		sourceLink = getSourceBySSRC(pkt->getSSRC(),
@@ -358,7 +359,6 @@ QueueRTCPManager::takeInControlPacket()
 					transport_port) ) {
 			if ( pkt->fh.type == RTCPPacket::tSDES ) {
 				bool cname = onGotSDES(*s,*pkt);
-				pointer += pkt->getLength();
 				cname_found = cname_found? cname_found : cname;
 			} else if ( pkt->fh.type == RTCPPacket::tAPP ) {
 				onGotAPP(*s,pkt->info.APP,pkt->getLength());
@@ -368,6 +368,7 @@ QueueRTCPManager::takeInControlPacket()
 			}
 		}
 		// Get the next packet in the compound.
+		pointer += pkt->getLength();
 		pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer +pointer);
 	}
 		
