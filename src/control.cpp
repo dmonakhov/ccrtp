@@ -362,7 +362,7 @@ QueueRTCPManager::takeInControlPacket()
 				cname_found = cname_found? cname_found : cname;
 			} else if ( pkt->fh.type == RTCPPacket::tAPP ) {
 				onGotAPP(*s,pkt->info.APP,pkt->getLength());
-				pointer += pkt->getLength();
+		//		pointer += pkt->getLength();
 			} else {
 				// error?
 			}
