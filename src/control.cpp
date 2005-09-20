@@ -297,8 +297,6 @@ QueueRTCPManager::takeInControlPacket()
 		// Network address is assumed to be the same as the control one
 		setNetworkAddress(*s,network_address);
 		sourceLink->initStats();
-		// First packet arrival time.
-		sourceLink->setInitialTime(recvtime);
 		sourceLink->setProbation(getMinValidPacketSequence());
 		if ( sourceLink->getHello() )
 			onNewSyncSource(*s);

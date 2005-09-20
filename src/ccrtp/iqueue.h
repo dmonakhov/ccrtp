@@ -644,17 +644,17 @@ protected:
 		inline void setJitter(float j)
 		{ jitter = j; }
 
-		inline uint32 getInitialTimestamp() const 
-		{ return initialTimestamp; }
+		inline uint32 getInitialDataTimestamp() const 
+		{ return initialDataTimestamp; }
 
-		inline void setInitialTimestamp(uint32 ts) 
-		{ initialTimestamp = ts; }
+		inline void setInitialDataTimestamp(uint32 ts) 
+		{ initialDataTimestamp = ts; }
 
-		inline timeval getInitialTime() const
-		{ return initialTime; }
+		inline timeval getInitialDataTime() const
+		{ return initialDataTime; }
 
-		inline void setInitialTime(timeval it)
-		{ initialTime = it; }
+		inline void setInitialDataTime(timeval it)
+		{ initialDataTime = it; }
 		
 		/**
 		 * Mark this source as having sent a BYE control packet.
@@ -773,8 +773,8 @@ protected:
 		uint32 lastPacketTransitTime;
 		// interarrival jitter of packets from this source.
 		float jitter;
-		uint32 initialTimestamp;
-		timeval initialTime;
+		uint32 initialDataTimestamp;
+		timeval initialDataTime;
 
 		// this flag assures we only call one gotHello and one
 		// gotGoodbye for this src.
@@ -1115,14 +1115,16 @@ protected:
 	 *
 	 * @param srcLink Link structure for the synchronization
 	 * source of this packet.
-	 * @param pkt Packet just created and to be logged 
+	 * @param pkt Packet just created and to be logged.
+	 * @param recvtime Reception time.
 	 *
 	 * @return whether, according to the source state and
 	 * statistics, the packet is considered valid and must be
 	 * inserted in the incoming packets queue.
 	 **/
 	bool
-	recordReception(SyncSourceLink& srcLink, const IncomingRTPPkt& pkt);
+	recordReception(SyncSourceLink& srcLink, const IncomingRTPPkt& pkt,
+			const timeval recvtime);
 
 	/**
 	 * Log extraction of a packet from this source from the

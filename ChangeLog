@@ -1,3 +1,21 @@
+2005-09-20  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* Fixes for jitter calculation (bug report by Greg Silverman):
+
+	* src/ccrtp/iqueue.h, src/incqueue.cpp:
+	(IncomingDataQueue::recordReception) now also records
+	lastPacketTime.
+
+	* src/ccrtp/iqueue.h, src/incqueue.cpp: (struct SyncSourceLink)
+	renamed initialTime, initialTimestamp, getInitialTime,
+	setInitialTime, getInitialTimestamp, setInitialTimestamp to
+	initialDataTime, initialDataTimestamp and so on.
+	
+	* src/control.cpp: (QueueRTCPManager::takeInControlPacket): do not
+	call srcLink->setInitialTime.
+
+	* src/ccrtp/rtcppkt.h: doc. fix.
+
 2005-08-21  David Sugar <dyfet@gnutelephony.org>
 
 	* src/queue.cpp: needs <cstdio> for sprintf...

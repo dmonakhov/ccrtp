@@ -227,7 +227,7 @@ IncomingDataQueue::takeInDataPacket(void)
 		setNetworkAddress(*s,network_address);
 		sourceLink->initStats();
 		// First packet arrival time.
-		sourceLink->setInitialTime(recvtime);
+		sourceLink->setInitialDataTime(recvtime);
 		sourceLink->setProbation(getMinValidPacketSequence());
 		if ( sourceLink->getHello() )
 			onNewSyncSource(*s);
@@ -244,14 +244,14 @@ IncomingDataQueue::takeInDataPacket(void)
 	// TODO: also check CSRC identifiers.
 	if ( checkSSRCInIncomingRTPPkt(*sourceLink,source_created,
 				       network_address,transport_port) &&
-	     recordReception(*sourceLink,*packet) ) {
+	     recordReception(*sourceLink,*packet,recvtime) ) {
 		// now the packet link is linked in the queues
 		IncomingRTPPktLink* packetLink = 
 			new IncomingRTPPktLink(packet,
 					       sourceLink,
 					       recvtime,
 					       packet->getTimestamp() - 
-					       sourceLink->getInitialTimestamp(),
+					       sourceLink->getInitialDataTimestamp(),
 					       NULL,NULL,NULL,NULL);
 		insertRecvPacket(packetLink);
 	} else {
@@ -604,7 +604,8 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 
 bool
 IncomingDataQueue::recordReception(SyncSourceLink& srcLink, 
-				   const IncomingRTPPkt& pkt)
+				   const IncomingRTPPkt& pkt, 
+				   const timeval recvtime)
 {
 	bool result = true;
 
@@ -663,10 +664,11 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		// the packet is considered valid.
 		srcLink.incObservedPacketCount();
 		srcLink.incObservedOctetCount(pkt.getPayloadSize());
+		srcLink.lastPacketTime = recvtime;
 		if ( srcLink.getObservedPacketCount() == 1 ) {
 			// ooops, it's the first packet from this source
 			setSender(*src,true);
-			srcLink.setInitialTimestamp(pkt.getTimestamp());
+			srcLink.setInitialDataTimestamp(pkt.getTimestamp());
 		}
 		// we record the last time a packet from this source
 		// was received, this has statistical interest and is
@@ -676,7 +678,7 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		// compute the interarrival jitter estimation.
 		timeval tarrival;
 		timeval lastT = srcLink.getLastPacketTime();
-		timeval initial = srcLink.getInitialTime();
+		timeval initial = srcLink.getInitialDataTime();
 		timersub(&lastT,&initial,&tarrival);
 		uint32 arrival = timeval2microtimeout(tarrival)
 			* getCurrentRTPClockRate();

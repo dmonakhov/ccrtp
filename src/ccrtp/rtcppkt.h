@@ -368,7 +368,7 @@ private:
 };
 
 /**
- * @class RTCPReceiverReport
+ * @class RTCPReceiverInfo
  * @short Report block information of SR/RR RTCP reports.
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org> 
