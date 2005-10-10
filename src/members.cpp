@@ -85,8 +85,8 @@ MembershipBookkeeping::SyncSourceLink::initStats()
 	cumulativePacketLost = 0;
 	fractionLost = 0;
 	jitter = 0;
-	initialTimestamp = 0;
-	initialTime.tv_sec = initialTime.tv_usec = 0;
+	initialDataTimestamp = 0;
+	initialDataTime.tv_sec = initialDataTime.tv_usec = 0;
 	flag = false;
 
 	badSeqNum = SEQNUMMOD + 1;

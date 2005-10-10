@@ -1,3 +1,9 @@
+2005-10-10  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/members.cpp:
+	(MembershipBookkeeping::SyncSourceLink::initStats) fixed
+	initialization of timestamps.
+
 2005-09-20  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* Fixes for jitter calculation (bug report by Greg Silverman):
