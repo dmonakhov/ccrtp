@@ -39,6 +39,7 @@
 #include <ccrtp/queuebase.h>
 #include <ccrtp/ioqueue.h>
 #include <cstdio>
+#include <cstring>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {
@@ -437,7 +438,11 @@ std::ostream &MD5Digest::strDigest(std::ostream &os)
 	commit();
 
 	for(i = 0; i < 16; ++i)
+#ifdef	WIN32
+		sprintf(dbuf + 2 * i, "%02x", md5[i]);
+#else
 		std::sprintf(dbuf + 2 * i, "%02x", md5[i]);
+#endif
 	os << dbuf;
 	return os;
 }
