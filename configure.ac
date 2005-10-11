@@ -31,10 +31,10 @@ if test ! -z "$cfg_options" ; then
         exit -1
 fi
 
-VERSION="1.3.4"
+VERSION="1.3.5"
 REQUIRES="1.3.0"
 LT_RELEASE="1.3"
-LT_VERSION="0:7"
+LT_VERSION="0:8"
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CANONICAL_SYSTEM
 AC_PROG_CPP

@@ -1,3 +1,7 @@
+2005-10-10  David Sugar <dyfet@gnutelephony.org>
+
+	* configure.ac: updated for new release
+
 2005-10-10  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/members.cpp:
