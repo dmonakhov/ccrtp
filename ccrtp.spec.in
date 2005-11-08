@@ -41,7 +41,7 @@ for building applications that use GNU ccRTP.
 %setup
 %build
 %configure
-make %{?_smp_mflags} CXXFLAGS="-I%{_includedir}/cc++2 $RPM_OPT_FLAGS"
+make %{?_smp_mflags} CXXFLAGS="-I%{_includedir}/cc++2 $RPM_OPT_FLAGS" LDFLAGS="-s"
 
 %install
 rm -fr %{buildroot}
