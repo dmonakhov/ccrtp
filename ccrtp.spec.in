@@ -7,12 +7,14 @@ License: GPL
 Group: Development/Libraries
 URL: http://www.gnu.org/software/ccrtp
 Source: ftp://ftp.gnu.org/gnu/ccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
-Prefix: %{_prefix}
 BuildRoot: %{_tmppath}/rtp-root
 Packager: David Sugar <dyfet@ostel.com>
 Requires: commoncpp2 >= 1.1.0
 BuildRequires: commoncpp2-devel
 BuildRequires: doxygen
+BuildRequires: info
+BuildRequires: pkgconfig
+BuildRequires: libstdc++-devel
 
 %package devel
 Requires: %{name} = %{epoch}:%{version}-%{release}
@@ -39,7 +41,7 @@ for building applications that use GNU ccRTP.
 %setup
 %build
 %configure
-make %{?_smp_mflags}
+make %{?_smp_mflags} CXXFLAGS="-I%{_includedir}/cc++2 $RPM_OPT_FLAGS"
 
 %install
 rm -fr %{buildroot}
@@ -53,15 +55,14 @@ rm -fr %{buildroot}
 #%exclude %{_libdir}/*.la
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING COPYING.addendum README
-%{_prefix}/lib/libccrtp*.so.*
-# %{_prefix}/bin/phone
+%{_libdir}/libccrtp*.so.*
 
 %files devel
 %defattr(-,root,root,-)
 %doc doc/html/*.html doc/html/*.*g*
-%{_prefix}/lib/libccrtp*.a
-%{_prefix}/lib/libccrtp*.so
-%{_prefix}/lib/libccrtp*.la
+%{_libdir}/libccrtp*.a
+%{_libdir}/libccrtp*.so
+%{_libdir}/libccrtp*.la
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 %{_infodir}/ccrtp*info*
