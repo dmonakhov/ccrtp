@@ -1,3 +1,12 @@
+2005-12-01  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/source.cpp: (RTPApplication::findCNAME) fixed to avoid
+	crashes when no user name and hostname is available (fix by Michel
+	de Boer).
+
+	* src/pool.cpp: (SingleRTPSessionPool::run) fix to make it run by
+	Guillaume FRAYSSE.
+
 2005-10-10  David Sugar <dyfet@gnutelephony.org>
 
 	* configure.ac: updated for new release

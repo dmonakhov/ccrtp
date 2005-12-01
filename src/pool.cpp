@@ -1,4 +1,4 @@
-// Copyright (C) 2000, 2001 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2000,2001,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -122,7 +122,6 @@ SingleRTPSessionPool::run()
 {
 #ifndef WIN32
 	SOCKET so;
-	timeval timeout = getPoolTimeout();
 
 	while ( isActive() ) {
 		PoolIterator i = sessionList.begin();
@@ -131,7 +130,18 @@ SingleRTPSessionPool::run()
 			controlTransmissionService(**i);
 			i++;
 		}
+		timeval timeout = getPoolTimeout();
 
+		// Reinitializa fd set
+		FD_ZERO(&recvSocketSet);
+		for (PoolIterator j = sessionList.begin(); j != 
+			     sessionList.end (); j++)
+			{
+				SOCKET s = getDataRecvSocket(**j);
+			FD_SET(s,&recvSocketSet);
+			}
+		
+		
 		int n = select(highestSocket,&recvSocketSet,NULL,NULL,
 			       &timeout);
 		
@@ -144,6 +154,13 @@ SingleRTPSessionPool::run()
 			dispatchDataPacket(**i);
 			i++;
 		}
+		//GF we added that to allow the kernel scheduler  to
+		// give other tasks some time as if we have lots of
+                // active sessions the thread cann take all the CPU if we
+                // don't pause at all. We haven't found the best way to
+                // do that yet.
+		// usleep (10);
+		yield();
 	}
 #endif // ndef WIN32
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002,2003,2004 Federico Montesino <fedemp@altern.org>
+// Copyright (C) 2001,2002,2003,2004,2005 Federico Montesino <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -76,8 +76,11 @@ findusername(std::string &username)
 	//    customization of the environment.
 	// Try both LOGNAME and USER env. var.
 	const char *user = Process::getEnv("LOGNAME");
-	if ( !strcmp(user,"") )
+	if ( !user || !strcmp(user,"") )
 		user = Process::getEnv("USER");
+	if ( !user || !strcmp(user,"") )
+		username = Process::getUser();
+
 	if ( user )
 		username = user;
 	else
@@ -232,8 +235,16 @@ RTPApplication::findCNAME()
 	std::string username;
 	findusername(username);
 	
+	// First create an InetHostAddress object, otherwise the
+	// object will be destructed and the hostname corrupted.
+	InetHostAddress iha;
+	const char *p = iha.getHostname();
+	// Returned hostname can be NULL
+	std::string hname;
+	if (p) hname = p;
+
 	setSDESItem(SDESItemTypeCNAME, 
-		    username + "@" + InetHostAddress().getHostname());
+		    username + "@" + hname);
 }
 
 #ifdef	CCXX_NAMESPACES
