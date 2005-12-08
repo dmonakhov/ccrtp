@@ -455,8 +455,8 @@ public:
 	 *
 	 * @param timestamp to use, native host machine byte order.
 	 */
-	inline void set2833Duration(uint16 d)
-		{getRaw2833Payload()->duration = htons(d);};
+	inline void set2833Duration(uint16 timestamp)
+		{getRaw2833Payload()->duration = htons(timestamp);};
 };
 
 /**

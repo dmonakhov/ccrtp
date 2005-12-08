@@ -1,3 +1,10 @@
+2005-12-08  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/iqueue.h, src/ccrtp/rtppkt.h: minor header fixes for
+	doxygen generated documentation.
+
+	* configure.ac: updated for new release.
+
 2005-12-01  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/source.cpp: (RTPApplication::findCNAME) fixed to avoid

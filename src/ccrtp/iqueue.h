@@ -1207,12 +1207,14 @@ protected:
 	 * overriden in the derived class.
 	 *
 	 * @return number of bytes read.
-	 * @param packet read buffer.
+	 * @param buffer of read packet.
 	 * @param length of data to read.
+	 * @param host address of source.
+	 * @param port number of source.
 	 **/
 	virtual size_t
-	recvData(unsigned char* buffer, size_t len, 
-		 InetHostAddress& na, tpport_t& tp) = 0;
+	recvData(unsigned char* buffer, size_t length, 
+		 InetHostAddress& host, tpport_t& port) = 0;
 
 	virtual size_t
 	getNextDataPacketSize() const = 0;
