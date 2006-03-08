@@ -110,7 +110,7 @@ public:
 	isPendingRecv(microtimeout_t timeout)
 	{ return UDPSocket::isPending(UDPSocket::pendingInput, timeout); }
 
-	InetHostAddress
+	inline InetHostAddress
 	getSender(tpport_t& port) const
 	{ return UDPSocket::getSender(&port); }
 
@@ -202,7 +202,7 @@ public:
 	isPendingRecv(microtimeout_t timeout) const
 	{ return recvSocket->isPendingRecv(timeout); }
 
-	InetHostAddress
+	inline InetHostAddress
 	getSender(tpport_t& port) const
 	{ return recvSocket->getSender(port); }
 
@@ -214,7 +214,7 @@ public:
 	getNextPacketSize() const
 	{ return recvSocket->getNextPacketSize(); }
 
-	Socket::Error
+	inline Socket::Error
 	setMulticast(bool enable)
 	{ return recvSocket->setMulticast(enable); }
 
@@ -250,6 +250,194 @@ private:
 	BaseSocket* sendSocket;
 	BaseSocket* recvSocket;
 };
+
+#ifdef	CCXX_IPV6
+
+/**
+ * @class RTPBaseUDPIPv4Socket
+ * @short A UDP/IPv6 socket class targetted at RTP stacks.
+ *
+ * This class provides a flat interface that includes all the services
+ * required by an RTP stack.
+ *
+ * It can be used in two ways:
+ *
+ * To instantiate the DualSocket template, which will be used to
+ * instantiate an RTP stack template (such as TRTPSessionBaseIPV6).
+ *
+ * To directly instantiate an RTP stack template (such as
+ * TRTPSessionBaseIPV6).
+ *
+ * This class offers an example of the interface that other classes
+ * should provide in order to specialize the ccRTP stack for different
+ * underlying protocols.
+ *
+ * @author David Sugar <dyfet@gnutelephony.org>
+ **/
+class RTPBaseUDPIPv6Socket : private UDPSocket
+{
+public:
+	/**
+	 * Constructor for receiver.
+	 **/
+	RTPBaseUDPIPv6Socket(const IPV6Address& ia, tpport_t port) :
+		UDPSocket(ia,port)
+	{ }
+	
+	inline ~RTPBaseUDPIPv6Socket()
+	{ endSocket(); }
+	
+	inline bool
+	isPendingRecv(microtimeout_t timeout)
+	{ return UDPSocket::isPending(UDPSocket::pendingInput, timeout); }
+
+	inline IPV6Host
+	getSender(tpport_t& port) const
+	{ return UDPSocket::getIPV6Sender(&port); }
+
+	inline size_t
+	recv(unsigned char* buffer, size_t len)
+	{ return UDPSocket::receive(buffer, len); }
+
+	/**
+	 * Get size of next datagram waiting to be read.
+	 **/
+	inline size_t
+	getNextPacketSize() const
+	{ size_t len; ccioctl(UDPSocket::so,FIONREAD,len); return len; }
+
+	Socket::Error
+	setMulticast(bool enable)
+	{ return UDPSocket::setMulticast(enable); }
+
+	inline Socket::Error
+	join(const IPV6Multicast& ia, uint32 iface)
+	{ return Socket::join(ia); }
+
+	inline Socket::Error
+	drop(const IPV6Multicast& ia)
+	{ return UDPSocket::drop(ia); }
+
+        inline Socket::Error 
+	setTimeToLive(unsigned char ttl)
+	{ return UDPSocket::setTimeToLive(ttl); }
+ 
+	/**
+	 * Constructor for transmitter.
+	 **/
+	RTPBaseUDPIPv6Socket() :
+		UDPSocket()
+	{ }
+
+	inline void 
+	setPeer(const IPV6Host &ia, tpport_t port)
+		{UDPSocket::setPeer(ia, port);}
+
+	inline size_t
+	send(const unsigned char* const buffer, size_t len)
+	{ return UDPSocket::send(buffer, len); }
+
+	inline SOCKET getRecvSocket() const
+	{ return UDPSocket::so; }
+
+	// common
+	inline void
+	endSocket()
+	{ UDPSocket::endSocket(); }
+};
+
+/**
+ * @class DualUDPIPv6Socket
+ * @short A socket class based on two UDP/IPv6 sockets.
+ *
+ * Defines a communication channel for RTP data and/or RTCP streams.
+ * Sockets used to instantiate this template must define a framing
+ * mechanism (UDP does not need any addition, TCP does).
+ *
+ * This class implements a socket as a pair of UDP/IPv6 sockets,
+ * alllowing both transmission and reception of packets in unicast as
+ * well as multicast mode. The implementation of this class relies on
+ * the Common C++ UDPSocket class but provides the interface needed by
+ * a ccRTP stack.
+ *
+ * Normally, RTP stacks will use two objects of this class, one for
+ * RTP data packets transmission/reception and other for RTCP
+ * (control) transmission/reception.
+ *
+ * @author David Sugar <dyfet@gnutelephony.org>
+ **/
+template<class BaseSocket>
+class DualRTPChannelIPV6
+{
+public:
+	DualRTPChannelIPV6(const IPV6Host& ia, tpport_t port)
+	{ 
+		recvSocket = new BaseSocket(ia,port);
+		sendSocket = new BaseSocket;
+	}
+
+	inline ~DualRTPChannelIPV6()
+	{ delete sendSocket; delete recvSocket; }
+	
+	inline bool
+	isPendingRecv(microtimeout_t timeout) const
+	{ return recvSocket->isPendingRecv(timeout); }
+
+	inline IPV6Host
+	getSender(tpport_t& port) const
+	{ return recvSocket->getIPV6Sender(port); }
+
+	inline size_t
+	recv(unsigned char* buffer, size_t len)
+	{ return recvSocket->recv(buffer, len); }
+
+	inline size_t
+	getNextPacketSize() const
+	{ return recvSocket->getNextPacketSize(); }
+
+	inline Socket::Error
+	setMulticast(bool enable)
+	{ return recvSocket->setMulticast(enable); }
+
+	inline Socket::Error
+	join(const IPV6Multicast& ia, uint32 iface)
+	{ return recvSocket->join(ia,iface); }
+
+	inline Socket::Error
+	drop(const IPV6Multicast& ia)
+	{ return recvSocket->drop(ia); }
+
+        inline Socket::Error 
+	setTimeToLive(unsigned char ttl)
+	{ return recvSocket->setTimeToLive(ttl); }
+ 
+	inline void 
+	setPeer(const IPV6Host& host, tpport_t port)
+	{ sendSocket->setPeer(host,port); }
+
+	inline size_t
+	send(const unsigned char* const buffer, size_t len)		  
+	{ return sendSocket->send(buffer, len); }
+
+	inline SOCKET getRecvSocket() const
+	{ return recvSocket->getRecvSocket(); }
+
+	// common.
+	inline void
+	endSocket()
+	{ sendSocket->endSocket(); recvSocket->endSocket(); }
+
+private:
+	BaseSocket* sendSocket;
+	BaseSocket* recvSocket;
+};
+
+
+typedef DualRTPChannelIPV6<RTPBaseUDPIPv6Socket> DualRTPUDPIPv6Channel; 
+typedef	RTPBaseUDPIPv6Socket SingleRTPChannelIPV6;
+typedef SingleRTPChannelIPV6 SymmetricRTPChannelIPV6;
+
+#endif
 
 typedef DualRTPChannel<RTPBaseUDPIPv4Socket> DualRTPUDPIPv4Channel;
 

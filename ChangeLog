@@ -1,3 +1,8 @@
+2006-03-08  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/rtp.h, src/ccrtp/channel.h, src/pool.cpp: added
+	preliminary IPV6 RTP support.
+
 2005-12-08  David Sugar <dyfet@gnutelephony.org>
 
 	* src/ccrtp/iqueue.h, src/ccrtp/rtppkt.h: minor header fixes for

@@ -241,6 +241,88 @@ void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue
 		sleep(~0);
 }
 
+
+#ifdef	CCXX_IPV6
+
+SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
+		const IPV6Host& ia, 
+			       tpport_t dataPort, 
+			       tpport_t controlPort,
+			       int pri,
+			       uint32 memberssize,
+			       RTPApplication& app):
+		Thread(pri),
+		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app)
+	{ }
+
+SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
+	const IPV6Multicast& ia,
+			       tpport_t dataPort, 
+			       tpport_t controlPort, 
+			       int pri,
+			       uint32 memberssize,
+			       RTPApplication& app,
+			       uint32 iface): 
+		Thread(pri),
+		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ia,dataPort,controlPort,memberssize,app,iface)
+	{ }
+
+void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::startRunning()
+{
+	enableStack();
+	Thread::start();
+}
+
+bool SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::isPendingData(microtimeout_t timeout)
+{
+	return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
+}
+
+void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::timerTick(void)
+{
+}
+
+void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::run(void)
+{
+		microtimeout_t timeout = 0;
+		while ( ServiceQueue::isActive() ) {
+			if ( timeout < 1000 ){ // !(timeout/1000)
+				timeout = getSchedulingTimeout();
+			}
+			setCancel(cancelDeferred);
+			controlReceptionService();
+			controlTransmissionService();
+			setCancel(cancelImmediate);
+			microtimeout_t maxWait = 
+				timeval2microtimeout(getRTCPCheckInterval());
+			// make sure the scheduling timeout is
+			// <= the check interval for RTCP
+			// packets
+			timeout = (timeout > maxWait)? maxWait : timeout;
+			if ( timeout < 1000 ) { // !(timeout/1000)
+				setCancel(cancelDeferred);
+				dispatchDataPacket();
+				setCancel(cancelImmediate);
+				timerTick();
+			} else {
+				if ( isPendingData(timeout/1000) ) {
+					setCancel(cancelDeferred);
+					takeInDataPacket();
+					setCancel(cancelImmediate);
+				}
+				timeout = 0;
+			}
+		}
+		dispatchBYE("GNU ccRTP stack finishing.");
+		sleep(~0);
+}
+
+
+#endif
+
+
 #endif
 
 #ifdef  CCXX_NAMESPACES
