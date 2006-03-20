@@ -1091,8 +1091,8 @@ typedef RTPSessionIPV6 RTPSocketIPV6;
  *
  * @short Symmetric UDP/IPv6 RTP session scheduled by one thread of execution.
  **/\
-typedef SingleThreadRTPSessionIPV6<SymmetricRTPChannel,
-			       SymmetricRTPChannel> SymmetricRTPSessionIPV6;
+typedef SingleThreadRTPSessionIPV6<SymmetricRTPChannelIPV6,
+			       SymmetricRTPChannelIPV6> SymmetricRTPSessionIPV6;
 
 
 #endif
