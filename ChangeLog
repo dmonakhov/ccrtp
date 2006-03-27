@@ -1,3 +1,7 @@
+2006-03-27  David Sugar <dyfet@gnutelephony.org>
+
+	* src/queue.cpp: 64 bit friendly...
+
 2006-03-08  David Sugar <dyfet@gnutelephony.org>
 
 	* src/ccrtp/rtp.h, src/ccrtp/channel.h, src/pool.cpp: added
