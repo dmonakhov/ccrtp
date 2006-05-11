@@ -8,9 +8,9 @@
 @documentencoding ISO-8859-1
 @c %** end of header
 
-@set EDITION 1.1
-@set VERSION 1.1
-@set UPDATED Jan 2004
+@set EDITION 1.3
+@set VERSION 1.3
+@set UPDATED Jan 2006
 
 @dircategory Development
 @direntry
@@ -26,7 +26,7 @@ GNU ccRTP is a C++ class framework for the development of Real Time
 Transport Protocol (@acronym{RTP}) based applications. It is based on
 GNU Common C++.
 
-Copyright @copyright{} 2001, 2002, 2003, 2004 Federico Montesino Pouzols
+Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006 Federico Montesino Pouzols
 @email{fedemp@@altern.org}.
 @include fdlnotice.texi
 @end ifnottex
@@ -219,6 +219,7 @@ At its highest level, ccRTP provides classes for the real-time
 transport of data through @acronym{RTP} sessions, as well as the
 control functions of @acronym{RTCP}.
 
+@cindex packet queue
 The main concept in the ccRTP implementation of @acronym{RTP} sessions
 is the use of packet queues to handle transmission and reception of
 @acronym{RTP} data packets/application data units. In ccRTP, a data
@@ -241,6 +242,8 @@ Starting with 1.0 releases, ccRTP fully supports @acronym{RTP} and
 
 @item It is threadsafe and supports almost any threading model.
 
+@cindex header check
+@cindex header validity
 @item Generic and extensible @acronym{RTP} and @acronym{RTCP} header validity checks.
 
 @item Handles source states and information as well as statistics recording.
@@ -290,11 +293,11 @@ accessible through the most external interface.
 @tindex SyncSource
 @tindex Participant
 @tindex AppDataUnit
-All this functions are performed through a few essential classes and
+All these functions are performed through a few essential classes and
 types. The most basic ones are the enumerated type
-@code{StaticPayloadType}, and the classes @code{StaticPayloadFormat}
-and @code{DynamicPayloadFormat}. The most important ones are the
-classes @code{RTPSession}, @code{SyncSource}, @code{Participant} and
+@code{StaticPayloadType}, and the classes @code{StaticPayloadFormat} and
+@code{DynamicPayloadFormat}. The most important ones are the classes
+@code{RTPSession}, @code{SyncSource}, @code{Participant} and
 @code{AppDataUnit}, that represent @acronym{RTP} sessions,
 synchronization sources, participants in an @acronym{RTP} application,
 and application data units conveyed in @acronym{RTP} data packets,
@@ -372,6 +375,8 @@ if ( adu != NULL )
 @chapter Using ccRTP
 @cindex Using ccRTP
 
+@cindex packet queue
+@cindex thread
 When using ccRTP, both sending and receiving of data transported over
 @acronym{RTP} sessions is done through reception and transmission
 queues handled by the @acronym{RTP} stack. In the most common case, a
@@ -384,6 +389,8 @@ possible to not associate any separate thread with any @acronym{RTP}
 session, manually calling the main data and control service methods
 from whatever other thread.
 
+@cindex reception queue
+@cindex incoming queue
 The basic idea for packet reception with ccRTP is that the application
 does not directly read packets from sockets but gets them from a
 reception queue. The stack is responsible for inserting received
@@ -391,6 +398,8 @@ packets in the reception queue and handling this queue. In general, a
 packet reception and insertion in the reception queue does not occur
 at the same time the application gets it from the queue.
 
+@cindex transmission queue
+@cindex outgoing queue
 Conversely, the basic idea for packet transmission with ccRTP is that
 packets are not directly written to sockets but inserted in a
 transmission queue handled by the stack. In general, packet insertion
