@@ -1,4 +1,4 @@
-// Copyright (C) 2000,2001,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2000,2001,2004,2005,2006 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,14 +61,11 @@ RTPSessionPool::addSession(RTPSessionBase& session)
 	bool result = false;
 	poolLock.writeLock();
 	// insert in list. 
-	SOCKET s = getDataRecvSocket(session);
+	PredEquals predEquals(&session);
 	if ( sessionList.end() == 
-	     find(sessionList.begin(),sessionList.end(),&session) ) {
+	     std::find_if(sessionList.begin(),sessionList.end(),predEquals) ) {
 		result = true;
-		sessionList.push_back(&session);
-		if ( s > highestSocket + 1 )
-			highestSocket = s + 1;
-		FD_SET(s,&recvSocketSet);	
+		sessionList.push_back(new SessionListElement(&session));
 	} else {
 		result = false;
 	}
@@ -86,13 +83,12 @@ RTPSessionPool::removeSession(RTPSessionBase& session)
 	bool result = false;
 	poolLock.writeLock();
 	// remove from list. 
-	SOCKET s = getDataRecvSocket(session);
+	PredEquals predEquals(&session);
 	PoolIterator i;
 	if ( sessionList.end() != 
-	     (i = find(sessionList.begin(),sessionList.end(),&session)) ) { 
-		sessionList.erase(i);
+	     (i = find_if(sessionList.begin(),sessionList.end(),predEquals)) ) { 
+		(*i)->clear();
 		result = true;
-		FD_CLR(s,&recvSocketSet);
 	} else {
 		result = false;
 	}
@@ -122,38 +118,97 @@ SingleRTPSessionPool::run()
 {
 #ifndef WIN32
 	SOCKET so;
-
+	microtimeout_t packetTimeout(0);
 	while ( isActive() ) {
-		PoolIterator i = sessionList.begin();
-		while ( i != sessionList.end() ) {
-			controlReceptionService(**i);
-			controlTransmissionService(**i);
+		poolLock.readLock();
+		// Make a copy of the list so that add and remove does
+		// not affect the list during this loop iteration
+		list<SessionListElement*> sessions(sessionList);
+		poolLock.unlock();
+
+		PoolIterator i = sessions.begin();
+		while ( i != sessions.end() ) {
+			poolLock.readLock();
+			if (!(*i)->isCleared()) {
+				RTPSessionBase* session((*i)->get());
+				controlReceptionService(*session);
+				controlTransmissionService(*session);
+			}
+			poolLock.unlock();
 			i++;
 		}
 		timeval timeout = getPoolTimeout();
 
 		// Reinitializa fd set
 		FD_ZERO(&recvSocketSet);
-		for (PoolIterator j = sessionList.begin(); j != 
-			     sessionList.end (); j++)
-			{
-				SOCKET s = getDataRecvSocket(**j);
-			FD_SET(s,&recvSocketSet);
+		poolLock.readLock();
+		highestSocket = 0;
+		for (PoolIterator j = sessions.begin(); j != 
+			     sessions.end (); j++) {
+			if (!(*j)->isCleared()) {
+				RTPSessionBase* session((*j)->get());
+				SOCKET s = getDataRecvSocket(*session);
+				FD_SET(s,&recvSocketSet);
+				if ( s > highestSocket + 1 )
+					highestSocket = s + 1;
 			}
+		}
+		poolLock.unlock();
 		
 		
 		int n = select(highestSocket,&recvSocketSet,NULL,NULL,
 			       &timeout);
 		
-		i = sessionList.begin();
-		while ( (i != sessionList.end()) ) {
-			so = getDataRecvSocket(**i);
-			if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
-				takeInDataPacket(**i);
+		i = sessions.begin();
+		while ( (i != sessions.end()) ) {
+			poolLock.readLock();
+			if (!(*i)->isCleared()) {
+				RTPSessionBase* session((*i)->get());
+				so = getDataRecvSocket(*session);
+				if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
+					takeInDataPacket(*session);
+				}
+			
+				// schedule by timestamp, as in
+				// SingleThreadRTPSession (by Joergen
+				// Terner)
+				if (packetTimeout < 1000) {
+					packetTimeout = getSchedulingTimeout(*session);
+				}
+				microtimeout_t maxWait = 
+					timeval2microtimeout(getRTCPCheckInterval(*session));
+				// make sure the scheduling timeout is
+				// <= the check interval for RTCP
+				// packets
+				packetTimeout = (packetTimeout > maxWait)? maxWait : packetTimeout;
+				if ( packetTimeout < 1000 ) { // !(packetTimeout/1000)
+					setCancel(cancelDeferred);
+					dispatchDataPacket(*session);
+					setCancel(cancelImmediate);
+					//timerTick();
+				} else {
+					packetTimeout = 0;
+				}
 			}
-			dispatchDataPacket(**i);
+			poolLock.unlock();
 			i++;
 		}
+
+		// Purge elements for removed sessions.
+		poolLock.writeLock();
+		i = sessionList.begin();
+		while (i != sessionList.end()) {
+			if ((*i)->isCleared()) {
+				SessionListElement* element(*i);
+				i = sessionList.erase(i);
+				delete element;
+			}
+			else {
+				++i;
+			}
+		}
+		poolLock.unlock();
+
 		//GF we added that to allow the kernel scheduler  to
 		// give other tasks some time as if we have lots of
                 // active sessions the thread cann take all the CPU if we

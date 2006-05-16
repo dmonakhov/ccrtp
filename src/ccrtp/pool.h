@@ -1,4 +1,4 @@
-// Copyright (C) 2001, 2002 Federico Montesino Pouzols <fedemp@altern.org>
+// Copyright (C) 2001,2002,2006 Federico Montesino Pouzols <fedemp@altern.org>
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,6 +56,12 @@ typedef TRTPSessionBase<> RTPSessionBase;
 class RTPSessionBaseHandler
 {
 public:
+	inline microtimeout_t getSchedulingTimeout(RTPSessionBase& s)
+	{ return s.getSchedulingTimeout(); }
+
+	inline timeval getRTCPCheckInterval(RTPSessionBase& s)
+	{ return s.getRTCPCheckInterval(); }
+
 	size_t
 	takeInDataPacket(RTPSessionBase& s)
 	{ return s.takeInDataPacket(); }
@@ -77,6 +83,62 @@ public:
 	
 	inline SOCKET getControlRecvSocket(RTPSessionBase& s) const
 	{ return s.getControlRecvSocket(); }
+};
+
+/**
+ * Class for tracking session status. Session pools arrange sessions
+ * in lists of SessionListElement objects.
+ *
+ * @author Jorgen Terner
+ **/
+
+class SessionListElement {
+private:
+	RTPSessionBase* elem;
+	bool cleared;
+
+public:
+	SessionListElement(RTPSessionBase* e);
+	void clear();
+	bool isCleared();
+	RTPSessionBase* get();
+};
+
+
+inline SessionListElement::SessionListElement(RTPSessionBase* e) 
+	: elem(e), cleared(false) { 
+}
+
+inline void SessionListElement::clear() {
+	cleared = true;
+	delete elem;
+	elem = 0;
+}
+
+inline bool SessionListElement::isCleared() {
+	return cleared;
+}
+
+inline RTPSessionBase* SessionListElement::get() {
+	return elem;
+}
+
+/**
+ * std equality for SessionListElement objects.
+ *
+ * @author Jorgen Terner
+ **/
+class PredEquals
+{
+protected:
+    RTPSessionBase* elem;
+public:
+    PredEquals(RTPSessionBase* e) : elem(e) {}
+
+    bool operator() (SessionListElement* e)
+    {
+	    return e->get() == elem;
+    }
 };
 
 /**
@@ -127,8 +189,10 @@ protected:
 	inline void setPoolTimeout(struct timeval to)
 	{ poolTimeout = to; }
 
-	std::list<RTPSessionBase*> sessionList;
-	typedef std::list<RTPSessionBase*>::iterator PoolIterator;
+	std::list<SessionListElement*> sessionList;
+	typedef std::list<SessionListElement*>::iterator PoolIterator;
+
+	mutable ThreadLock poolLock;
 
 #ifndef WIN32
 	fd_set recvSocketSet;
@@ -136,7 +200,6 @@ protected:
 #endif
 
 private:
-	mutable ThreadLock poolLock;
 	timeval poolTimeout;
 	mutable bool poolActive;
 };
@@ -164,7 +227,7 @@ public:
 protected:
 	/**
 	 * Runnable method for the thread. This thread serves all the
-	 * added RTP sessions.
+	 * RTP sessions.added to this pool.
 	 */
 	void run();
 };

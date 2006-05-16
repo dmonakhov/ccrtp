@@ -1,3 +1,16 @@
+2006-05-16  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/pool.h, src/pool.cpp: applied patch in Savannah
+	support request #105229 (by Jorgen Terner) for session pools
+	thread safety. New classes: SessionListElement and PredEquals.
+
+	* src/ccrtp/pool.h, src/pool.cpp: applied patch in Savannah
+	support request #105156 (by Jorgen Terner) for scheduling packets
+	by timeout (as in single threaded RTP sessions).
+	
+	* src/outqueue.cpp: (OutgoingDataQueue::purgeOutgoingQueue)
+	nullify sendLast (fix by Jorgen Terner)
+
 2006-05-02  David Sugar <dyfet@gnutelephony.org>
 
 	* configure.in: updated for 1.4.0.

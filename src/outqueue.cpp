@@ -150,6 +150,7 @@ OutgoingDataQueue::purgeOutgoingQueue()
 		delete sendFirst;
 		sendFirst = sendnext;
 	}
+	sendLast = NULL;
 	sendLock.unlock();
 }
 
