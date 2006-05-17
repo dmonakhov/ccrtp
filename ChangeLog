@@ -1,3 +1,18 @@
+2006-05-16  David Sugar <dyfet@gnutelephony.org>
+
+	* src/ccrtp/ioqueue.h: make endQueue protected.
+
+	* src/outqueue.cpp, src/ccrtp/oqueue.h: support added to send
+	immediate RTP data packet with new sendImmediate method.
+
+	* src/ccrtp/rtp.h: endSocket validates dso/cso correctly
+
+	* configure.in: updated for 1.4.1.
+
+2006-05-02  David Sugar <dyfet@gnutelephony.org>
+
+	* configure.in: updated for 1.4.0.
+
 2006-05-16  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/pool.h, src/pool.cpp: applied patch in Savannah

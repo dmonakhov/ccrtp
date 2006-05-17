@@ -186,6 +186,7 @@ public:
  	bool 
 	isSending() const;
 
+
 	/**
 	 * This is used to create a data packet in the send queue.  
 	 * Sometimes a "NULL" or empty packet will be used instead, and
@@ -200,6 +201,22 @@ public:
 	 **/
 	void
 	putData(uint32 stamp, const unsigned char* data = NULL, size_t len = 0);
+
+        /**
+         * This is used to create a data packet and send it immediately.
+         * Sometimes a "NULL" or empty packet will be used instead, and
+         * these are known as "silent" packets.  "Silent" packets are
+         * used simply to "push" the scheduler along more accurately
+         * by giving the appearence that a next packet is waiting to
+         * be sent and to provide a valid timestamp for that packet.
+         *
+         * @param stamp Timestamp immediate send time of packet.
+         * @param data Value or NULL if special "silent" packet.
+         * @param len May be 0 to indicate a default by payload type.
+         **/
+        void
+        sendImmediate(uint32 stamp, const unsigned char* data = NULL, size_t len = 0);
+
 	
 	/**
 	 * Set padding. All outgoing packets will be transparently
@@ -322,6 +339,16 @@ protected:
 		// global outgoing packets queue.
 		OutgoingRTPPktLink * prev, * next;
 	};
+
+	/**
+	 * This is used to write the RTP data packet to one or more
+	 * destinations.  It is used by both sendImmediate and by
+	 * dispatchDataPacket.
+	 *
+	 * @param RTP packet to send.
+	 */
+	void
+	dispatchImmediate(OutgoingRTPPkt *packet);
 
 	/**
 	 * This computes the timeout period for scheduling transmission

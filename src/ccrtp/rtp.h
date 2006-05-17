@@ -265,11 +265,15 @@ protected:
 	inline void
 	endSocket()
 	{ 
-		dso->endSocket();
-		cso->endSocket();
-		if (dso) delete dso;
+		if (dso) {
+		 dso->endSocket();
+		 delete dso;
+		}
 		dso = NULL;
-		if (cso) delete cso;
+		if (cso) {
+		 cso->endSocket();
+ 		 delete cso;
+                }
 		cso = NULL;
 	}
 

@@ -364,6 +364,69 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 	}
 }
 
+void
+OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
+                           size_t datalen)
+{
+        if ( !data || !datalen )
+                return;
+
+        size_t step = 0, offset = 0;
+        while ( offset < datalen ) {
+                // remainder and step take care of segmentation
+                // according to getMaxSendSegmentSize()
+                size_t remainder = datalen - offset;
+                step = ( remainder > getMaxSendSegmentSize() ) ?
+                        getMaxSendSegmentSize() : remainder;
+
+                OutgoingRTPPkt* packet;
+                if ( sendInfo.sendCC )
+                        packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen);
+                else
+                        packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen);
+
+		                
+		packet->setPayloadType(getCurrentPayloadType());
+                packet->setSeqNum(sendInfo.sendSeq++);
+                packet->setTimestamp(stamp + getInitialTimestamp());
+                packet->setSSRCNetwork(getLocalSSRCNetwork());
+                if ( (0 == offset) && getMark() ) {
+                        packet->setMarker(true);
+                        setMark(false);
+                } else {
+                        packet->setMarker(false);
+                }
+		dispatchImmediate(packet);
+		delete packet;
+		offset += step;
+	}
+}
+
+void OutgoingDataQueue::dispatchImmediate(OutgoingRTPPkt *packet)
+{
+	lockDestinationList();
+        if ( isSingleDestination() ) {
+                TransportAddress* tmp = destList.front();
+                // if going from multi destinations to single destinations.
+                setDataPeer(tmp->getNetworkAddress(),
+                            tmp->getDataTransportPort());
+
+                sendData(packet->getRawPacket(),
+                         packet->getRawPacketSize());
+        } else {
+                // when no destination has been added, NULL == dest.
+                for (std::list<TransportAddress*>::iterator i =
+                             destList.begin(); destList.end() != i; i++) {
+                        TransportAddress* dest = *i;
+                        setDataPeer(dest->getNetworkAddress(),
+                                    dest->getDataTransportPort());
+                        sendData(packet->getRawPacket(),
+                                 packet->getRawPacketSize());
+                }
+        }
+        unlockDestinationList();
+}
+
 size_t
 OutgoingDataQueue::dispatchDataPacket(void)
 {
@@ -377,27 +440,7 @@ OutgoingDataQueue::dispatchDataPacket(void)
 	
 	OutgoingRTPPkt* packet = packetLink->getPacket();
 	uint32 rtn = packet->getPayloadSize();
-	lockDestinationList();
-	if ( isSingleDestination() ) {
-		TransportAddress* tmp = destList.front();
-		// if going from multi destinations to single destinations.
-		setDataPeer(tmp->getNetworkAddress(),
-			    tmp->getDataTransportPort());
-
-		sendData(packet->getRawPacket(),
-			 packet->getRawPacketSize());
-	} else {
-		// when no destination has been added, NULL == dest.
-		for (std::list<TransportAddress*>::iterator i = 
-			     destList.begin(); destList.end() != i; i++) {
-			TransportAddress* dest = *i;
-			setDataPeer(dest->getNetworkAddress(),
-				    dest->getDataTransportPort());
-			sendData(packet->getRawPacket(),
-				 packet->getRawPacketSize());
-		}
-	}
-	unlockDestinationList();
+	dispatchImmediate(packet);
 
 	// unlink the sent packet from the queue and destroy it. Also
 	// record the sending.

@@ -292,6 +292,7 @@ private:
 	void
 	initQueue();
 
+protected:
 	/**
 	 * This method ends the queue.
 	 */
@@ -308,6 +309,7 @@ private:
 	virtual bool
 	isPendingData(microtimeout_t timeout) = 0;
 
+private:
 	// true if connection "active"
 	volatile bool dataServiceActive;
 	Tos typeOfService;
