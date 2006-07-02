@@ -1,3 +1,9 @@
+2006-07-03  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/control.cpp: (QueueRTCPManager::packReportBlocks): fixed
+	byte ordering bug in report blocks SSRC field. Reported by Yaniv
+	Levy.
+
 2006-05-16  David Sugar <dyfet@gnutelephony.org>
 
 	* src/ccrtp/ioqueue.h: make endQueue protected.

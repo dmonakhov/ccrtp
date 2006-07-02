@@ -987,7 +987,7 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 		SyncSourceLink& srcLink = *i;
 		// update stats.
 		srcLink.computeStats();
-		blocks[j].ssrc = srcLink.getSource()->getID();
+		blocks[j].ssrc = htonl(srcLink.getSource()->getID());
 		blocks[j].rinfo.fractionLost = srcLink.getFractionLost();
 		blocks[j].rinfo.lostMSB = 
 			(srcLink.getCumulativePacketLost() & 0xFF0000) >> 16;
