@@ -1,3 +1,14 @@
+2006-07-25  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* Added 2 fixes from Yaniv Levy:
+
+	* src/ccrtp/cqueue.h: added missing implementation of
+	QueueRTCPManager::setMinRTCPInterval.
+
+	* src/ccrtp/oqueue.h: added two new methods to class
+	OutgoingDataQueue: setNextSeqNum and getCurrentSeqNum (for RTSP
+	PLAY).
+
 2006-07-03  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/control.cpp: (QueueRTCPManager::packReportBlocks): fixed

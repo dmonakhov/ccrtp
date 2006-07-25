@@ -372,6 +372,22 @@ protected:
 	dispatchDataPacket();
 
 	/**
+	 * For thoses cases in which the application requires a method
+	 * to set the sequence number for the outgoing stream (such as
+	 * for implementing the RTSP PLAY command).
+	 *
+	 * @param seqNum next sequence number to be used for outgoing packets.
+	 *
+	 **/
+	inline void
+	setNextSeqNum(uint32 seqNum)
+	{ sendInfo.sendSeq = seqNum; }
+
+	inline uint32
+	getCurrentSeqNum(void)
+	{ return sendInfo.sendSeq; }
+
+	/**
 	 */
 	inline void 
 	setInitialTimestamp(uint32 ts)

@@ -158,8 +158,18 @@ public:
 	setSendersControlFraction(float fraction)
 	{ sendControlBwFract = fraction; recvControlBwFract = 1 - fraction;};
 
+	/**
+	 * Manually set the minimum interval for sending RTP compound
+	 * packets
+	 *
+	 * @param interval minimum interval between RTCP packets, in
+	 * microseconds.
+	 *
+	 * @see computeRTCPInterval()
+	 **/
 	void
-	setMinRTCPInterval(microtimeout_t);
+	setMinRTCPInterval(microtimeout_t interval)
+	{ rtcpMinInterval = interval; }
 
 	/**
 	 * Get the total number of RTCP packets sent until now
