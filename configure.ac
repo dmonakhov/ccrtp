@@ -1,9 +1,9 @@
 # Copyright (C) 1999-2003 Open Source Telecom Corporation.
-#  
+#
 # This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without 
+# unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -15,13 +15,13 @@ if test -z "$*" ; then
         if test -f ~/.configure ; then
 		cfg_options=`grep ^ccrtp: ~/.configure | sed -e s/^ccrtp://`
         elif test -f /etc/configure.conf ; then
-		cfg_options=`grep ^ccrtp: /etc/configure.conf | sed -e s/^ccrtp://`   
+		cfg_options=`grep ^ccrtp: /etc/configure.conf | sed -e s/^ccrtp://`
         fi
 fi
 
 if test ! -z "$cfg_options" ; then
         echo "using ~/.configure defaults...$cfg_options"
-        case "$SHELL" in       
+        case "$SHELL" in
         */bash*)
                 exec $SHELL $0 $cfg_options
                 exit -1
@@ -44,6 +44,9 @@ AC_PROG_CXX
 AM_PROG_LIBTOOL
 AM_INIT_AUTOMAKE(ccrtp,[$VERSION])
 AM_CONFIG_HEADER(src/config.h)
+
+# check availability of openSSL crypto library
+AC_CHECK_LIB([crypto], [EVP_CipherInit_ex], [], AC_MSG_ERROR([OpenSSL crypto library not found.]))
 
 OST_PROG_COMMON
 OST_PROG_LIBVER
@@ -70,6 +73,10 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 			])
 	])
 ])
+
+AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
+                 [], AC_MSG_ERROR([OpenSSL headers not found.]))
+
 KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
 AC_SUBST(KDOC_DIR)
@@ -78,6 +85,6 @@ AC_PATH_PROG(DOXYGEN, doxygen, no)
 AC_SUBST(DOXYGEN)
 AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
-AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile 
+AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
 ccrtp.list libccrtp1.pc)

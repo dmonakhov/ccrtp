@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>
-//  
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -46,10 +46,10 @@ const size_t IncomingDataQueueBase::defaultMaxRecvPacketSize = 65534;
 
 ConflictHandler::ConflictingTransportAddress::
 ConflictingTransportAddress(InetAddress na,tpport_t dtp, tpport_t ctp):
-	networkAddress(na), dataTransportPort(dtp), 
+	networkAddress(na), dataTransportPort(dtp),
 	controlTransportPort(ctp), next(NULL)
-{ 
-	gettimeofday(&lastPacketTime,NULL); 
+{
+	gettimeofday(&lastPacketTime,NULL);
 }
 
 ConflictHandler::ConflictingTransportAddress*
@@ -62,24 +62,24 @@ ConflictHandler::searchDataConflict(InetAddress na, tpport_t dtp)
 	return result;
 }
 
-ConflictHandler::ConflictingTransportAddress* 
+ConflictHandler::ConflictingTransportAddress*
 ConflictHandler::searchControlConflict(InetAddress na, tpport_t ctp)
 {
 	ConflictingTransportAddress* result = firstConflict;
-	while ( result && 
+	while ( result &&
 		(result->networkAddress != na ||
 		 result->controlTransportPort != ctp) )
 		result = result->next;
 	return result;
 }
 
-void 
-ConflictHandler::addConflict(const InetAddress& na, tpport_t dtp, 
+void
+ConflictHandler::addConflict(const InetAddress& na, tpport_t dtp,
 			      tpport_t ctp)
 {
-	ConflictingTransportAddress* nc = 
+	ConflictingTransportAddress* nc =
 		new ConflictingTransportAddress(na,dtp,ctp);
-	
+
 	if ( lastConflict ) {
 		lastConflict->setNext(nc);
 		lastConflict = nc;
@@ -91,7 +91,7 @@ ConflictHandler::addConflict(const InetAddress& na, tpport_t dtp,
 const uint8 IncomingDataQueue::defaultMinValidPacketSequence = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketMisorder = 0;
 const uint16 IncomingDataQueue::defaultMaxPacketDropout = 3000;
-const size_t IncomingDataQueue::defaultMembersSize = 
+const size_t IncomingDataQueue::defaultMembersSize =
 MembershipBookkeeping::defaultMembersHashSize;
 
 IncomingDataQueue::IncomingDataQueue(uint32 size) :
@@ -105,7 +105,7 @@ IncomingDataQueue::IncomingDataQueue(uint32 size) :
 	maxPacketMisorder = getDefaultMaxPacketMisorder();
 }
 
-void 
+void
 IncomingDataQueue::purgeIncomingQueue()
 {
 	IncomingRTPPktLink* recvnext;
@@ -115,12 +115,12 @@ IncomingDataQueue::purgeIncomingQueue()
 	while( recvFirst )
 	{
 		recvnext = recvFirst->getNext();
-		
+
 		// nullify source specific packet list
 		SyncSourceLink *s = recvFirst->getSourceLink();
 		s->setFirst(NULL);
 		s->setLast(NULL);
-		
+
 		delete recvFirst->getPacket();
 		delete recvFirst;
 		recvFirst = recvnext;
@@ -209,6 +209,10 @@ IncomingDataQueue::takeInDataPacket(void)
 		return 0;
 	}
 
+        CryptoContext* pcc = getInQueueCryptoContext( packet->getSSRC());
+        if (pcc != NULL) {
+                packet->unprotect(pcc); // TODO - discard packet in case of error
+        }
 	// virtual for profile-specific validation and processing.
 	if ( !onRTPPacketRecv(*packet) )
 	{
@@ -217,7 +221,7 @@ IncomingDataQueue::takeInDataPacket(void)
 	}
 
 	bool source_created;
-	SyncSourceLink* sourceLink = 
+	SyncSourceLink* sourceLink =
 		getSourceBySSRC(packet->getSSRC(),source_created);
 	SyncSource* s = sourceLink->getSource();
 	if ( source_created ) {
@@ -246,11 +250,11 @@ IncomingDataQueue::takeInDataPacket(void)
 				       network_address,transport_port) &&
 	     recordReception(*sourceLink,*packet,recvtime) ) {
 		// now the packet link is linked in the queues
-		IncomingRTPPktLink* packetLink = 
+		IncomingRTPPktLink* packetLink =
 			new IncomingRTPPktLink(packet,
 					       sourceLink,
 					       recvtime,
-					       packet->getTimestamp() - 
+					       packet->getTimestamp() -
 					       sourceLink->getInitialDataTimestamp(),
 					       NULL,NULL,NULL,NULL);
 		insertRecvPacket(packetLink);
@@ -271,8 +275,8 @@ bool IncomingDataQueue::checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink,
 						  bool is_new,
 						  InetAddress& network_address,
 						  tpport_t transport_port)
-					 
-{	
+
+{
 	bool result = true;
 
 	// Test if the source is new and it is not the local one.
@@ -287,16 +291,16 @@ bool IncomingDataQueue::checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink,
 		// SSRC collision or a loop has happened
 		if ( s->getID() != getLocalSSRC() ) {
 			// TODO: Optional error counter.
-			
+
 			// Note this differs from the default in the RFC.
 			// Discard packet only when the collision is
 			// repeating (to avoid flip-flopping)
-			if ( sourceLink.getPrevConflict() && 
+			if ( sourceLink.getPrevConflict() &&
 			     (
-			      (network_address == 
+			      (network_address ==
 			       sourceLink.getPrevConflict()->networkAddress)
 			      &&
-			      (transport_port == 
+			      (transport_port ==
 			       sourceLink.getPrevConflict()->dataTransportPort)
 			      ) ) {
 				// discard packet and do not flip-flop
@@ -311,11 +315,11 @@ bool IncomingDataQueue::checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink,
 				setDataTransportPort(*s,transport_port);
 				setNetworkAddress(*s,network_address);
 			}
-			
+
 		} else {
 			// Collision or loop of own packets.
-			ConflictingTransportAddress* conflicting = 
-				searchDataConflict(network_address, 
+			ConflictingTransportAddress* conflicting =
+				searchDataConflict(network_address,
 						   transport_port);
 			if ( conflicting ) {
 				// Optional error counter.
@@ -472,7 +476,7 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 {
 	if ( src && !isMine(*src) )
 		return NULL;
-	
+
 	IncomingRTPPktLink *result;
 	recvLock.writeLock();
 	if ( src != NULL ) {
@@ -491,7 +495,7 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 			recvLock.unlock();
 			return result;
 		}
-		while ( l && (l->getTimestamp() < timestamp) || 
+		while ( l && (l->getTimestamp() < timestamp) ||
 			end2EndDelayed(*l) ) {
 			nold++;
 			l = l->getSrcNext();
@@ -549,7 +553,7 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 		// process source unspecific queries
 		int nold = 0;
 		IncomingRTPPktLink* l = recvFirst;
-		while ( l && (l->getTimestamp() < timestamp || 
+		while ( l && (l->getTimestamp() < timestamp ||
 			      end2EndDelayed(*l) ) ){
 			nold++;
 			l = l->getNext();
@@ -603,8 +607,8 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 }
 
 bool
-IncomingDataQueue::recordReception(SyncSourceLink& srcLink, 
-				   const IncomingRTPPkt& pkt, 
+IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
+				   const IncomingRTPPkt& pkt,
 				   const timeval recvtime)
 {
 	bool result = true;
@@ -631,7 +635,7 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		srcLink.setMaxSeqNum(pkt.getSeqNum());
 	} else {
 		// source was already valid.
-		uint16 step = pkt.getSeqNum() - srcLink.getMaxSeqNum(); 
+		uint16 step = pkt.getSeqNum() - srcLink.getMaxSeqNum();
 		if ( step < getMaxPacketDropout() ) {
 			// Ordered, with not too high step.
 			if ( pkt.getSeqNum() < srcLink.getMaxSeqNum() ) {
@@ -673,8 +677,8 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		// we record the last time a packet from this source
 		// was received, this has statistical interest and is
 		// needed to time out old senders that are no sending
-		// any longer.  
-		
+		// any longer.
+
 		// compute the interarrival jitter estimation.
 		timeval tarrival;
 		timeval lastT = srcLink.getLastPacketTime();
@@ -683,14 +687,14 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 		uint32 arrival = timeval2microtimeout(tarrival)
 			* getCurrentRTPClockRate();
 		uint32 transitTime = arrival - pkt.getTimestamp();
-		int32 delta = transitTime - 
+		int32 delta = transitTime -
 			srcLink.getLastPacketTransitTime();
 		srcLink.setLastPacketTransitTime(transitTime);
 		if ( delta < 0 )
 			delta = -delta;
-		srcLink.setJitter( srcLink.getJitter() + 
-				   (1.0f / 16.0f) * 
-				  (static_cast<float>(delta) - 
+		srcLink.setJitter( srcLink.getJitter() +
+				   (1.0f / 16.0f) *
+				  (static_cast<float>(delta) -
 				   srcLink.getJitter()));
 	}
 	return result;
@@ -699,6 +703,37 @@ IncomingDataQueue::recordReception(SyncSourceLink& srcLink,
 void
 IncomingDataQueue::recordExtraction(const IncomingRTPPkt&)
 {
+}
+
+void
+IncomingDataQueue::setInQueueCryptoContext(CryptoContext* cc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+        std::list<CryptoContext *>::iterator i;
+
+        // check if a CryptoContext for a SSRC already exists. If yes
+        // remove it from list before inserting the new one.
+        for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+                if( (*i)->getSsrc() == cc->getSsrc() ) {
+                        cryptoContexts.erase(i);
+                        break;
+                }
+        }
+        cryptoContexts.push_back(cc);
+}
+
+CryptoContext*
+IncomingDataQueue::getInQueueCryptoContext(uint32 ssrc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+        std::list<CryptoContext *>::iterator i;
+
+        for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+                if( (*i)->getSsrc() == ssrc) {
+                        return (*i);
+                }
+        }
+        return NULL;
 }
 
 #ifdef  CCXX_NAMESPACES

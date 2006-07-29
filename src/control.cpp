@@ -1,27 +1,27 @@
 // Copyright (C) 1999-2005 Open Source Telecom Corporation.
-//  
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -69,16 +69,16 @@ QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 	lowerHeadersSize = networkHeaderSize() + transportHeaderSize();
 
 	nextScheduledSDESItem = SDESItemTypeNAME;
-	
+
 	// initialize RTCP timing
-	reconsInfo.rtcpTp.tv_sec = reconsInfo.rtcpTc.tv_sec = 
+	reconsInfo.rtcpTp.tv_sec = reconsInfo.rtcpTc.tv_sec =
 		reconsInfo.rtcpTn.tv_sec = 0;
 	reconsInfo.rtcpTp.tv_usec = reconsInfo.rtcpTc.tv_usec =
 		reconsInfo.rtcpTn.tv_usec = 0;
-	reconsInfo.rtcpPMembers = 1; 
+	reconsInfo.rtcpPMembers = 1;
 
 	rtcpWeSent = false;
-	rtcpAvgSize = sizeof(RTCPFixedHeader) + sizeof(uint32) + 
+	rtcpAvgSize = sizeof(RTCPFixedHeader) + sizeof(uint32) +
 		sizeof(SenderInfo);
 	rtcpInitial = true;
 	// force an initial check for incoming RTCP packets
@@ -93,7 +93,7 @@ QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 	rtcpMinInterval = 5000000;  // 5 seconds.
 
 	leavingDelay = 1000000; // 1 second
-	end2EndDelay = getDefaultEnd2EndDelay();	
+	end2EndDelay = getDefaultEnd2EndDelay();
 
 	// Fill in fixed fields that will never change
 	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(rtcpSendBuffer);
@@ -103,6 +103,57 @@ QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 
 	// allow to start RTCP service once everything is set up
 	controlServiceActive = true;
+}
+
+// TODO Streamline this code (same as above, put into a separate method)
+QueueRTCPManager::QueueRTCPManager(uint32 ssrc, uint32 size, RTPApplication& app):
+                RTPDataQueue(&ssrc, size),
+        RTCPCompoundHandler(RTCPCompoundHandler::defaultPathMTU),
+        queueApplication(app)
+{
+        controlServiceActive = false;
+        controlBwFract = 0.05f;
+        sendControlBwFract = 0.25;
+        recvControlBwFract = 1-sendControlBwFract;
+        ctrlSendCount = 0;
+
+        lowerHeadersSize = networkHeaderSize() + transportHeaderSize();
+
+        nextScheduledSDESItem = SDESItemTypeNAME;
+
+        // initialize RTCP timing
+        reconsInfo.rtcpTp.tv_sec = reconsInfo.rtcpTc.tv_sec =
+                        reconsInfo.rtcpTn.tv_sec = 0;
+        reconsInfo.rtcpTp.tv_usec = reconsInfo.rtcpTc.tv_usec =
+                        reconsInfo.rtcpTn.tv_usec = 0;
+        reconsInfo.rtcpPMembers = 1;
+
+        rtcpWeSent = false;
+        rtcpAvgSize = sizeof(RTCPFixedHeader) + sizeof(uint32) +
+                        sizeof(SenderInfo);
+        rtcpInitial = true;
+        // force an initial check for incoming RTCP packets
+        gettimeofday(&rtcpNextCheck,NULL);
+        // check for incoming RTCP packets every 1/4 seconds.
+        rtcpCheckInterval.tv_sec = 0;
+        rtcpCheckInterval.tv_usec = 250000;
+        timersub(&rtcpNextCheck,&rtcpCheckInterval,&rtcpLastCheck);
+
+        lastSendPacketCount = 0;
+
+        rtcpMinInterval = 5000000;  // 5 seconds.
+
+        leavingDelay = 1000000; // 1 second
+        end2EndDelay = getDefaultEnd2EndDelay();
+
+        // Fill in fixed fields that will never change
+        RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(rtcpSendBuffer);
+        pkt->fh.version = CCRTP_VERSION;
+        // (SSRCCollision will have to take this into account)
+        pkt->info.SR.ssrc = getLocalSSRCNetwork();
+
+        // allow to start RTCP service once everything is set up
+        controlServiceActive = true;
 }
 
 QueueRTCPManager::~QueueRTCPManager()
@@ -120,31 +171,31 @@ QueueRTCPManager::endQueueRTCPManager()
 bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
 					  bool is_new,
 					  InetAddress& network_address,
-					  tpport_t transport_port) 
+					  tpport_t transport_port)
 {
 	bool result = true;
-	
+
 	// Test if the source is new and it is not the local one.
 	if ( is_new &&
 	     sourceLink.getSource()->getID() != getLocalSSRC() )
 		return result;
-	
+
 	SyncSource *s = sourceLink.getSource();
 	if ( s->getControlTransportPort() != transport_port ||
 	     s->getNetworkAddress() != network_address ) {
 		// SSRC collision or a loop has happened
 		if ( s->getID() != getLocalSSRC() ) {
 			// TODO: Optional error counter.
-			
+
 			// Note this differs from the default in the RFC.
 			// Discard packet only when the collision is
 			// repeating (to avoid flip-flopping)
 			if ( sourceLink.getPrevConflict() &&
 			     (
-			      (network_address == 
+			      (network_address ==
 			       sourceLink.getPrevConflict()->networkAddress)
 			      &&
-			      (transport_port == 
+			      (transport_port ==
 			       sourceLink.getPrevConflict()->controlTransportPort)
 			      ) ) {
 				// discard packet and do not flip-flop
@@ -159,11 +210,11 @@ bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
 				setControlTransportPort(*s,transport_port);
 				setNetworkAddress(*s,network_address);
 			}
-			
+
 		} else {
 			// Collision or loop of own packets.
-			ConflictingTransportAddress* conflicting = 
-				searchControlConflict(network_address, 
+			ConflictingTransportAddress* conflicting =
+				searchControlConflict(network_address,
 						      transport_port);
 			if ( conflicting ) {
 				// Optional error counter.
@@ -213,11 +264,11 @@ QueueRTCPManager::controlReceptionService()
 
 void
 QueueRTCPManager::controlTransmissionService()
-{	
+{
 	if ( !controlServiceActive )
 		return;
-	
-	// B) send RTCP packets 
+
+	// B) send RTCP packets
 	gettimeofday(&(reconsInfo.rtcpTc),NULL);
 	if ( timercmp(&(reconsInfo.rtcpTc),&(reconsInfo.rtcpTn),>=) ) {
 		if ( timerReconsideration() ) {
@@ -239,7 +290,7 @@ QueueRTCPManager::controlTransmissionService()
 			// next check.
 			reconsInfo.rtcpPMembers = getMembersCount();
 		}
-	} 
+	}
 }
 
 bool
@@ -258,7 +309,7 @@ QueueRTCPManager::timerReconsideration()
 	return result;
 }
 
-void 
+void
 QueueRTCPManager::expireSSRCs()
 {
 }
@@ -277,16 +328,16 @@ QueueRTCPManager::takeInControlPacket()
 	gettimeofday(&recvtime,NULL);
 
 	// process a 'len' octets long RTCP compound packet
-	
+
 	// Check validity of the header fields of the compound packet
 	if ( !RTCPCompoundHandler::checkCompoundRTCPHeader(len) )
 		return;
-	RTCPPacket *pkt = 
+	RTCPPacket *pkt =
 		reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer);
-	
+
 	// TODO: for now, we do nothing with the padding bit
 	// in the header.
-	
+
 	bool source_created;
 	SyncSourceLink* sourceLink =
 		getSourceBySSRC(pkt->getSSRC(),source_created);
@@ -369,9 +420,9 @@ QueueRTCPManager::takeInControlPacket()
 		pointer += pkt->getLength();
 		pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer +pointer);
 	}
-		
+
 	// TODO: error? if !cname_found
-	
+
 	// process BYE packets
 	while ( pointer < len ) {
 		if ( pkt->fh.type == RTCPPacket::tBYE ) {
@@ -384,17 +435,17 @@ QueueRTCPManager::takeInControlPacket()
 		} else if ( pkt->fh.type != RTCPPacket::tBYE ) {
 			break; // TODO: check non-BYE out of place.
 		} else {
-			break; 
+			break;
 		}
 	}
-	
+
 	// Call plug-in in case there are profile extensions
 	// at the end of the SR/RR.
 	if ( pointer != len ) {
 		onGotRRSRExtension(rtcpRecvBuffer + pointer,
 				   len - pointer);
 	}
-	
+
 	// Everything went right, update the RTCP average size
 	updateAvgRTCPSize(len);
 }
@@ -408,7 +459,7 @@ QueueRTCPManager::end2EndDelayed(IncomingRTPPktLink& pl)
 		SyncSourceLink* sl = pl.getSourceLink();
 		void* si = sl->getSenderInfo();
 		if ( NULL != si ) {
-			RTCPSenderInfo rsi(si);		
+			RTCPSenderInfo rsi(si);
 			uint32 tsInc = pl.getPacket()->getTimestamp() -
 				rsi.getRTPTimestamp();
 			// approx.
@@ -457,7 +508,7 @@ QueueRTCPManager::onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks)
 void
 QueueRTCPManager::updateAvgRTCPSize(size_t len)
 {
-	size_t newlen = len; 
+	size_t newlen = len;
 	newlen += lowerHeadersSize;
 	rtcpAvgSize = (uint16)(( (15 * rtcpAvgSize) >> 4 ) + ( newlen >> 4));
 }
@@ -472,7 +523,7 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t)
 
 	if ( (sizeof(RTCPFixedHeader) + pkt.fh.block_count * sizeof(uint32))
 	     < pkt.getLength() ) {
-		uint16 endpointer = (uint16)(pointer + sizeof(RTCPFixedHeader) + 
+		uint16 endpointer = (uint16)(pointer + sizeof(RTCPFixedHeader) +
 			pkt.fh.block_count * sizeof(uint32));
 		uint16 len = rtcpRecvBuffer[endpointer];
 		reason = new char[len + 1];
@@ -486,7 +537,7 @@ QueueRTCPManager::getBYE(RTCPPacket& pkt, size_t& pointer, size_t)
 	int i = 0;
 	while ( i < pkt.fh.block_count ){
 		bool created;
-		SyncSourceLink* srcLink = 
+		SyncSourceLink* srcLink =
 			getSourceBySSRC(pkt.getSSRC(),created);
 		i++;
 		if( srcLink->getGoodbye() )
@@ -507,21 +558,21 @@ QueueRTCPManager::reverseReconsideration()
 {
 	if ( getMembersCount() < reconsInfo.rtcpPMembers ) {
 		timeval inc;
-		
+
 		// reconsider reconsInfo.rtcpTn (time for next RTCP packet)
-		microtimeout_t t = 
+		microtimeout_t t =
 			(reconsInfo.rtcpTn.tv_sec - reconsInfo.rtcpTc.tv_sec) *
-			1000000 + 
+			1000000 +
 			(reconsInfo.rtcpTn.tv_usec - reconsInfo.rtcpTc.tv_usec);
 		t *= getMembersCount();
 		t /= reconsInfo.rtcpPMembers;
 		inc.tv_usec = t % 1000000;
 		inc.tv_sec = t / 1000000;
 		timeradd(&(reconsInfo.rtcpTc),&inc,&(reconsInfo.rtcpTn));
-		
+
 		// reconsider tp (time for previous RTCP packet)
-		t = (reconsInfo.rtcpTc.tv_sec - reconsInfo.rtcpTp.tv_sec) * 
-			1000000 + 
+		t = (reconsInfo.rtcpTc.tv_sec - reconsInfo.rtcpTp.tv_sec) *
+			1000000 +
 			(reconsInfo.rtcpTc.tv_usec - reconsInfo.rtcpTp.tv_usec);
 		t *= getMembersCount();
 		t /= reconsInfo.rtcpPMembers;
@@ -566,7 +617,7 @@ QueueRTCPManager::onGotSDES(SyncSource& source, RTCPPacket& pkt)
 }
 
 bool
-QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk, 
+QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 				 size_t len)
 {
 	bool cname_found = false;
@@ -579,10 +630,10 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 
 	// process chunk items
 	while ( (pointer < len) && !end ) {
-		SDESItem* item = 
+		SDESItem* item =
 			reinterpret_cast<SDESItem*>(size_t(&(chunk)) + pointer);
 		if ( item->type > SDESItemTypeEND && item->type <= SDESItemTypeLast) {
-			pointer += sizeof(item->type) + sizeof(item->len) + 
+			pointer += sizeof(item->type) + sizeof(item->len) +
 				item->len;
 			if ( NULL == part && SDESItemTypeCNAME == item->type ) {
 				const RTPApplication& app = getApplication();
@@ -639,7 +690,7 @@ QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk,
 
 timeval
 QueueRTCPManager::computeRTCPInterval()
-{	
+{
 	float bwfract = controlBwFract * getSessionBandwidth();
 	uint32 participants = getMembersCount();
 	if ( getSendersCount() > 0 &&
@@ -674,7 +725,7 @@ QueueRTCPManager::computeRTCPInterval()
 		interval = 100000000;
 	}
 
-	interval = static_cast<microtimeout_t>(interval * ( 0.5 + 
+	interval = static_cast<microtimeout_t>(interval * ( 0.5 +
 						(rand() / (RAND_MAX + 1.0))));
 
 	timeval result;
@@ -702,7 +753,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 		rtcpInitial = true;
 		rtcpWeSent = false;
 		rtcpAvgSize = (uint16)(sizeof(RTCPFixedHeader) + sizeof(uint32) +
-			strlen(reason.c_str()) + 
+			strlen(reason.c_str()) +
 			(4 - (strlen(reason.c_str()) & 0x03)));
 		gettimeofday(&(reconsInfo.rtcpTc),NULL);
 		timeval T = computeRTCPInterval();
@@ -717,7 +768,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 
 
 	unsigned char buffer[500];
-	// Build an empty RR as first packet in the compound.  
+	// Build an empty RR as first packet in the compound.
         // TODO: provide more information if available. Not really
 	// important, since this is the last packet being sent.
 	RTCPPacket* pkt = reinterpret_cast<RTCPPacket*>(buffer);
@@ -751,7 +802,7 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 	}
 	pkt->fh.length = htons(((len - len1) >> 2) - 1);
 	pkt->fh.padding = (padlen > 0);
-	
+
 	return sendControlToDestinations(buffer,len);
 }
 
@@ -763,7 +814,7 @@ QueueRTCPManager::getOnlyBye()
 	timersub(&(reconsInfo.rtcpTn),&(reconsInfo.rtcpTc),&wait);
 	microtimeout_t timer = wait.tv_usec/1000 + wait.tv_sec * 1000;
 	// wait up to reconsInfo.rtcpTn
-	if ( !isPendingControl(timer) ) 
+	if ( !isPendingControl(timer) )
 		return;
 
 	size_t len = 0;
@@ -772,10 +823,10 @@ QueueRTCPManager::getOnlyBye()
 	while (	(len = recvControl(rtcpRecvBuffer,getPathMTU(),
 				  network_address,transport_port)) ) {
 		// Process a <code>len<code> octets long RTCP compound packet
-		// Check validity of the header fields of the compound packet 
+		// Check validity of the header fields of the compound packet
 		if ( !RTCPCompoundHandler::checkCompoundRTCPHeader(len) )
 			return;
-		
+
 		// TODO: For now, we do nothing with the padding bit
 		// in the header.
 		uint32 pointer = 0;
@@ -783,10 +834,10 @@ QueueRTCPManager::getOnlyBye()
 		while ( pointer < len) {
 			pkt = reinterpret_cast<RTCPPacket*>
 				(rtcpRecvBuffer + pointer);
-			
+
 			if (pkt->fh.type == RTCPPacket::tBYE ) {
 				bool created;
-				SyncSourceLink* srcLink = 
+				SyncSourceLink* srcLink =
 					getSourceBySSRC(pkt->getSSRC(),
 							created);
 				if( srcLink->getGoodbye() )
@@ -837,7 +888,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 		uint32 tstamp = now.tv_usec - getInitialTime().tv_usec;
 		tstamp *= (getCurrentRTPClockRate()/1000);
 		tstamp /= 1000;
-		tstamp += (now.tv_sec - getInitialTime().tv_sec) * 
+		tstamp += (now.tv_sec - getInitialTime().tv_sec) *
 			getCurrentRTPClockRate();
 		tstamp += getInitialTimestamp();
 		pkt->info.SR.sinfo.RTPTimestamp = htonl(tstamp);
@@ -850,7 +901,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 		pkt->fh.type = RTCPPacket::tRR;
 		pkt->info.RR.ssrc = getLocalSSRCNetwork();
 	}
-	
+
 	// (B) put report blocks
 	// After adding report blocks, we have to leave room for at
 	// least a CNAME SDES item
@@ -858,8 +909,8 @@ QueueRTCPManager::dispatchControlPacket(void)
 		- lowerHeadersSize
 		- len
 		- (sizeof(RTCPFixedHeader) +
-		   2*sizeof(uint8) + 
-		   getApplication().getSDESItem(SDESItemTypeCNAME).length()) 
+		   2*sizeof(uint8) +
+		   getApplication().getSDESItem(SDESItemTypeCNAME).length())
 		- 100);
 
 	// if we have to go to a new RR packet
@@ -879,8 +930,8 @@ QueueRTCPManager::dispatchControlPacket(void)
 		if ( 31 == blocks ) {
 			// we would need room for a new RR packet and
 			// a CNAME SDES
-			if ( len < (available - 
-			     ( sizeof(RTCPFixedHeader) + sizeof(uint32) + 
+			if ( len < (available -
+			     ( sizeof(RTCPFixedHeader) + sizeof(uint32) +
 			       sizeof(RRBlock))) ) {
 				another = true;
 				// Header for this new packet in the compound
@@ -914,7 +965,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 	ctrlSendCount++;
 	// Everything went right, update the RTCP average size
 	updateAvgRTCPSize(len);
- 
+
 	return count;
 }
 
@@ -932,25 +983,25 @@ QueueRTCPManager::packSDES(uint16 &len)
 	pkt->info.SDES.ssrc = getLocalSSRCNetwork();
 	pkt->info.SDES.item.type = SDESItemTypeCNAME;
 	// put CNAME
-	size_t cnameLen = 
+	size_t cnameLen =
 		getApplication().getSDESItem(SDESItemTypeCNAME).length();
-	const char* cname = 
+	const char* cname =
 		getApplication().getSDESItem(SDESItemTypeCNAME).c_str();
 	pkt->info.SDES.item.len = (uint8)cnameLen;
-	len += sizeof(RTCPFixedHeader) + sizeof(pkt->info.SDES.ssrc) + 
+	len += sizeof(RTCPFixedHeader) + sizeof(pkt->info.SDES.ssrc) +
 		sizeof(pkt->info.SDES.item.type) +
 		sizeof(pkt->info.SDES.item.len);
-	
+
 	memcpy((rtcpSendBuffer + len),cname,cnameLen);
 	len += (uint16)cnameLen;
 	// pack items other than CNAME (following priorities
 	// stablished inside scheduleSDESItem()).
 	SDESItemType nexttype = scheduleSDESItem();
-	if ( (nexttype > SDESItemTypeCNAME) && 
+	if ( (nexttype > SDESItemTypeCNAME) &&
 	     (nexttype <= SDESItemTypeLast ) ) {
 		SDESItem *item = reinterpret_cast<SDESItem *>(rtcpSendBuffer + len);
 		item->type = nexttype;
-		const char *content = 
+		const char *content =
 			getApplication().getSDESItem(nexttype).c_str();
 		item->len = (uint8)strlen(content);
 		len += 2;
@@ -973,14 +1024,14 @@ QueueRTCPManager::packSDES(uint16 &len)
 }
 
 uint8
-QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len, 
+QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 				   uint16& available)
 {
 	uint8 j = 0;
 	// pack as many report blocks as we can
 	SyncSourceLink* i = getFirst();
 	for ( ;
-	      ( ( i != NULL ) && 
+	      ( ( i != NULL ) &&
 		( len < (available - sizeof(RTCPCompoundHandler::RRBlock)) ) &&
 		( j < 31 ) );
 	      i = i->getNext() ) {
@@ -989,15 +1040,15 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 		srcLink.computeStats();
 		blocks[j].ssrc = htonl(srcLink.getSource()->getID());
 		blocks[j].rinfo.fractionLost = srcLink.getFractionLost();
-		blocks[j].rinfo.lostMSB = 
+		blocks[j].rinfo.lostMSB =
 			(srcLink.getCumulativePacketLost() & 0xFF0000) >> 16;
-		blocks[j].rinfo.lostLSW = 
+		blocks[j].rinfo.lostLSW =
 			htons(srcLink.getCumulativePacketLost() & 0xFFFF);
-		blocks[j].rinfo.highestSeqNum = 
+		blocks[j].rinfo.highestSeqNum =
 			htonl(srcLink.getExtendedMaxSeqNum());
-		blocks[j].rinfo.jitter = 
+		blocks[j].rinfo.jitter =
 			htonl(static_cast<uint32>(srcLink.getJitter()));
-		RTCPCompoundHandler::SenderInfo* si = 
+		RTCPCompoundHandler::SenderInfo* si =
 			reinterpret_cast<RTCPCompoundHandler::SenderInfo*>(srcLink.getSenderInfo());
 		if ( NULL == si ) {
 			blocks[j].rinfo.lsr = 0;
@@ -1011,17 +1062,17 @@ QueueRTCPManager::packReportBlocks(RRBlock* blocks, uint16 &len,
 			gettimeofday(&now,NULL);
 			timeval last = srcLink.getLastRTCPSRTime();
 			timersub(&now,&last,&diff);
-			blocks[j].rinfo.dlsr = 
+			blocks[j].rinfo.dlsr =
 				htonl(timevalIntervalTo65536(diff));
 		}
 		len += sizeof(RTCPCompoundHandler::RRBlock);
-		j++;		
+		j++;
 	}
 	return j;
 }
 
-void 
-QueueRTCPManager::setSDESItem(Participant* part, SDESItemType type, 
+void
+QueueRTCPManager::setSDESItem(Participant* part, SDESItemType type,
 				const char* const value, size_t len)
 {
 	char* buf = new char[len + 1];
@@ -1032,8 +1083,8 @@ QueueRTCPManager::setSDESItem(Participant* part, SDESItemType type,
 }
 
 
-void 
-QueueRTCPManager::setPRIVPrefix(Participant* part, const char* const value, 
+void
+QueueRTCPManager::setPRIVPrefix(Participant* part, const char* const value,
 				size_t len)
 {
 	char *buf = new char[len + 1];
@@ -1083,7 +1134,7 @@ QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t len)
 		count = sendControl(buffer,len);
 	} else {
 		// when no destination has been added, NULL == dest.
-		for (std::list<TransportAddress*>::iterator i = 
+		for (std::list<TransportAddress*>::iterator i =
 			     destList.begin(); destList.end() != i; i++) {
 			TransportAddress* dest = *i;
 			setControlPeer(dest->getNetworkAddress(),

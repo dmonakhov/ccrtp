@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>
-//  
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -73,10 +73,10 @@ DestinationListHandler::~DestinationListHandler()
 	unlockDestinationList();
 }
 
-bool 
-DestinationListHandler::addDestinationToList(const InetAddress& ia, 
+bool
+DestinationListHandler::addDestinationToList(const InetAddress& ia,
 					     tpport_t data, tpport_t control)
-{	
+{
 	TransportAddress* addr = new TransportAddress(ia,data,control);
 	writeLockDestinationList();
 	destList.push_back(addr);
@@ -85,8 +85,8 @@ DestinationListHandler::addDestinationToList(const InetAddress& ia,
 }
 
 bool
-DestinationListHandler::removeDestinationFromList(const InetAddress& ia, 
-						  tpport_t dataPort,  
+DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
+						  tpport_t dataPort,
 						  tpport_t controlPort)
 {
 	bool result = false;
@@ -117,7 +117,7 @@ OutgoingDataQueue::OutgoingDataQueue():
 	OutgoingDataQueueBase(),
 	DestinationListHandler(),
 	sendLock(),
-	sendFirst(NULL), sendLast(NULL)
+        sendFirst(NULL), sendLast(NULL), cContext(NULL)
 {
 	setInitialTimestamp(random32());
 	setSchedulingTimeout(getDefaultSchedulingTimeout());
@@ -155,7 +155,7 @@ OutgoingDataQueue::purgeOutgoingQueue()
 }
 
 bool
-OutgoingDataQueue::addDestination(const InetHostAddress& ia, 
+OutgoingDataQueue::addDestination(const InetHostAddress& ia,
 				  tpport_t dataPort,
 				  tpport_t controlPort)
 {
@@ -170,7 +170,7 @@ OutgoingDataQueue::addDestination(const InetHostAddress& ia,
 }
 
 bool
-OutgoingDataQueue::addDestination(const InetMcastAddress& ia, 
+OutgoingDataQueue::addDestination(const InetMcastAddress& ia,
 				  tpport_t dataPort,
 				  tpport_t controlPort)
 {
@@ -185,7 +185,7 @@ OutgoingDataQueue::addDestination(const InetMcastAddress& ia,
 }
 
 bool
-OutgoingDataQueue::forgetDestination(const InetHostAddress& ia, 
+OutgoingDataQueue::forgetDestination(const InetHostAddress& ia,
 				     tpport_t dataPort,
 				     tpport_t controlPort)
 {
@@ -196,7 +196,7 @@ OutgoingDataQueue::forgetDestination(const InetHostAddress& ia,
 }
 
 bool
-OutgoingDataQueue::forgetDestination(const InetMcastAddress& ia, 
+OutgoingDataQueue::forgetDestination(const InetMcastAddress& ia,
 				     tpport_t dataPort,
 				     tpport_t controlPort)
 {
@@ -271,7 +271,7 @@ OutgoingDataQueue::getSchedulingTimeout(void)
 					 &(sendInfo.overflowTime));
 			} while ( now.tv_sec - send.tv_sec > 5000 );
 		}
-		
+
 		// This tries to solve the aforementioned problem
 		// about disordered packets coming after an overflowed
 		// one. Now we apply the reverse idea.
@@ -287,7 +287,7 @@ OutgoingDataQueue::getSchedulingTimeout(void)
 		if ( send.tv_sec - now.tv_sec > 3600 ){
 			return 3600000000ul;
 		}
-		int32 diff = 
+		int32 diff =
 			((send.tv_sec - now.tv_sec) * 1000000ul) +
 			send.tv_usec - now.tv_usec;
 		// B: wait <code>diff</code> usecs more before sending
@@ -318,7 +318,7 @@ OutgoingDataQueue::getSchedulingTimeout(void)
 }
 
 void
-OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data, 
+OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 			   size_t datalen)
 {
 	if ( !data || !datalen )
@@ -334,24 +334,27 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 
 		OutgoingRTPPkt* packet;
 		if ( sendInfo.sendCC )
-			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen);
+			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen, cContext);
 		else
-			packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen);
-		
+			packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen, cContext);
+
 		packet->setPayloadType(getCurrentPayloadType());
 		packet->setSeqNum(sendInfo.sendSeq++);
 		packet->setTimestamp(stamp + getInitialTimestamp());
+
 		packet->setSSRCNetwork(getLocalSSRCNetwork());
 		if ( (0 == offset) && getMark() ) {
-			packet->setMarker(true); 
+			packet->setMarker(true);
 			setMark(false);
 		} else {
 			packet->setMarker(false);
 		}
-		
+                if (cContext != NULL) {
+                        packet->protect(getLocalSSRC());
+                }
 		// insert the packet into the "tail" of the sending queue
 		sendLock.writeLock();
-		OutgoingRTPPktLink *link = 
+		OutgoingRTPPktLink *link =
 			new OutgoingRTPPktLink(packet,sendLast,NULL);
 		if (sendLast)
 			sendLast->setNext(link);
@@ -381,11 +384,11 @@ OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
 
                 OutgoingRTPPkt* packet;
                 if ( sendInfo.sendCC )
-                        packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen);
+                        packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen,cContext);
                 else
-                        packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen);
+                        packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen,cContext);
 
-		                
+
 		packet->setPayloadType(getCurrentPayloadType());
                 packet->setSeqNum(sendInfo.sendSeq++);
                 packet->setTimestamp(stamp + getInitialTimestamp());
@@ -395,6 +398,9 @@ OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
                         setMark(false);
                 } else {
                         packet->setMarker(false);
+                }
+                if (cContext != NULL) {
+                        packet->protect(getLocalSSRC());
                 }
 		dispatchImmediate(packet);
 		delete packet;
@@ -412,7 +418,7 @@ void OutgoingDataQueue::dispatchImmediate(OutgoingRTPPkt *packet)
                             tmp->getDataTransportPort());
 
                 sendData(packet->getRawPacket(),
-                         packet->getRawPacketSize());
+                         packet->getRawPacketSizeSrtp());
         } else {
                 // when no destination has been added, NULL == dest.
                 for (std::list<TransportAddress*>::iterator i =
@@ -421,7 +427,7 @@ void OutgoingDataQueue::dispatchImmediate(OutgoingRTPPkt *packet)
                         setDataPeer(dest->getNetworkAddress(),
                                     dest->getDataTransportPort());
                         sendData(packet->getRawPacket(),
-                                 packet->getRawPacketSize());
+                                 packet->getRawPacketSizeSrtp());
                 }
         }
         unlockDestinationList();
@@ -432,12 +438,12 @@ OutgoingDataQueue::dispatchDataPacket(void)
 {
 	sendLock.writeLock();
 	OutgoingRTPPktLink* packetLink = sendFirst;
-	
+
 	if ( !packetLink ){
 		sendLock.unlock();
 		return 0;
 	}
-	
+
 	OutgoingRTPPkt* packet = packetLink->getPacket();
 	uint32 rtn = packet->getPayloadSize();
 	dispatchImmediate(packet);
@@ -450,7 +456,7 @@ OutgoingDataQueue::dispatchDataPacket(void)
 	} else {
 		sendLast = NULL;
 	}
-	// for general accounting and RTCP SR statistics 
+	// for general accounting and RTCP SR statistics
 	sendInfo.packetCount++;
 	sendInfo.octetCount += packet->getPayloadSize();
 	delete packetLink;
@@ -460,7 +466,7 @@ OutgoingDataQueue::dispatchDataPacket(void)
 }
 
 size_t
-OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data, 
+OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data,
 			      size_t offset, size_t max)
 {
 	sendLock.writeLock();

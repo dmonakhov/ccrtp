@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -35,8 +35,8 @@
 // If you do not wish that, delete this exception notice.
 //
 
-/** 
- * @file iqueue.h 
+/**
+ * @file iqueue.h
  *
  * @short Generic RTP input queues.
  **/
@@ -45,6 +45,9 @@
 #define CCXX_RTP_IQUEUE_H_
 
 #include <ccrtp/queuebase.h>
+#include <ccrtp/CryptoContext.h>
+
+#include <list>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {
@@ -62,7 +65,7 @@ namespace ost {
  * Records the number of members as well as active senders. For now,
  * it is too simple.
  *
- * @author Federico Montesino Pouzols <fedemp@altern.org> 
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
 class __EXPORT Members
 {
@@ -82,7 +85,7 @@ public:
 	inline uint32
 	getMembersCount() const
 	{ return members; }
-	
+
 	inline void
 	setSendersCount(uint32 n)
 	{ activeSenders = n; }
@@ -100,8 +103,8 @@ public:
 	{ return activeSenders; }
 
 protected:
-	Members() :	
-		members(0), 
+	Members() :
+		members(0),
 		activeSenders(0)
 	{ }
 
@@ -157,16 +160,16 @@ public:
 	inline void
 	setControlTransportPort(SyncSource& source, tpport_t p)
 	{ source.setControlTransportPort(p); }
-	
+
 	inline void
 	setNetworkAddress(SyncSource& source, InetAddress addr)
 	{ source.setNetworkAddress(addr); }
-	
+
 protected:
 	SyncSourceHandler()
 	{ }
 
-	inline virtual ~SyncSourceHandler() 
+	inline virtual ~SyncSourceHandler()
 	{ }
 };
 
@@ -180,7 +183,7 @@ class __EXPORT ParticipantHandler
 {
 public:
 	inline void
-	setSDESItem(Participant* part, SDESItemType item, 
+	setSDESItem(Participant* part, SDESItemType item,
 		    const std::string& val)
 	{ part->setSDESItem(item,val); }
 
@@ -205,12 +208,12 @@ protected:
 class __EXPORT ApplicationHandler
 {
 public:
-	inline void 
+	inline void
 	addParticipant(RTPApplication& app, Participant& part)
 	{ app.addParticipant(part); }
-		
+
 	inline void
-	removeParticipant(RTPApplication& app, 
+	removeParticipant(RTPApplication& app,
 			  RTPApplication::ParticipantLink* pl)
 	{ app.removeParticipant(pl); }
 
@@ -230,10 +233,10 @@ protected:
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
 class __EXPORT ConflictHandler
-{ 
+{
 public:
 	struct ConflictingTransportAddress
-	{ 
+	{
 		ConflictingTransportAddress(InetAddress na,
 					    tpport_t dtp, tpport_t ctp);
 
@@ -256,7 +259,7 @@ public:
 		// arrival time of last data or control packet.
 		timeval lastPacketTime;
 	};
-	
+
 	/**
 	 * @param na Inet network address.
 	 * @param dtp Data transport port.
@@ -278,24 +281,24 @@ public:
 protected:
 	ConflictHandler()
 	{ firstConflict = lastConflict = NULL; }
-	
+
 	inline virtual ~ConflictHandler()
 	{ }
 
 	ConflictingTransportAddress* firstConflict, * lastConflict;
 };
 
-/** 
+/**
  * @class MembershipBookkeeping
- * @short Controls the group membership in the current session.  
+ * @short Controls the group membership in the current session.
  *
  * For now, this class implements only a hash table of members, but
  * its design and relation with other classes is intented to support
  * group membership sampling in case scalability problems arise.
  *
- * @author Federico Montesino Pouzols <fedemp@altern.org> 
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
  */
-class __EXPORT MembershipBookkeeping : 
+class __EXPORT MembershipBookkeeping :
 	public SyncSourceHandler,
 	public ParticipantHandler,
 	public ApplicationHandler,
@@ -353,11 +356,11 @@ protected:
 		IncomingRTPPktLink(IncomingRTPPkt* pkt, SyncSourceLink* sLink,
 				   struct timeval& recv_ts,
 				   uint32 shifted_ts,
-				   IncomingRTPPktLink* sp, 
+				   IncomingRTPPktLink* sp,
 				   IncomingRTPPktLink* sn,
 				   IncomingRTPPktLink* p,
 				   IncomingRTPPktLink* n) :
-			packet(pkt), 
+			packet(pkt),
 			sourceLink(sLink),
 			prev(p), next(n),
 			srcPrev(sp), srcNext(sn),
@@ -435,7 +438,7 @@ protected:
 		{ shiftedTimestamp = ts;}
 
 		// the packet this link refers to.
-		IncomingRTPPkt* packet;	
+		IncomingRTPPkt* packet;
 		// the synchronization source this packet comes from.
 		SyncSourceLink* sourceLink;
 		// global incoming packet queue links.
@@ -479,7 +482,7 @@ protected:
 			       SyncSourceLink* ns = NULL,
 			       SyncSourceLink* ncollis = NULL) :
 			membership(m), source(s), first(fp), last(lp),
-			prev(ps), next(ns), nextCollis(ncollis), 
+			prev(ps), next(ns), nextCollis(ncollis),
 			prevConflict(NULL)
 		{ m->setLink(*s,this); // record that the source is associated
 		  initStats();         // to this link.
@@ -490,9 +493,9 @@ protected:
 		 **/
 		~SyncSourceLink();
 
-		inline MembershipBookkeeping* getMembership() 
+		inline MembershipBookkeeping* getMembership()
 		{ return membership; }
-		
+
 		/**
 		 * Get the synchronization source object this link
 		 * objet holds information for.
@@ -527,7 +530,7 @@ protected:
 
 		inline void setPrev(SyncSourceLink* ps)
 		{ prev = ps; }
-		
+
 		/**
 		 * Get the link object for the next RTP source.
 		 **/
@@ -545,27 +548,27 @@ protected:
 		 **/
 		inline SyncSourceLink* getNextCollis()
 		{ return nextCollis; }
-		
+
 		inline void setNextCollis(SyncSourceLink* ns)
 		{ nextCollis = ns; }
 
 		inline ConflictingTransportAddress* getPrevConflict() const
 		{ return prevConflict; }
-		
+
 		/**
 		 * Get conflicting address.
 		 **/
 		void setPrevConflict(InetAddress& addr, tpport_t dataPort,
 				     tpport_t controlPort);
-		
+
 		unsigned char* getSenderInfo()
 		{ return senderInfo; }
-		
+
 		void setSenderInfo(unsigned char* si);
 
 		unsigned char* getReceiverInfo()
 		{ return receiverInfo; }
-		
+
 		void setReceiverInfo(unsigned char* ri);
 
 		inline timeval getLastPacketTime() const
@@ -583,7 +586,7 @@ protected:
 		 */
 		inline uint32 getObservedPacketCount() const
 		{ return obsPacketCount; }
-		
+
 		inline void incObservedPacketCount()
 		{ obsPacketCount++; }
 
@@ -634,7 +637,7 @@ protected:
 
 		inline uint32 getLastPacketTransitTime()
 		{ return lastPacketTransitTime; }
-		
+
 		inline void setLastPacketTransitTime(uint32 time)
 		{ lastPacketTransitTime = time; }
 
@@ -644,10 +647,10 @@ protected:
 		inline void setJitter(float j)
 		{ jitter = j; }
 
-		inline uint32 getInitialDataTimestamp() const 
+		inline uint32 getInitialDataTimestamp() const
 		{ return initialDataTimestamp; }
 
-		inline void setInitialDataTimestamp(uint32 ts) 
+		inline void setInitialDataTimestamp(uint32 ts)
 		{ initialDataTimestamp = ts; }
 
 		inline timeval getInitialDataTime() const
@@ -655,7 +658,7 @@ protected:
 
 		inline void setInitialDataTime(timeval it)
 		{ initialDataTime = it; }
-		
+
 		/**
 		 * Mark this source as having sent a BYE control packet.
 		 *
@@ -670,7 +673,7 @@ protected:
 			flag = false;
 			return true;
 		}
-		
+
 		/**
 		 * Mark this source as having sent some packet.
 		 *
@@ -686,7 +689,7 @@ protected:
 
 		inline uint32 getBadSeqNum() const
 		{ return badSeqNum; }
-		
+
 		inline void setBadSeqNum(uint32 seq)
 		{ badSeqNum = seq; }
 
@@ -716,7 +719,7 @@ protected:
 		 **/
 		inline void initSequence(uint16 seqnum)
 		{ maxSeqNum = seqNumAccum = seqnum; }
-		
+
 		/**
 		 * Record the insertion of an RTP packet from this
 		 * source into the scheduled reception queue. All
@@ -739,16 +742,16 @@ protected:
 
 		MembershipBookkeeping* membership;
 		// The source this link object refers to.
-		SyncSource* source;		
+		SyncSource* source;
 		// first/last packets from this source in the queue.
-		IncomingRTPPktLink* first, * last; 
+		IncomingRTPPktLink* first, * last;
 		// Links for synchronization sources located before
 		// and after this one in the list of sources.
 		SyncSourceLink* prev, * next;
 		// Prev and next inside the hash table collision list.
 		SyncSourceLink* nextCollis;
 		ConflictingTransportAddress* prevConflict;
-		unsigned char* senderInfo; 
+		unsigned char* senderInfo;
 		unsigned char* receiverInfo;
 		// time the last RTP packet from this source was
 		// received at.
@@ -799,7 +802,7 @@ protected:
 	/**
 	 * Get the description of a source by its <code>ssrc</code> identifier.
 	 *
-	 * @param ssrc SSRC identifier, in host order. 
+	 * @param ssrc SSRC identifier, in host order.
 	 * @param created whether a new source has been created.
 	 * @return Pointer to the SyncSource object identified by
 	 * <code>ssrc</code>.
@@ -825,7 +828,7 @@ protected:
 	 * <code>ssrc</code>
 	 *
 	 * @return whether the source has been actually removed or it
-	 * did not exist.  
+	 * did not exist.
 	 */
 	bool
 	removeSource(uint32 ssrc);
@@ -856,16 +859,16 @@ private:
 
 	MembershipBookkeeping&
 	operator=(const MembershipBookkeeping &o);
-	
+
 	/**
 	 * Purge all RTPSource structures, the hash table and the list
 	 * of sources.
 	 **/
 	void
 	endMembers();
-	
+
 	// Hash table with sources of RTP and RTCP packets
-	uint32 sourceBucketsNum; 
+	uint32 sourceBucketsNum;
 	SyncSourceLink** sourceLinks;
 	// List of sources, ordered from older to newer
 	SyncSourceLink* first, * last;
@@ -875,7 +878,7 @@ private:
  * @class IncomingDataQueue
  * @short Queue for incoming RTP data packets in an RTP session.
  *
- * @author Federico Montesino Pouzols <fedemp@altern.org> 
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
 class __EXPORT IncomingDataQueue: public IncomingDataQueueBase,
 	protected MembershipBookkeeping
@@ -894,11 +897,11 @@ public:
 		typedef ptrdiff_t difference_type;
 		typedef const SyncSource* pointer;
 		typedef const SyncSource& reference;
-		
+
 		SyncSourcesIterator(SyncSourceLink* l = NULL) :
 			link(l)
 		{ }
-		
+
 		SyncSourcesIterator(const SyncSourcesIterator& si) :
 			link(si.link)
 		{ }
@@ -934,7 +937,7 @@ public:
 
 	SyncSourcesIterator begin()
 	{ return SyncSourcesIterator(MembershipBookkeeping::getFirst()); }
-	
+
 	SyncSourcesIterator end()
 	{ return SyncSourcesIterator(NULL); }
 
@@ -965,9 +968,9 @@ public:
 	 * @param src optional source selector.
  	 * @return timestamp of first arrival packet.
  	 **/
- 	uint32 
+ 	uint32
 	getFirstTimestamp(const SyncSource* src = NULL) const;
- 
+
 	/**
 	 * When receiving packets from a new source, it may be
 	 * convenient to reject a first few packets before we are
@@ -1006,15 +1009,15 @@ public:
 	getMinValidPacketSequence() const
 	{ return minValidPacketSequence; }
 
-	void 
+	void
 	setMaxPacketMisorder(uint16 packets)
 	{ maxPacketMisorder = packets; }
-	
-	uint16 
+
+	uint16
 	getDefaultMaxPacketMisorder() const
 	{ return defaultMaxPacketMisorder; }
 
-	uint16 
+	uint16
 	getMaxPacketMisorder() const
 	{ return maxPacketMisorder; }
 
@@ -1041,6 +1044,27 @@ public:
         getDefaultMembersSize()
         { return defaultMembersSize; }
 
+        /**
+         * Set input queue CryptoContext.
+         *
+         * The endQueue method (provided by RTPQueue) also deletes all
+         * registered CryptoContexts.
+         *
+         * @param cc Pointer to initialized CryptoContext to set.
+         */
+        void
+        setInQueueCryptoContext(CryptoContext* cc);
+
+        /**
+         * Get a input queue CryptoContext identified by SSRC
+         *
+         * @param ssrc Request CryptoContext for this incoming SSRC
+         * @return Pointer to CryptoContext of the SSRC of NULL if no context
+         * available for this SSRC.
+         */
+        CryptoContext*
+        getInQueueCryptoContext(uint32 ssrc);
+
 protected:
 	/**
 	 * @param size initial size of the membership table.
@@ -1062,19 +1086,19 @@ protected:
 	 *
 	 * @return whether the packet must not be discarded.
 	 **/
-	bool checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink, 
-				       bool is_new, InetAddress& na, 
+	bool checkSSRCInIncomingRTPPkt(SyncSourceLink& sourceLink,
+				       bool is_new, InetAddress& na,
 				       tpport_t tp);
 
 	/**
 	 * Set the number of RTCP intervals that the stack will wait
 	 * to change the state of a source from stateActive to
 	 * stateInactive, or to delete the source after being in
-	 * stateInactive. 
+	 * stateInactive.
 	 *
 	 * Note that this value should be uniform accross all
 	 * participants and SHOULD be fixed for a particular profile.
-	 * 
+	 *
 	 * @param intervals number of RTCP report intervals
 	 *
 	 * @note If RTCP is not being used, the RTCP interval is
@@ -1090,7 +1114,7 @@ protected:
 	 *
 	 * @return number of payload bytes received.  <0 if error.
 	 */
-	size_t
+	virtual size_t
 	takeInDataPacket();
 
 	void renewLocalSSRC();
@@ -1132,9 +1156,9 @@ protected:
 	 *
 	 * @param pkt Packet extracted from the queue.
 	 **/
-	void 
+	void
 	recordExtraction(const IncomingRTPPkt& pkt);
-	
+
 	void purgeIncomingQueue();
 
 	/**
@@ -1151,7 +1175,7 @@ protected:
 	/**
 	 * A virtual function to support parsing of arriving packets
 	 * to determine if they should be kept in the queue and to
-	 * dispatch events. 
+	 * dispatch events.
 	 *
 	 * A generic header validity check (as specified in RFC 1889)
 	 * is performed on every incoming packet. If the generic check
@@ -1167,22 +1191,22 @@ protected:
 	inline virtual bool
 	onRTPPacketRecv(IncomingRTPPkt&)
 	{ return true; }
-	
+
 	/**
 	 * A hook to filter packets in the receive queue that are being
 	 * expired. This hook may be used to do some application
 	 * specific processing on expired packets before they are
 	 * deleted.
-	 * 
+	 *
 	 * @param - packet expired from the recv queue.
 	 **/
 	inline virtual void onExpireRecv(IncomingRTPPkt&)
 	{ return; }
-	
+
 	inline virtual bool
 	end2EndDelayed(IncomingRTPPktLink&)
 	{ return false; }
-	
+
        	/**
 	 * Insert a just received packet in the queue (both general
 	 * and source specific queues). If the packet was already in
@@ -1213,7 +1237,7 @@ protected:
 	 * @param port number of source.
 	 **/
 	virtual size_t
-	recvData(unsigned char* buffer, size_t length, 
+	recvData(unsigned char* buffer, size_t length,
 		 InetHostAddress& host, tpport_t& port) = 0;
 
 	virtual size_t
@@ -1231,7 +1255,8 @@ protected:
 	uint16 maxPacketDropout;
 	static const size_t defaultMembersSize;
 	uint8 sourceExpirationPeriod;
-};	
+        std::list<CryptoContext *> cryptoContexts;
+};
 
 /** @}*/ // iqueue
 

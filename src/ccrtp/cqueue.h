@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -35,8 +35,8 @@
 // If you do not wish that, delete this exception notice.
 //
 
-/** 
- * @file cqueue.h 
+/**
+ * @file cqueue.h
  *
  * @short Generic RTCP control queues.
  **/
@@ -63,12 +63,12 @@ namespace ost {
  * Extends an RTP data i/o queue adding management of RTCP functions:
  *
  * Provide feedback on the quality of the data distribution.
- * 
+ *
  * Convey the CNAME (persistent transport-level identifier) for every
  * RTP source.
- * 
+ *
  * Control the sending rate of RTCP packets
- * 
+ *
  * Convey minimal control information about the participants
  *
  * This class implements generic RTCP behaviour (as specified in RFC
@@ -77,7 +77,7 @@ namespace ost {
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class __EXPORT QueueRTCPManager : public RTPDataQueue, 
+class __EXPORT QueueRTCPManager : public RTPDataQueue,
 	protected RTCPCompoundHandler
 {
 public:
@@ -142,16 +142,16 @@ public:
 	{ return end2EndDelay; }
 
 	/**
-	 * Specify the fraction of the total control bandwith to be 
-	 * dedicated to senders reports.  
+	 * Specify the fraction of the total control bandwith to be
+	 * dedicated to senders reports.
 	 *
-	 * @param fraction fraction of bandwidth, must be between 0 an 1. 
-	 * 
+	 * @param fraction fraction of bandwidth, must be between 0 an 1.
+	 *
 	 * This method sets the fraction of the global control
 	 * bandwidth that will be dedicated to senders reports. Of
 	 * course, <code>1 - fraction</code> will be dedicated to
 	 * receivers reports.
-	 * 
+	 *
 	 * @see setControlBandwidth
 	 */
 	inline void
@@ -179,14 +179,14 @@ public:
 	{ return ctrlSendCount; }
 
 protected:
-	QueueRTCPManager(uint32 size = RTPDataQueue::defaultMembersHashSize, 
+	QueueRTCPManager(uint32 size = RTPDataQueue::defaultMembersHashSize,
 			 RTPApplication& app = defaultApplication());
 
 	QueueRTCPManager(uint32 ssrc,
-			 uint32 size = RTPDataQueue::defaultMembersHashSize, 
+			 uint32 size = RTPDataQueue::defaultMembersHashSize,
 			 RTPApplication& app = defaultApplication());
 
-	virtual 
+	virtual
 	~QueueRTCPManager();
 
 	const RTPApplication&
@@ -196,8 +196,8 @@ protected:
 	inline void
 	setControlBandwidth(float fraction)
 	{ controlBwFract = fraction; }
-	
-	float 
+
+	float
 	getControlBandwidth() const
 	{ return controlBwFract; }
 
@@ -205,14 +205,14 @@ protected:
 	 * Build and send RTCP packets following timing rules
 	 * (including the "timer reconsideration" algorithm).
 	 **/
-	void 
+	void
 	controlTransmissionService();
 
 	/**
 	 * Process incoming RTCP packets pending in the control
 	 * reception socket.
 	 **/
-	void 
+	void
 	controlReceptionService();
 
 	/**
@@ -245,7 +245,7 @@ protected:
 	 **/
 	virtual void
 	onGotSR(SyncSource& source, SendReport& SR, uint8 blocks);
-	
+
 	/**
 	 * Plug-in for processing (acquire information carried in) an
 	 * incoming RTCP Receiver Report. The default implementation
@@ -258,11 +258,11 @@ protected:
 	 **/
 	virtual void
 	onGotRR(SyncSource& source, RecvReport& RR, uint8 blocks);
-	
+
 	/**
 	 * @param source Synchronization source of SDES RTCP packet.
 	 * @param pkt SDES RTCP packet received.
-	 **/		
+	 **/
 	bool
 	onGotSDES(SyncSource& source, RTCPPacket& pkt);
 
@@ -303,7 +303,7 @@ protected:
 	uint32
 	getLastSendPacketCount() const
 	{ return lastSendPacketCount; }
-	
+
 	/**
 	 * @param n Number of members.
 	 **/
@@ -311,7 +311,7 @@ protected:
 	setPrevMembersNum(uint32 n)
 	{ reconsInfo.rtcpPMembers = n; };
 
-	inline uint32 
+	inline uint32
 	getPrevMembersCount() const
 	{ return reconsInfo.rtcpPMembers; };
 
@@ -341,10 +341,10 @@ protected:
 
 private:
 	QueueRTCPManager(const QueueRTCPManager &o);
-	
+
 	QueueRTCPManager&
 	operator=(const QueueRTCPManager &o);
-	
+
 	/**
 	 * Posting of RTCP messages.
 	 *
@@ -362,7 +362,7 @@ private:
 	 * This method decomposes all incoming RTCP compound packets
 	 * pending in the control socket and processes each RTCP
 	 * packet.
-	 * 
+	 *
 	 **/
 	void
 	takeInControlPacket();
@@ -380,7 +380,7 @@ private:
 	 *
 	 * @return interval for sending RTCP compound packets
 	 **/
-	virtual timeval 
+	virtual timeval
 	computeRTCPInterval();
 
 	/**
@@ -394,7 +394,7 @@ private:
 	scheduleSDESItem();
 
 	/**
-	 * Plug-in for SSRC collision handling. 
+	 * Plug-in for SSRC collision handling.
 	 *
 	 * @param - previously identified source.
 	 **/
@@ -436,10 +436,10 @@ private:
 	/**
 	 * Process a BYE packet just received and identified.
 	 *
-	 * @param pkt previously identified RTCP BYE packet 
+	 * @param pkt previously identified RTCP BYE packet
 	 * @param pointer octet number in the RTCP reception buffer
-	 *        where the packet is stored 
-	 * @param len total length of the compount RTCP packet the BYE 
+	 *        where the packet is stored
+	 * @param len total length of the compount RTCP packet the BYE
 	 *        packet to process is contained
 	 *
 	 * @bug if the bye packet contains several SSRCs,
@@ -453,7 +453,7 @@ private:
 	 **/
 	uint8
 	packReportBlocks(RRBlock* blocks, uint16& len, uint16& available);
-	
+
 	/**
 	 * Builds an SDES RTCP packet. Each chunk is built following
 	 * appendix A.4 in draft-ietf-avt-rtp-new.
@@ -462,7 +462,7 @@ private:
 	 *
 	 * @return
 	 **/
-	void 
+	void
 	packSDES(uint16& len);
 
 	/**
@@ -478,18 +478,18 @@ private:
 	 **/
 	void
 	updateAvgRTCPSize(size_t len);
-	
+
 	/**
 	 * Apply reverse reconsideration adjustment to timing
 	 * parameters when receiving BYE packets and not waiting to
-	 * send a BYE. 
+	 * send a BYE.
 	 **/
 	void
 	reverseReconsideration();
-	
+
 	bool
 	timerReconsideration();
-	
+
 	/**
 	 * Purge sources that do not seem active any more.
 	 *
@@ -498,9 +498,9 @@ private:
 	 * @todo implement it. It may be dangerous and anyway should
 	 * be optional.
 	 **/
-	void 
+	void
 	expireSSRCs();
-	
+
 	/**
 	 * To be executed when whe are leaving the session.
 	 **/
@@ -511,7 +511,7 @@ private:
 	 * Set item value from a string without null termination (as
 	 * it is transported in RTCP packets).
 	 **/
-	void 
+	void
 	setSDESItem(Participant* part, SDESItemType type,
 		    const char* const value, size_t len);
 
@@ -519,9 +519,9 @@ private:
 	 * Set PRIV item previx value from a string without null
 	 * termination (as it is transported in RTCP packets).
 	 **/
-	void 
+	void
 	setPRIVPrefix(Participant* part, const char* const value, size_t len);
-	
+
 	/**
 	 * For certain control calculations in RTCP, the size of the
 	 * underlying network and transport protocols is needed. This
@@ -531,7 +531,7 @@ private:
 	 * redefined in a new specialized class.
 	 *
 	 * @return size of the headers of the network level. IP (20) by
-	 *        default. 
+	 *        default.
 	 **/
 	inline virtual uint16
 	networkHeaderSize()
@@ -546,7 +546,7 @@ private:
 	 * redefined in a new specialized class.
 	 *
 	 * return size of the headers of the transport level. UDP (8)
-	 *        by default 
+	 *        by default
 	 **/
 	inline virtual uint16
 	transportHeaderSize()
@@ -554,17 +554,17 @@ private:
 
 	SDESItemType
 	nextSDESType(SDESItemType t);
-	
+
 	virtual size_t
 	sendControl(const unsigned char* const buffer, size_t len) = 0;
 
-	virtual size_t 
+	virtual size_t
 	recvControl(unsigned char* buffer, size_t len,
 		    InetHostAddress& na, tpport_t& tp) = 0;
 
-	virtual bool 
+	virtual bool
 	isPendingControl(microtimeout_t timeout) = 0;
-	
+
 	// whether the RTCP service is active
 	volatile bool controlServiceActive;
 	float controlBwFract, sendControlBwFract, recvControlBwFract;
@@ -600,7 +600,7 @@ private:
 	// number of RTP data packets sent at the time of the last
 	// RTCP packet transmission.
 	uint32 lastSendPacketCount;
-	
+
 	// minimum interval for transmission of RTCP packets. The
 	// result of computeRTCPInterval will always be >= (times a
 	// random number between 0.5 and 1.5).
@@ -638,22 +638,22 @@ public:
 	 *
 	 * @param fraction fraction of the session bandwidth, between
 	 * 0 and 1
-	 * 
+	 *
 	 * @note If this method is not called, it is assumed that the
 	 * control bandwidth is equal to 5% of the session
 	 * bandwidth. Note also that the RFC RECOMMENDS the 5%.
-	 * 
+	 *
 	 **/
 	inline void
 	setControlBandwidth(float fraction)
 	{ QueueRTCPManager::setControlBandwidth(fraction); }
-	
-	float 
+
+	float
 	getControlBandwidth() const
 	{ return QueueRTCPManager::getControlBandwidth(); }
-	
-protected: 
-	AVPQueue(uint32 size = RTPDataQueue::defaultMembersHashSize, 
+
+protected:
+	AVPQueue(uint32 size = RTPDataQueue::defaultMembersHashSize,
 		 RTPApplication& app = defaultApplication()) :
 		QueueRTCPManager(size,app)
 	{ }
@@ -661,12 +661,12 @@ protected:
 	/**
 	 * Local SSRC is given instead of computed by the queue.
 	 **/
-	AVPQueue(uint32 ssrc, uint32 size = 
-		 RTPDataQueue::defaultMembersHashSize, 
-		 RTPApplication& app = defaultApplication()) : 
-		QueueRTCPManager(ssrc,size,app)
+	AVPQueue(uint32 ssrc, uint32 size =
+		 RTPDataQueue::defaultMembersHashSize,
+		 RTPApplication& app = defaultApplication()) :
+ 		QueueRTCPManager(ssrc,size,app)
 	{ }
-	inline virtual ~AVPQueue() 
+	inline virtual ~AVPQueue()
 	{ }
 };
 

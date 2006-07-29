@@ -1,27 +1,27 @@
 // Copyright (C) 2002 Federico Montesino Pouzols <fedemp@altern.org>.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -40,13 +40,14 @@
 
 #include <ccrtp/base.h>
 #include <ccrtp/formats.h>
+#include <ccrtp/CryptoContext.h>
 
 #ifdef CCXX_NAMESPACES
 namespace ost {
 #endif
 
-/** 
- * @file rtppkt.h 
+/**
+ * @file rtppkt.h
  *
  * @short RTP packets handling.
  **/
@@ -68,12 +69,15 @@ namespace ost {
  *
  * @author David Sugar <dyfet@ostel.com>
  **/
+
+class CryptoContext;
+
 class  __EXPORT RTPPacket
 {
 private:
 	struct RTPFixedHeader;
 	struct RTPHeaderExt;
-		
+
 public:
 	/**
 	 * Constructor, construct a packet object given the memory
@@ -81,13 +85,13 @@ public:
 	 * used to build RTPPacket objects from incoming data.
 	 *
 	 * @param block whole packet
-	 * @param len total length (header + payload + padding) of the 
-	 *        packet 
+	 * @param len total length (header + payload + padding) of the
+	 *        packet
 	 * @param duplicate whether to memcopy the packet. At present,
 	 *        this feature is not used.
-	 * @note used in IncomingRTPPkt. 
+	 * @note used in IncomingRTPPkt.
 	 **/
-	RTPPacket(const unsigned char* const block, size_t len, 
+	RTPPacket(const unsigned char* const block, size_t len,
 		  bool duplicate = false);
 
 	/**
@@ -101,7 +105,7 @@ public:
 	 * @param paddinglen pad packet to a multiple of paddinglen
 	 * @note used in OutgoingRTPPkt.
 	 */
-	RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen);
+        RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen, CryptoContext* pcc= NULL);
 
 	/**
 	 * Get the length of the header, including contributing
@@ -112,28 +116,28 @@ public:
 	inline uint32
 	getHeaderSize() const
 	{ return hdrSize; }
-		
+
 	/**
 	 * @return pointer to the payload section of the packet.
 	 **/
 	inline const uint8* const
 	getPayload() const
 	{ return (uint8*)(buffer + getHeaderSize()); }
-		
+
 	/**
 	 * @return length of the payload section, in octets.
 	 **/
 	inline uint32
 	getPayloadSize() const
 	{ return payloadSize; }
-		
+
 	/**
 	 * @return value of the PT header field.
 	 **/
 	inline PayloadType
 	getPayloadType() const
 	{ return static_cast<PayloadType>(getHeader()->payload); }
-		
+
 	/**
 	 * @return value of the sequence number header field, in host order.
 	 **/
@@ -141,9 +145,9 @@ public:
 	getSeqNum() const
 	{ return cachedSeqNum; }
 
-	/** 
+	/**
 	 * @return packet timestamp in host order.
-	 **/ 
+	 **/
 	inline uint32
 	getTimestamp() const
 	{ return cachedTimestamp; }
@@ -162,7 +166,7 @@ public:
 	inline bool
 	isPadded() const
 	{ return getHeader()->padding; }
-		
+
 	/**
 	 * Get the number of octets padding the end of the payload
 	 * section.
@@ -182,7 +186,7 @@ public:
 	inline bool
 	isMarked() const
 	{ return getHeader()->marker; }
-		
+
 	/**
 	 * Ask whether the packet contains header extensions.
 	 *
@@ -199,7 +203,7 @@ public:
 	inline uint16
 	getCSRCsCount() const
 	{ return getHeader()->cc; }
-		
+
 	/**
 	 * Get the 32-bit identifiers of the contributing sources for
 	 * the packet as an array, of length getCSRCsCount().
@@ -210,7 +214,7 @@ public:
 	inline const uint32*
 	getCSRCs() const
 	{ return static_cast<const uint32*>(&(getHeader()->sources[1])); }
-		
+
 	/**
 	 * Get the first 16 bits (in network order) of the header of
 	 * the RTP header extension. Its meaning is undefined at this
@@ -218,10 +222,10 @@ public:
 	 *
 	 * @return 0 if the packet has no header extension, otherwise
 	 *         the first 16 bits of the header extension, in
-	 *         network order. 
-	 * 
+	 *         network order.
+	 *
 	 * @note 0 could be a valid value for the first 16 bits, in
-	 *         that case RTPPacket::isExtended() should be use. 
+	 *         that case RTPPacket::isExtended() should be use.
 	 **/
 	inline uint16
 	getHdrExtUndefined() const
@@ -233,27 +237,27 @@ public:
 	 * the four octets at the beginning of the header extension.
 	 *
 	 * @return 0 if the packet has no header extension, otherwise
-	 *         the length.  
+	 *         the length.
 	 *
 	 * @note 0 is a valid value for this field, so
 	 *       RTPPacket::isExtended() should be used.
 	 **/
 	inline uint32
 	getHdrExtSize() const
-	{ return (isExtended()? 
-		  (static_cast<uint32>(getHeaderExt()->length) << 2) : 
+	{ return (isExtended()?
+		  (static_cast<uint32>(getHeaderExt()->length) << 2) :
 		  0); }
 
 	/**
-	 * Get the content of the header extension. 
+	 * Get the content of the header extension.
 	 *
 	 * @return NULL if the packet has no header extension, otherwise
-	 *         a pointer to the packet header extension content.  
+	 *         a pointer to the packet header extension content.
 	 **/
 	inline const unsigned char*
 	getHdrExtContent() const
-	{ return (isExtended() ? 
-		  (reinterpret_cast<const unsigned char*>(getHeaderExt()) + 
+	{ return (isExtended() ?
+		  (reinterpret_cast<const unsigned char*>(getHeaderExt()) +
 		   sizeof(RTPHeaderExt)) :
 		  NULL); }
 
@@ -266,7 +270,7 @@ public:
 	inline const unsigned char* const
 	getRawPacket() const
 	{ return buffer; }
-		
+
 	/**
 	 * Get the raw packet length, including header, extension,
 	 * payload and padding.
@@ -277,21 +281,25 @@ public:
 	getRawPacketSize() const
 	{ return total; };
 
-	inline size_t
+        inline uint32
+        getRawPacketSizeSrtp() const
+        { return total + srtpLength; };
+
+        inline size_t
 	getSizeOfFixedHeader() const
 	{ return sizeof(RTPFixedHeader); }
 
-protected:		
+protected:
 	/**
 	 * Destructor, free the buffer provided in the constructor.
 	 **/
 	inline virtual ~RTPPacket()
 	{ endPacket(); };
-		
+
 	/**
 	 * Free memory allocated for the packet.
 	 **/
-	void 
+	void
 	endPacket();
 
 	/**
@@ -302,7 +310,7 @@ protected:
 	inline RTPFixedHeader*
 	getHeader() const
 	{ return reinterpret_cast<RTPFixedHeader*>(buffer); }
-		
+
 	inline void
 	setExtension(bool e)
 	{ getHeader()->extension = e; }
@@ -310,14 +318,14 @@ protected:
 	/**
 	 * Get a pointer to RTPHeaderExt pointing after the RTP header
 	 * (fixed part plus contributing sources). No check for
-	 * for the X bit is done. 
-	 * 
+	 * for the X bit is done.
+	 *
 	 * @return header extension if present, garbage if not.
 	 **/
 	inline const RTPHeaderExt*
 	getHeaderExt() const
 	{
-         uint32 fixsize = sizeof(RTPFixedHeader) + (getHeader()->cc << 2); 
+         uint32 fixsize = sizeof(RTPFixedHeader) + (getHeader()->cc << 2);
 	 return (reinterpret_cast<RTPHeaderExt*>(buffer + fixsize));
 	}
 
@@ -330,7 +338,7 @@ protected:
 	getRawTimestamp() const
 	{ return ntohl(getHeader()->timestamp); };
 
-	inline void 
+	inline void
 	setbuffer(const void* src, size_t len, size_t pos)
 	{ memcpy(buffer + pos,src,len); }
 
@@ -339,15 +347,32 @@ protected:
 	/// Packet timestamp in host order (includes initial shift).
 	uint32 cachedTimestamp;
 
+        /**
+         * Offset into packet memory pointing to area for SRTP data.
+         *
+         * This offset points to the memory where the SRTP protect will
+         * store the authentication and MKI data.
+         */
+        uint32 srtpDataOffset;
+
+        /**
+         * Lebgth of additional SRTP data.
+         *
+         * Covers the SRTP authentication and MKI data.
+         */
+        int32 srtpLength;
+
+        /// total length, including header, payload and padding
+        uint32 total;
+
+        /// note: payload (not full packet) size.
+        uint32 payloadSize;
+
 private:
 	/// packet in memory
 	unsigned char* buffer;
 	/// size of the header, including contributing sources and extensions
 	uint32 hdrSize;
-	/// note: payload (not full packet) size.
-	uint32 payloadSize;
-	/// total length, including header, payload and padding
-	uint32 total;
 	/// whether the object was contructed with duplicated = true
 	bool duplicated;
 
@@ -357,7 +382,7 @@ private:
 	/**
 	 * @struct RTPFixedHeader
 	 * @short RTP fixed header as it is send through the network.
-	 * 
+	 *
 	 * A low-level representation for generic RTP packet header as
 	 * defined in RFC 1889. A packet consists of the fixed RTP
 	 * header, a possibly empty list of contributing sources and
@@ -371,12 +396,12 @@ private:
 		unsigned char version:2;       ///< Version, currently 2
 		unsigned char padding:1;       ///< Padding bit
 		unsigned char extension:1;     ///< Extension bit
-		unsigned char cc:4;            ///< CSRC count 
+		unsigned char cc:4;            ///< CSRC count
 		unsigned char marker:1;        ///< Marker bit
 		unsigned char payload:7;       ///< Payload type
 #else
 		/// For little endian boxes
-		unsigned char cc:4;            ///< CSRC count 
+		unsigned char cc:4;            ///< CSRC count
 		unsigned char extension:1;     ///< Extension bit
 		unsigned char padding:1;       ///< Padding bit
 		unsigned char version:2;       ///< Version, currently 2
@@ -409,12 +434,12 @@ public:
         	uint8 event : 8;
         	uint8 vol : 6;
         	bool rbit : 1;
-        	bool ebit : 1; 
+        	bool ebit : 1;
         	uint16 duration : 16;
 #endif
-	};	
+	};
 
-private:	
+private:
 	/**
 	 * @struct RTPHeaderExt
 	 *
@@ -424,7 +449,7 @@ private:
 	 **/
 	struct RTPHeaderExt
 	{
-		uint16 undefined; ///< to be defined 
+		uint16 undefined; ///< to be defined
 		uint16 length;    ///< number of 32-bit words in the extension
 	};
 #ifdef	CCXX_PACKED
@@ -467,7 +492,7 @@ public:
  * are inserted into the sending queue, so that they are processed in
  * a understandable and format independent manner inside the stack.
  *
- * @author Federico Montesino Pouzols <fedemp@altern.org> 
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
 class __EXPORT OutgoingRTPPkt : public RTPPacket
 {
@@ -475,8 +500,13 @@ public:
 	/**
 	 * Construct a new packet to be sent, containing several
 	 * contributing source identifiers, header extensions and
-	 * payload. A new copy in memory (holding all this components
-	 * along with the fixed header) is created.
+	 * payload.
+         *
+         * A new copy in memory (holding all this components
+	 * along with the fixed header) is created. If the pointer
+         * to the SRTP CryptoContext is not NULL and holds a CryptoContext
+         * for the SSRC take the SSRC data into account when computing
+         * the required memory buffer.
 	 *
 	 * @param csrcs array of countributing source 32-bit
 	 *        identifiers, in host order.
@@ -486,21 +516,28 @@ public:
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
 	 * @param paddinglen pad packet to a multiple of paddinglen.
+         * @param pcc Pointer to the SRTP CryptoContext, defaults to NULL
+         * if not specified.
 	 *
 	 * @note For efficiency purposes, since this constructor is
 	 * valid for all packets but is too complex for the common
 	 * case, two simpler others are provided.
 	 **/
-	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
+	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc,
 		       const unsigned char* const hdrext, uint32 hdrextlen,
 		       const unsigned char* const data, size_t datalen,
-		       uint8 paddinglen);
+                       uint8 paddinglen= 0, CryptoContext* pcc= NULL);
 
 	/**
 	 * Construct a new packet to be sent, containing several
-	 * contributing source identifiers and payload. A new copy in
+	 * contributing source identifiers and payload.
+         *
+         * A new copy in
 	 * memory (holding all this components along with the fixed
-	 * header) is created.
+         * header) is created. If the pointer
+         * to the SRTP CryptoContext is not NULL and holds a CryptoContext
+         * for the SSRC take the SSRC data into account when computing
+         * the required memory buffer.
 	 *
 	 * @param csrcs array of countributing source 32-bit
 	 * identifiers, in host order.
@@ -508,22 +545,31 @@ public:
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
 	 * @param paddinglen pad packet to a multiple of paddinglen.
-	 **/
-	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc, 
+         * @param pcc Pointer to the SRTP CryptoContext, defaults to NULL
+         * if not specified.
+         **/
+	OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc,
 		       const unsigned char* const data, size_t datalen,
-		       uint8 paddinglen);
-		
+                       uint8 paddinglen= 0, CryptoContext* pcc= NULL);
+
 	/**
 	 * Construct a new packet (fast variant, with no contributing
-	 * sources and no header extension) to be sent. A new copy in
-	 * memory (holding the whole packet) is created.
+	 * sources and no header extension) to be sent.
+         *
+         * A new copy in
+         * memory (holding the whole packet) is created. If the pointer
+         * to the SRTP CryptoContext is not NULL and holds a CryptoContext
+         * for the SSRC take the SSRC data into account when computing
+         * the required memory buffer.
 	 *
 	 * @param data payload.
 	 * @param datalen payload length, in octets.
 	 * @param paddinglen pad packet to a multiple of paddinglen.
-	 **/
-	OutgoingRTPPkt(const unsigned char* const data, size_t datalen, 
-		       uint8 paddinglen);
+         * @param pcc Pointer to the SRTP CryptoContext, defaults to NULL
+         * if not specified.
+         **/
+	OutgoingRTPPkt(const unsigned char* const data, size_t datalen,
+                       uint8 paddinglen= 0, CryptoContext* pcc= NULL);
 
 	~OutgoingRTPPkt()
 	{ }
@@ -534,15 +580,20 @@ public:
 	inline void
 	setPayloadType(PayloadType pt)
 	{ getHeader()->payload = pt; };
-		
+
 	/**
+         * Sets the sequence number in the header.
+         *
+         * After the sequence number is set call the protect method to
+         * perform SRTP protection of the data if required.
+         *
 	 * @param seq Packet sequence number, in host order.
 	 **/
 	inline void
 	setSeqNum(uint16 seq)
 	{
 		cachedSeqNum = seq;
-		getHeader()->sequence = htons(seq); 
+		getHeader()->sequence = htons(seq);
 	}
 
 	/**
@@ -550,8 +601,8 @@ public:
 	 **/
 	inline void
 	setTimestamp(uint32 pts)
-	{ 
-		cachedTimestamp = pts; 
+	{
+		cachedTimestamp = pts;
 		getHeader()->timestamp = htonl(pts);
 	}
 
@@ -561,7 +612,7 @@ public:
 	 * @param ssrc 32-bit Synchronization SouRCe numeric
 	 * identifier, in host order.
 	 **/
-	inline void 
+	inline void
 	setSSRC(uint32 ssrc) const
 	{ getHeader()->sources[0] = htonl(ssrc); }
 
@@ -575,7 +626,7 @@ public:
 	inline void
 	setSSRCNetwork(uint32 ssrc) const
 	{ getHeader()->sources[0] = ssrc; }
-	
+
 	/**
 	 * Specify the value of the marker bit. By default, the marker
 	 * bit of outgoing packets is false/0. This method allows to
@@ -587,10 +638,18 @@ public:
 	setMarker(bool mark)
 	{ getHeader()->marker = mark; }
 
+        /**
+         * Called packet is setup and cContext is not NULL.
+         *
+         * This private method computes the SRTP data and stores it in the
+         * packet. Then encrypt the payload data (ex padding).
+         */
+        void protect(uint32 ssrc);
+
 	/**
 	 * Outgoing packets are equal if their sequence numbers match.
 	 **/
-	inline bool 
+	inline bool
 	operator==(const OutgoingRTPPkt &p) const
 	{ return ( this->getSeqNum() == p.getSeqNum() ); }
 
@@ -604,13 +663,13 @@ public:
 private:
 	/**
 	 * Copy constructor from objects of its same kind, declared
-	 * private to avoid its use.  
+	 * private to avoid its use.
 	 **/
 	OutgoingRTPPkt(const OutgoingRTPPkt &o);
-	
+
 	/**
 	 * Assignment operator from objects of its same kind, declared
-	 * private to avoid its use.  
+	 * private to avoid its use.
 	 **/
 	OutgoingRTPPkt&
 	operator=(const OutgoingRTPPkt &o);
@@ -618,8 +677,11 @@ private:
 	/**
 	 * Set the list of CSRC identifiers in an RTP packet,
 	 * switching host to network order.
-	 **/
+	 */
 	void setCSRCArray(const uint32* const csrcs, uint16 numcsrc);
+
+        CryptoContext* cContext;
+
 };
 
 /**
@@ -632,7 +694,7 @@ private:
  * processed in an understandable and format independent manner inside
  * the stack.
  *
- * @author Federico Montesino Pouzols <fedemp@altern.org> 
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
  */
 class __EXPORT IncomingRTPPkt : public RTPPacket
 {
@@ -669,17 +731,27 @@ public:
 	 * @return 32-bits Synchronization SouRCe numeric identifier,
 	 * in host order.
 	 **/
-	inline uint32 
+	inline uint32
 	getSSRC() const
 	{ return cachedSSRC; }
+
+        /**
+         * Unprotect a received packet.
+         *
+         * Perform SRTP processing on this packet.
+         *
+         * @param pcc Pointer to SRTP CryptoContext.
+         */
+        bool
+        unprotect(CryptoContext* pcc);
 
 	/**
 	 * Two incoming packets are equal if they come from sources
 	 * with the same SSRC and have the same sequence number.
 	 **/
-	inline bool 
+	inline bool
 	operator==(const IncomingRTPPkt &p) const
-	{ return ( (this->getSeqNum() == p.getSeqNum()) && 
+	{ return ( (this->getSeqNum() == p.getSeqNum()) &&
 		   (this->getSSRC() == p.getSSRC()) ); }
 
 	/**
@@ -693,13 +765,13 @@ public:
 private:
 	/**
 	 * Copy constructor from objects of its same kind, declared
-	 * private to avoid its use.  
+	 * private to avoid its use.
 	 **/
 	IncomingRTPPkt(const IncomingRTPPkt &ip);
 
 	/**
 	 * Assignment operator from objects of its same kind, declared
-	 * private to avoid its use.  
+	 * private to avoid its use.
 	 */
 	IncomingRTPPkt&
 	operator=(const IncomingRTPPkt &ip);
@@ -713,7 +785,7 @@ private:
 	// packets.
 	static const uint16 RTP_INVALID_PT_MASK;
 	static const uint16 RTP_INVALID_PT_VALUE;
-};	
+};
 
 /** @}*/ // rtppacket
 

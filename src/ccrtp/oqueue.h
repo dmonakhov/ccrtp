@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004,2005 Federico Montesino Pouzols <fedemp@altern.org>.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -35,8 +35,8 @@
 // If you do not wish that, delete this exception notice.
 //
 
-/** 
- * @file oqueue.h 
+/**
+ * @file oqueue.h
  *
  * @short Generic RTP output queues.
  **/
@@ -45,6 +45,7 @@
 #define CCXX_RTP_OQUEUE_H_
 
 #include <ccrtp/queuebase.h>
+#include <ccrtp/CryptoContext.h>
 #include <list> // TODO: minimal std::list template
 
 #ifdef	CCXX_NAMESPACES
@@ -98,9 +99,9 @@ protected:
 	 * Locks the object before modifying it.
 	 **/
 	bool
-	addDestinationToList(const InetAddress& ia, tpport_t data, 
+	addDestinationToList(const InetAddress& ia, tpport_t data,
 			     tpport_t control);
-	
+
 	/**
 	 * Locks the object before modifying it.
 	 **/
@@ -109,9 +110,9 @@ protected:
 				       tpport_t controlPort);
 
 	struct TransportAddress
-	{ 
+	{
 		TransportAddress(InetAddress na, tpport_t dtp, tpport_t ctp) :
-			networkAddress(na), dataTransportPort(dtp), 
+			networkAddress(na), dataTransportPort(dtp),
 			controlTransportPort(ctp)
 		{  }
 
@@ -145,22 +146,22 @@ class __EXPORT OutgoingDataQueue:
 {
 public:
 	bool
-	addDestination(const InetHostAddress& ia, 
+	addDestination(const InetHostAddress& ia,
 		       tpport_t dataPort = DefaultRTPDataPort,
 		       tpport_t controlPort = 0);
 
 	bool
-	addDestination(const InetMcastAddress& ia, 
+	addDestination(const InetMcastAddress& ia,
 		       tpport_t dataPort = DefaultRTPDataPort,
 		       tpport_t controlPort = 0);
 
 	bool
-	forgetDestination(const InetHostAddress& ia, 
+	forgetDestination(const InetHostAddress& ia,
 			  tpport_t dataPort = DefaultRTPDataPort,
 			  tpport_t controlPort = 0);
 
 	bool
-	forgetDestination(const InetMcastAddress& ia, 
+	forgetDestination(const InetMcastAddress& ia,
 			  tpport_t dataPort = DefaultRTPDataPort,
 			  tpport_t controlPort = 0);
 
@@ -183,12 +184,12 @@ public:
  	 *
  	 * @return true if there are packets waiting to be send.
  	 */
- 	bool 
+ 	bool
 	isSending() const;
 
 
 	/**
-	 * This is used to create a data packet in the send queue.  
+	 * This is used to create a data packet in the send queue.
 	 * Sometimes a "NULL" or empty packet will be used instead, and
 	 * these are known as "silent" packets.  "Silent" packets are
 	 * used simply to "push" the scheduler along more accurately
@@ -217,7 +218,7 @@ public:
         void
         sendImmediate(uint32 stamp, const unsigned char* data = NULL, size_t len = 0);
 
-	
+
 	/**
 	 * Set padding. All outgoing packets will be transparently
 	 * padded to a multiple of paddinglen.
@@ -254,7 +255,7 @@ public:
 	 * @param max Maximum data size.
 	 * @return Number of packet data bytes set.
 	 **/
-	size_t 
+	size_t
 	setPartial(uint32 timestamp, unsigned char* data, size_t offset, size_t max);
 
 	inline microtimeout_t
@@ -267,7 +268,7 @@ public:
 	 *
 	 * @param to timeout in milliseconds.
 	 **/
-	inline void 
+	inline void
 	setSchedulingTimeout(microtimeout_t to)
 	{ schedulingTimeout = to; }
 
@@ -282,7 +283,7 @@ public:
 	 *
 	 * @param to timeout to expire unsent packets in milliseconds.
 	 **/
-	inline void 
+	inline void
 	setExpireTimeout(microtimeout_t to)
 	{ expireTimeout = to; }
 
@@ -307,16 +308,47 @@ public:
 	getSendOctetCount() const
 	{ return sendInfo.octetCount; }
 
+        /**
+         * Set the CryptoContext for this outgoing queue.
+         *
+         * The endQueue method (provided by RTPQueue) also deletes the
+         * CryptoContext.
+         *
+         * @param cc Pointer to initialized CryptoContext to set.
+         */
+        inline void
+        setOutQueueCryptoContext(CryptoContext *cc)
+        {cContext = cc;}
+
+        /**
+         * Get the CryptoContext of the outgoing queue
+         *
+         * @return pointer to CryptoContext.
+         */
+        inline CryptoContext*
+        getOutQueueCryptoContext() const
+        { return cContext;}
+
+        /**
+         * Get the sequence number of the next outgoing packet.
+         *
+         * @return the 16 bit sequence number.
+         **/
+        inline uint16
+        getSequenceNumber() const
+        { return sendInfo.sendSeq; }
+
+
 protected:
 	OutgoingDataQueue();
 
 	virtual ~OutgoingDataQueue()
 	{ }
-	
-	struct OutgoingRTPPktLink 
+
+	struct OutgoingRTPPktLink
 	{
 		OutgoingRTPPktLink(OutgoingRTPPkt* pkt,
-				   OutgoingRTPPktLink* p, 
+				   OutgoingRTPPktLink* p,
 				   OutgoingRTPPktLink* n) :
 			packet(pkt), prev(p), next(n) { }
 
@@ -325,7 +357,7 @@ protected:
 		inline OutgoingRTPPkt* getPacket() { return packet; }
 
 		inline void setPacket(OutgoingRTPPkt* pkt) { packet = pkt; }
-		
+
 		inline OutgoingRTPPktLink* getPrev() { return prev; }
 
 		inline void setPrev(OutgoingRTPPktLink* p) { prev = p; }
@@ -389,13 +421,13 @@ protected:
 
 	/**
 	 */
-	inline void 
+	inline void
 	setInitialTimestamp(uint32 ts)
 	{ initialTimestamp = ts; }
 
 	/**
 	 */
-	inline uint32 
+	inline uint32
 	getInitialTimestamp()
 	{ return initialTimestamp; }
 
@@ -432,12 +464,16 @@ private:
 	static const microtimeout_t defaultExpireTimeout;
 	mutable ThreadLock sendLock;
 	// outgoing data packets queue
-	OutgoingRTPPktLink* sendFirst, * sendLast; 
+	OutgoingRTPPktLink* sendFirst, * sendLast;
 	uint32 initialTimestamp;
 	// transmission scheduling timeout for the service thread
 	microtimeout_t schedulingTimeout;
 	// how old a packet can reach in the sending queue before deletetion
 	microtimeout_t expireTimeout;
+
+        // The crypto context for outgoing SRTP sessions. Only one CryptoContext
+        // for an outgoing queue.
+        CryptoContext* cContext;
 
 	struct {
 		// number of packets sent from the beginning

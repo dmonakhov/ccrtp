@@ -1,27 +1,27 @@
 // Copyright (C) 1999-2005 Open Source Telecom Corporation.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -35,8 +35,8 @@
 // If you do not wish that, delete this exception notice.
 //
 
-/** 
- * @file rtp.h 
+/**
+ * @file rtp.h
  *
  * @short Generic and audio/video profile specific RTP interface of
  * ccRTP.
@@ -82,325 +82,325 @@ namespace ost {
  * @author David Sugar <dyfet@ostel.com>
  * @short RTP protocol stack based on Common C++.
  **/
-template <class RTPDataChannel = DualRTPUDPIPv4Channel, 
-	  class RTCPChannel = DualRTPUDPIPv4Channel, 
-	  class ServiceQueue = AVPQueue>
-class __EXPORT TRTPSessionBase : public ServiceQueue
-{
-public:
-	/**
-	 * Builds a session waiting for packets in a host address.
-	 *
-	 * @param ia Network address this socket is to be bound.
-	 * @param dataPort Transport port the data socket is to be bound.
-	 * @param controlPort Transport port the control socket is to be bound.
-	 * @param membersSize Initial size of the membership table.
-	 * @param app Application this session is associated to.
-	 * */
-	TRTPSessionBase(const InetHostAddress& ia, tpport_t dataPort,
-			 tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app) :
-		ServiceQueue(membersSize,app)
-	{ build(ia,dataPort,controlPort); }
-
-	/**
-	 * Builds a session with the specified ssrc identifier for the
-	 * local source.
-	 *
-	 * @param ssrc SSRC identifier for the local source.
-	 * @param ia Network address this socket is to be bound.
-	 * @param dataPort Transport port the data socket is to be bound.
-	 * @param controlPort Transport port the control socket is to be bound.
-	 * @param membersSize Initial size of the membership table.
-	 * @param app Application this session is associated to.
-	 **/
-	TRTPSessionBase(uint32 ssrc,
-			 const InetHostAddress& ia, 
-			 tpport_t dataPort, tpport_t controlPort,
-			 uint32 membersSize, RTPApplication& app):
-			 ServiceQueue(ssrc,membersSize,app)
-	{ build(ia,dataPort,controlPort); }
-			 
-	/**
-	 * Builds a session waiting for packets in a multicast address.
-	 * TODO: ssrc constructor for multicast!
-	 *
-	 * @param ia Multicast address this socket is to be bound.
-	 * @param dataPort Transport port the data socket is to be bound.
-	 * @param controlPort Transport port the control socket is to be bound.
-	 * @param membersSize Initial size of the membership table.
-	 * @param app Application this session is associated to.
-	 * @param iface Index (from 0 to n) of network interface to join to
-	 * multicast group.
-	 **/
-	TRTPSessionBase(const InetMcastAddress& ia, tpport_t dataPort,
-			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app, uint32 iface) :
-		ServiceQueue(membersSize,app)
-	{ build(ia,dataPort,controlPort,iface); }
-
-	/**
-	 * Builds a session waiting for packets in a multicast
-	 * address, with the specified ssrc identifier for the local
-	 * source.
-	 *
-	 * @param ssrc SSRC identifier for the local source.
-	 * @param ia Multicast address this socket is to be bound.
-	 * @param dataPort Transport port the data socket is to be bound.
-	 * @param controlPort Transport port the control socket is to be bound.
-	 * @param membersSize Initial size of the membership table.
-	 * @param app Application this session is associated to.
-	 * @param iface Index (from 0 to n) of network interface to join to
-	 * multicast group.
-	 **/
-	TRTPSessionBase(uint32 ssrc,
-			const InetMcastAddress& ia, tpport_t dataPort,
-			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app, uint32 iface) :
-		ServiceQueue(ssrc,membersSize,app)
-	{ build(ia,dataPort,controlPort,iface); }
-
-	virtual size_t dispatchBYE(const std::string &str)
+	template <class RTPDataChannel = DualRTPUDPIPv4Channel,
+		  class RTCPChannel = DualRTPUDPIPv4Channel,
+		  class ServiceQueue = AVPQueue>
+	class __EXPORT TRTPSessionBase : public ServiceQueue
 	{
-	return QueueRTCPManager::dispatchBYE(str);
-	}
+	public:
+		/**
+		 * Builds a session waiting for packets in a host address.
+		 *
+		 * @param ia Network address this socket is to be bound.
+		 * @param dataPort Transport port the data socket is to be bound.
+		 * @param controlPort Transport port the control socket is to be bound.
+		 * @param membersSize Initial size of the membership table.
+		 * @param app Application this session is associated to.
+		 * */
+		TRTPSessionBase(const InetHostAddress& ia, tpport_t dataPort,
+				tpport_t controlPort, uint32 membersSize,
+				RTPApplication& app) :
+			ServiceQueue(membersSize,app)
+			{ build(ia,dataPort,controlPort); }
 
-	inline virtual
-	~TRTPSessionBase()
-	{ 
-	dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
-	 endSocket(); 
-	}
+		/**
+		 * Builds a session with the specified ssrc identifier for the
+		 * local source.
+		 *
+		 * @param ssrc SSRC identifier for the local source.
+		 * @param ia Network address this socket is to be bound.
+		 * @param dataPort Transport port the data socket is to be bound.
+		 * @param controlPort Transport port the control socket is to be bound.
+		 * @param membersSize Initial size of the membership table.
+		 * @param app Application this session is associated to.
+		 **/
+		TRTPSessionBase(uint32 ssrc,
+				const InetHostAddress& ia,
+				tpport_t dataPort, tpport_t controlPort,
+				uint32 membersSize, RTPApplication& app):
+			ServiceQueue(ssrc,membersSize,app)
+			{ build(ia,dataPort,controlPort); }
 
-	inline RTPDataChannel *getDSO(void)
-		{return dso;};
+		/**
+		 * Builds a session waiting for packets in a multicast address.
+		 * TODO: ssrc constructor for multicast!
+		 *
+		 * @param ia Multicast address this socket is to be bound.
+		 * @param dataPort Transport port the data socket is to be bound.
+		 * @param controlPort Transport port the control socket is to be bound.
+		 * @param membersSize Initial size of the membership table.
+		 * @param app Application this session is associated to.
+		 * @param iface Index (from 0 to n) of network interface to join to
+		 * multicast group.
+		 **/
+		TRTPSessionBase(const InetMcastAddress& ia, tpport_t dataPort,
+				tpport_t controlPort, uint32 membersSize,
+				RTPApplication& app, uint32 iface) :
+			ServiceQueue(membersSize,app)
+			{ build(ia,dataPort,controlPort,iface); }
 
-protected:
-	/**
-	 * @param timeout maximum timeout to wait, in microseconds
-	 */
-	inline bool
-	isPendingData(microtimeout_t timeout)
-	{ return dso->isPendingRecv(timeout); }
+		/**
+		 * Builds a session waiting for packets in a multicast
+		 * address, with the specified ssrc identifier for the local
+		 * source.
+		 *
+		 * @param ssrc SSRC identifier for the local source.
+		 * @param ia Multicast address this socket is to be bound.
+		 * @param dataPort Transport port the data socket is to be bound.
+		 * @param controlPort Transport port the control socket is to be bound.
+		 * @param membersSize Initial size of the membership table.
+		 * @param app Application this session is associated to.
+		 * @param iface Index (from 0 to n) of network interface to join to
+		 * multicast group.
+		 **/
+		TRTPSessionBase(uint32 ssrc,
+				const InetMcastAddress& ia, tpport_t dataPort,
+				tpport_t controlPort, uint32 membersSize,
+				RTPApplication& app, uint32 iface) :
+			ServiceQueue(ssrc,membersSize,app)
+			{ build(ia,dataPort,controlPort,iface); }
 
-	InetHostAddress
-	getDataSender(tpport_t *port = NULL) const
-        { return dso->getSender(port); }
+		virtual size_t dispatchBYE(const std::string &str)
+			{
+				return QueueRTCPManager::dispatchBYE(str);
+			}
 
-	inline size_t
-	getNextDataPacketSize() const
-	{ return dso->getNextPacketSize(); }
+		inline virtual
+		~TRTPSessionBase()
+			{
+				dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
+				endSocket();
+			}
 
-	/**
-	 * Receive data from the data channel/socket.
-	 *
-	 * @param buffer Memory region to read to.
-	 * @param len Maximum number of octets to get.
-	 * @param na Source network address.
-	 * @param tp Source transport port.
-	 * @return Number of octets actually read.
-	 */
-	inline size_t
-	recvData(unsigned char* buffer, size_t len, 
-		 InetHostAddress& na, tpport_t& tp)
-	{ na = dso->getSender(tp); return dso->recv(buffer, len); }
+		inline RTPDataChannel *getDSO(void)
+			{return dso;};
 
-        inline void
-        setDataPeer(const InetAddress &host, tpport_t port)
-	{ dso->setPeer(host,port); }
+	protected:
+		/**
+		 * @param timeout maximum timeout to wait, in microseconds
+		 */
+		inline bool
+		isPendingData(microtimeout_t timeout)
+			{ return dso->isPendingRecv(timeout); }
 
-	/**
-	 * @param buffer memory region to write from
-	 * @param len number of octets to write
-	 */
-	inline size_t
-	sendData(const unsigned char* const buffer, size_t len)
-	{ return dso->send(buffer, len); }
+		InetHostAddress
+		getDataSender(tpport_t *port = NULL) const
+			{ return dso->getSender(port); }
 
-	inline SOCKET getDataRecvSocket() const
-	{ return dso->getRecvSocket(); }
+		inline size_t
+		getNextDataPacketSize() const
+			{ return dso->getNextPacketSize(); }
 
-	/**
-	 * @param timeout maximum timeout to wait, in microseconds
-	 * @return whether there are packets waiting to be picked
-	 */
-        inline bool
-	isPendingControl(microtimeout_t timeout)
-	{ return cso->isPendingRecv(timeout); }
+		/**
+		 * Receive data from the data channel/socket.
+		 *
+		 * @param buffer Memory region to read to.
+		 * @param len Maximum number of octets to get.
+		 * @param na Source network address.
+		 * @param tp Source transport port.
+		 * @return Number of octets actually read.
+		 */
+		inline size_t
+		recvData(unsigned char* buffer, size_t len,
+			 InetHostAddress& na, tpport_t& tp)
+			{ na = dso->getSender(tp); return dso->recv(buffer, len); }
 
-	InetHostAddress
-	getControlSender(tpport_t *port = NULL) const
-        { return cso->getSender(port); }
+		inline void
+		setDataPeer(const InetAddress &host, tpport_t port)
+			{ dso->setPeer(host,port); }
 
-	/**
-	 * Receive data from the control channel/socket.
-	 *
-	 * @param buffer Buffer where to get data.
-	 * @param len Maximum number of octets to get.
-	 * @param na Source network address.
-	 * @param tp Source transport port.
-	 * @return Number of octets actually read.
-	 **/
-        inline size_t
-	recvControl(unsigned char *buffer, size_t len,
-		    InetHostAddress& na, tpport_t& tp)
-	{ na = cso->getSender(tp); return cso->recv(buffer,len); }
+		/**
+		 * @param buffer memory region to write from
+		 * @param len number of octets to write
+		 */
+		inline size_t
+		sendData(const unsigned char* const buffer, size_t len)
+			{ return dso->send(buffer, len); }
 
-        inline void
-        setControlPeer(const InetAddress &host, tpport_t port)
-	{ cso->setPeer(host,port); }
+		inline SOCKET getDataRecvSocket() const
+			{ return dso->getRecvSocket(); }
 
-	/**
-	 * @return number of octets actually written
-	 * @param buffer
-	 * @param len
-	 */
-        inline size_t
-	sendControl(const unsigned char* const buffer, size_t len)
-	{ return cso->send(buffer,len); }
+		/**
+		 * @param timeout maximum timeout to wait, in microseconds
+		 * @return whether there are packets waiting to be picked
+		 */
+		inline bool
+		isPendingControl(microtimeout_t timeout)
+			{ return cso->isPendingRecv(timeout); }
 
-	inline SOCKET getControlRecvSocket() const
-	{ return cso->getRecvSocket(); }
-	
-	inline void
-	endSocket()
-	{ 
-		if (dso) {
-		 dso->endSocket();
-		 delete dso;
-		}
-		dso = NULL;
-		if (cso) {
-		 cso->endSocket();
- 		 delete cso;
-                }
-		cso = NULL;
-	}
+		InetHostAddress
+		getControlSender(tpport_t *port = NULL) const
+			{ return cso->getSender(port); }
 
-private:
-	void 
-	build(const InetHostAddress& ia, tpport_t dataPort, 
-	      tpport_t controlPort)
-	{
-		if ( 0 == controlPort ) {
-			dataBasePort = even_port(dataPort); 
-			controlBasePort = dataBasePort + 1;
-		} else {
-			dataBasePort = dataPort;
-			controlBasePort = controlPort;
-		}
-		dso = new RTPDataChannel(ia,dataBasePort);
-		cso = new RTCPChannel(ia,controlBasePort);
-	}
+		/**
+		 * Receive data from the control channel/socket.
+		 *
+		 * @param buffer Buffer where to get data.
+		 * @param len Maximum number of octets to get.
+		 * @param na Source network address.
+		 * @param tp Source transport port.
+		 * @return Number of octets actually read.
+		 **/
+		inline size_t
+		recvControl(unsigned char *buffer, size_t len,
+			    InetHostAddress& na, tpport_t& tp)
+			{ na = cso->getSender(tp); return cso->recv(buffer,len); }
 
-	void 
-	build(const InetMcastAddress& ia, tpport_t dataPort, 
-	      tpport_t controlPort, uint32 iface)
-	{
-		if ( 0 == controlPort ) {
-			dataBasePort = even_port(dataPort); 
-			controlBasePort = dataBasePort + 1;
-		} else {
-			dataBasePort = dataPort;
-			controlBasePort = controlPort;
-		}
-		dso = new RTPDataChannel(InetHostAddress("0.0.0.0"),dataBasePort);
-		cso = new RTCPChannel(InetHostAddress("0.0.0.0"),controlBasePort);
-		joinGroup(ia,iface);
-	}
+		inline void
+		setControlPeer(const InetAddress &host, tpport_t port)
+			{ cso->setPeer(host,port); }
 
-	/**
-	 * Join a multicast group. 
-	 *
-	 * @param ia address of the multicast group
-	 * @return error code from the socket operation
-	 */
-	inline Socket::Error
-	joinGroup(const InetMcastAddress& ia, uint32 iface)
-	{ 
-		Socket::Error error  = dso->setMulticast(true);
-		if ( error ) return error;
-		error = dso->join(ia,iface); 
-		if ( error ) return error;
-		error = cso->setMulticast(true);
-		if ( error ) {
-			dso->drop(ia);
-			return error;
-		}
-		error = cso->join(ia,iface);
-		if ( error ) {
-			dso->drop(ia);
-			return error;
-		}
-		return Socket::errSuccess;
-	}
+		/**
+		 * @return number of octets actually written
+		 * @param buffer
+		 * @param len
+		 */
+		inline size_t
+		sendControl(const unsigned char* const buffer, size_t len)
+			{ return cso->send(buffer,len); }
 
-	/**
-	 * Leave a multicast group. 
-	 * 
-	 * @param ia address of the multicast group
-	 * @return error code from the socket operation
-	 */
-	inline Socket::Error
-	leaveGroup(const InetMcastAddress& ia)
-	{
-		Socket::Error error = dso->setMulticast(false);
-		if ( error ) return error;
-		error = dso->leaveGroup(ia);
-		if ( error ) return error;
-		error = cso->setMulticast(false);
-		if ( error ) return error;
-		return cso->leaveGroup(ia);
-	}
+		inline SOCKET getControlRecvSocket() const
+			{ return cso->getRecvSocket(); }
 
-	/**
-	 * Set the value of the TTL field in the sent packets.
-	 *
-	 * @param ttl Time To Live
-	 * @return error code from the socket operation
-	 */
-	inline Socket::Error
-	setMcastTTL(uint8 ttl)
-	{
-		Socket::Error error = dso->setMulticast(true);
-		if ( error ) return error;
-		error = dso->setTimeToLive(ttl);
-		if ( error ) return error;
-		error = cso->setMulticast(true);
-		if ( error ) return error;
-		return cso->setTimeToLive(ttl);
-	}
+		inline void
+		endSocket()
+			{
+				if (dso) {
+					dso->endSocket();
+					delete dso;
+				}
+				dso = NULL;
+				if (cso) {
+					cso->endSocket();
+					delete cso;
+				}
+				cso = NULL;
+			}
 
-	/**
-	 * Ensure a port number is odd. If it is an even number, return
-	 * the next lower (odd) port number.
-	 *
-	 * @param port number to filter
-	 * @return filtered (odd) port number
-	 */
-	inline tpport_t
-	odd_port(tpport_t port)
-	{ return (port & 0x01)? (port) : (port - 1); }
+	private:
+		void
+		build(const InetHostAddress& ia, tpport_t dataPort,
+		      tpport_t controlPort)
+			{
+				if ( 0 == controlPort ) {
+					dataBasePort = even_port(dataPort);
+					controlBasePort = dataBasePort + 1;
+				} else {
+					dataBasePort = dataPort;
+					controlBasePort = controlPort;
+				}
+				dso = new RTPDataChannel(ia,dataBasePort);
+				cso = new RTCPChannel(ia,controlBasePort);
+			}
 
-	/**
-	 * Ensure a port number is even. If it is an odd number, return
-	 * the next lower (even) port number.
-	 *
-	 * @param port number to filter
-	 * @return filtered (even) port number
-	 */
-	inline tpport_t
-	even_port(tpport_t port)
-	{ return (port & 0x01)? (port - 1) : (port); }
+		void
+		build(const InetMcastAddress& ia, tpport_t dataPort,
+		      tpport_t controlPort, uint32 iface)
+			{
+				if ( 0 == controlPort ) {
+					dataBasePort = even_port(dataPort);
+					controlBasePort = dataBasePort + 1;
+				} else {
+					dataBasePort = dataPort;
+					controlBasePort = controlPort;
+				}
+				dso = new RTPDataChannel(InetHostAddress("0.0.0.0"),dataBasePort);
+				cso = new RTCPChannel(InetHostAddress("0.0.0.0"),controlBasePort);
+				joinGroup(ia,iface);
+			}
 
-	tpport_t dataBasePort;
-	tpport_t controlBasePort;
+		/**
+		 * Join a multicast group.
+		 *
+		 * @param ia address of the multicast group
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		joinGroup(const InetMcastAddress& ia, uint32 iface)
+			{
+				Socket::Error error  = dso->setMulticast(true);
+				if ( error ) return error;
+				error = dso->join(ia,iface);
+				if ( error ) return error;
+				error = cso->setMulticast(true);
+				if ( error ) {
+					dso->drop(ia);
+					return error;
+				}
+				error = cso->join(ia,iface);
+				if ( error ) {
+					dso->drop(ia);
+					return error;
+				}
+				return Socket::errSuccess;
+			}
 
-protected:
-	RTPDataChannel* dso;
-	RTCPChannel* cso;
-	friend class RTPSessionBaseHandler;
-};
+		/**
+		 * Leave a multicast group.
+		 *
+		 * @param ia address of the multicast group
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		leaveGroup(const InetMcastAddress& ia)
+			{
+				Socket::Error error = dso->setMulticast(false);
+				if ( error ) return error;
+				error = dso->leaveGroup(ia);
+				if ( error ) return error;
+				error = cso->setMulticast(false);
+				if ( error ) return error;
+				return cso->leaveGroup(ia);
+			}
+
+		/**
+		 * Set the value of the TTL field in the sent packets.
+		 *
+		 * @param ttl Time To Live
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		setMcastTTL(uint8 ttl)
+			{
+				Socket::Error error = dso->setMulticast(true);
+				if ( error ) return error;
+				error = dso->setTimeToLive(ttl);
+				if ( error ) return error;
+				error = cso->setMulticast(true);
+				if ( error ) return error;
+				return cso->setTimeToLive(ttl);
+			}
+
+		/**
+		 * Ensure a port number is odd. If it is an even number, return
+		 * the next lower (odd) port number.
+		 *
+		 * @param port number to filter
+		 * @return filtered (odd) port number
+		 */
+		inline tpport_t
+		odd_port(tpport_t port)
+			{ return (port & 0x01)? (port) : (port - 1); }
+
+		/**
+		 * Ensure a port number is even. If it is an odd number, return
+		 * the next lower (even) port number.
+		 *
+		 * @param port number to filter
+		 * @return filtered (even) port number
+		 */
+		inline tpport_t
+		even_port(tpport_t port)
+			{ return (port & 0x01)? (port - 1) : (port); }
+
+		tpport_t dataBasePort;
+		tpport_t controlBasePort;
+
+	protected:
+		RTPDataChannel* dso;
+		RTCPChannel* cso;
+		friend class RTPSessionBaseHandler;
+	};
 
 /**
  * @class SingleThreadRTPSession
@@ -412,144 +412,180 @@ protected:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-template
-<class RTPDataChannel = DualRTPUDPIPv4Channel, 
- class RTCPChannel = DualRTPUDPIPv4Channel, 
- class ServiceQueue = AVPQueue>
-class __EXPORT SingleThreadRTPSession : 
-	protected Thread,
-	public TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-{
-public:
-	SingleThreadRTPSession(const InetHostAddress& ia, 
-			       tpport_t dataPort = DefaultRTPDataPort, 
-			       tpport_t controlPort = 0,
-			       int pri = 0,
-			       uint32 memberssize = 
-			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication()
+	template
+	<class RTPDataChannel = DualRTPUDPIPv4Channel,
+	 class RTCPChannel = DualRTPUDPIPv4Channel,
+	 class ServiceQueue = AVPQueue>
+	class __EXPORT SingleThreadRTPSession :
+		protected Thread,
+		public TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	{
+	public:
+		SingleThreadRTPSession(const InetHostAddress& ia,
+				       tpport_t dataPort = DefaultRTPDataPort,
+				       tpport_t controlPort = 0,
+				       int pri = 0,
+				       uint32 memberssize =
+				       MembershipBookkeeping::defaultMembersHashSize,
+				       RTPApplication& app = defaultApplication()
 #if defined(_MSC_VER) && _MSC_VER >= 1300
-				   );
+			);
 #else
-				   ):
-			Thread(pri),
+		):
+		Thread(pri),
 		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app)
-	{ }
-#endif
-	
-	SingleThreadRTPSession(const InetMcastAddress& ia, 
-			       tpport_t dataPort = DefaultRTPDataPort, 
-			       tpport_t controlPort = 0, 
-			       int pri = 0,
-			       uint32 memberssize = 
-			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication(),
-			       uint32 iface = 0)
-#if defined(_MSC_VER) && _MSC_VER >= 1300
-				   ;
-#else
-				   :
-			Thread(pri),
-		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app,iface)
-	{ }
+		(ia,dataPort,controlPort,memberssize,app)
+		{ }
 #endif
 
-	~SingleThreadRTPSession()
-	{ terminate(); }
-
-#if defined(_MSC_VER) && _MSC_VER >= 1300 
-	virtual void startRunning();
+        SingleThreadRTPSession(uint32 ssrc, const InetHostAddress& ia,
+                               tpport_t dataPort = DefaultRTPDataPort,
+                               tpport_t controlPort = 0,
+                               int pri = 0,
+                               uint32 memberssize =
+                               MembershipBookkeeping::defaultMembersHashSize,
+                               RTPApplication& app = defaultApplication()
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+		);
 #else
-	/**
-	 * Activate stack and start service thread.
-	 **/
-	void
-	startRunning()
-	{ enableStack(); Thread::start(); }
+	):
+	Thread(pri),
+	TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+	(ssrc, ia,dataPort,controlPort,memberssize,app)
+{ }
+#endif
+
+SingleThreadRTPSession(const InetMcastAddress& ia,
+		       tpport_t dataPort = DefaultRTPDataPort,
+		       tpport_t controlPort = 0,
+		       int pri = 0,
+		       uint32 memberssize =
+		       MembershipBookkeeping::defaultMembersHashSize,
+		       RTPApplication& app = defaultApplication(),
+		       uint32 iface = 0
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+	       );
+#else
+        ):
+        Thread(pri),
+        TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+        (ia,dataPort,controlPort,memberssize,app,iface)
+        { }
+#endif
+
+SingleThreadRTPSession(uint32 ssrc, const InetMcastAddress& ia,
+		       tpport_t dataPort = DefaultRTPDataPort,
+		       tpport_t controlPort = 0,
+		       int pri = 0,
+		       uint32 memberssize =
+		       MembershipBookkeeping::defaultMembersHashSize,
+		       RTPApplication& app = defaultApplication(),
+		       uint32 iface = 0
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+                      );
+#else
+                ):
+                Thread(pri),
+                TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+                (ssrc,ia,dataPort,controlPort,memberssize,app,iface)
+{ }
+#endif
+
+
+~SingleThreadRTPSession()
+{ terminate(); }
+
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+virtual void startRunning();
+#else
+/**
+ * Activate stack and start service thread.
+ **/
+void
+startRunning()
+{ enableStack(); Thread::start(); }
 #endif
 
 
 protected:
-	inline void enableStack(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+inline void enableStack(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
 
-	inline microtimeout_t getSchedulingTimeout(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
+inline microtimeout_t getSchedulingTimeout(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
 
-	inline void controlReceptionService(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
+inline void controlReceptionService(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
 
-	inline void controlTransmissionService(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
+inline void controlTransmissionService(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
 
-	inline timeval getRTCPCheckInterval(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
+inline timeval getRTCPCheckInterval(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
 
-	inline size_t dispatchDataPacket(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
+inline size_t dispatchDataPacket(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
-	virtual void run(void);
+virtual void run(void);
 
-	virtual void timerTick(void);
+virtual void timerTick(void);
 
-	virtual bool isPendingData(microtimeout_t timeout); 
+virtual bool isPendingData(microtimeout_t timeout);
 #else
 
-	virtual void timerTick(void)
-		{return;}
+virtual void timerTick(void)
+{return;}
 
-	virtual bool isPendingData(microtimeout_t timeout)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
+virtual bool isPendingData(microtimeout_t timeout)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
 
-	/**
-	 * Single runnable method for this RTP stacks, schedules
-	 * outgoing and incoming RTP data and RTCP packets.
-	 **/
-	virtual void run(void)
-	{
-		microtimeout_t timeout = 0;
-		while ( ServiceQueue::isActive() ) {
-			if ( timeout < 1000 ){ // !(timeout/1000)
-				timeout = getSchedulingTimeout();
-			}
-			setCancel(cancelDeferred);
-			controlReceptionService();
-			controlTransmissionService();
-			setCancel(cancelImmediate);
-			microtimeout_t maxWait = 
-				timeval2microtimeout(getRTCPCheckInterval());
-			// make sure the scheduling timeout is
-			// <= the check interval for RTCP
-			// packets
-			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( timeout < 1000 ) { // !(timeout/1000)
-				setCancel(cancelDeferred);
-				dispatchDataPacket();
-				setCancel(cancelImmediate);
-				timerTick();
-			} else {
-				if ( isPendingData(timeout/1000) ) {
-					setCancel(cancelDeferred);
-					takeInDataPacket();
-					setCancel(cancelImmediate);
-				}
-				timeout = 0;
-			}
+/**
+ * Single runnable method for this RTP stacks, schedules
+ * outgoing and incoming RTP data and RTCP packets.
+ **/
+virtual void run(void)
+{
+	microtimeout_t timeout = 0;
+	while ( ServiceQueue::isActive() ) {
+		if ( timeout < 1000 ){ // !(timeout/1000)
+			timeout = getSchedulingTimeout();
 		}
-		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep((timeout_t)~0);
+		setCancel(cancelDeferred);
+		controlReceptionService();
+		controlTransmissionService();
+		setCancel(cancelImmediate);
+		microtimeout_t maxWait =
+			timeval2microtimeout(getRTCPCheckInterval());
+		// make sure the scheduling timeout is
+		// <= the check interval for RTCP
+		// packets
+		timeout = (timeout > maxWait)? maxWait : timeout;
+		if ( timeout < 1000 ) { // !(timeout/1000)
+			setCancel(cancelDeferred);
+			dispatchDataPacket();
+			setCancel(cancelImmediate);
+			timerTick();
+		} else {
+			if ( isPendingData(timeout/1000) ) {
+				setCancel(cancelDeferred);
+				takeInDataPacket();
+				setCancel(cancelImmediate);
+			}
+			timeout = 0;
+		}
 	}
+	dispatchBYE("GNU ccRTP stack finishing.");
+	sleep((timeout_t)~0);
+}
 
 #endif
 
-	inline size_t takeInDataPacket(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
+inline size_t takeInDataPacket(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
 
-	inline size_t dispatchBYE(const std::string &str)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
+inline size_t dispatchBYE(const std::string &str)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
 };
 
 /**
@@ -604,26 +640,26 @@ typedef SingleThreadRTPSession<SymmetricRTPChannel,
  * @author David Sugar <dyfet@ostel.com>
  * @short RTP protocol stack based on Common C++.
  **/
-template <class RTPDataChannel = DualRTPUDPIPv6Channel, 
-	  class RTCPChannel = DualRTPUDPIPv6Channel, 
+template <class RTPDataChannel = DualRTPUDPIPv6Channel,
+	  class RTCPChannel = DualRTPUDPIPv6Channel,
 	  class ServiceQueue = AVPQueue>
 class __EXPORT TRTPSessionBaseIPV6 : public ServiceQueue
 {
 public:
-	/**
-	 * Builds a session waiting for packets in a host address.
-	 *
-	 * @param ia Network address this socket is to be bound.
-	 * @param dataPort Transport port the data socket is to be bound.
-	 * @param controlPort Transport port the control socket is to be bound.
-	 * @param membersSize Initial size of the membership table.
-	 * @param app Application this session is associated to.
-	 * */
-	TRTPSessionBaseIPV6(const IPV6Host& ia, tpport_t dataPort,
-			 tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app) :
-		ServiceQueue(membersSize,app)
-	{ build(ia,dataPort,controlPort); }
+/**
+ * Builds a session waiting for packets in a host address.
+ *
+ * @param ia Network address this socket is to be bound.
+ * @param dataPort Transport port the data socket is to be bound.
+ * @param controlPort Transport port the control socket is to be bound.
+ * @param membersSize Initial size of the membership table.
+ * @param app Application this session is associated to.
+ * */
+TRTPSessionBaseIPV6(const IPV6Host& ia, tpport_t dataPort,
+	tpport_t controlPort, uint32 membersSize,
+	RTPApplication& app) :
+	ServiceQueue(membersSize,app)
+{ build(ia,dataPort,controlPort); }
 
 	/**
 	 * Builds a session with the specified ssrc identifier for the
@@ -637,12 +673,12 @@ public:
 	 * @param app Application this session is associated to.
 	 **/
 	TRTPSessionBaseIPV6(uint32 ssrc,
-			 const IPV6Host& ia, 
-			 tpport_t dataPort, tpport_t controlPort,
-			 uint32 membersSize, RTPApplication& app):
-			 ServiceQueue(ssrc,membersSize,app)
-	{ build(ia,dataPort,controlPort); }
-			 
+			    const IPV6Host& ia,
+			    tpport_t dataPort, tpport_t controlPort,
+			    uint32 membersSize, RTPApplication& app):
+		ServiceQueue(ssrc,membersSize,app)
+		{ build(ia,dataPort,controlPort); }
+
 	/**
 	 * Builds a session waiting for packets in a multicast address.
 	 * TODO: ssrc constructor for multicast!
@@ -656,10 +692,10 @@ public:
 	 * multicast group.
 	 **/
 	TRTPSessionBaseIPV6(const IPV6Multicast& ia, tpport_t dataPort,
-			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app, uint32 iface) :
+			    tpport_t controlPort, uint32 membersSize,
+			    RTPApplication& app, uint32 iface) :
 		ServiceQueue(membersSize,app)
-	{ build(ia,dataPort,controlPort,iface); }
+		{ build(ia,dataPort,controlPort,iface); }
 
 	/**
 	 * Builds a session waiting for packets in a multicast
@@ -676,23 +712,23 @@ public:
 	 * multicast group.
 	 **/
 	TRTPSessionBaseIPV6(uint32 ssrc,
-			const IPV6Multicast& ia, tpport_t dataPort,
-			tpport_t controlPort, uint32 membersSize,
-			 RTPApplication& app, uint32 iface) :
+			    const IPV6Multicast& ia, tpport_t dataPort,
+			    tpport_t controlPort, uint32 membersSize,
+			    RTPApplication& app, uint32 iface) :
 		ServiceQueue(ssrc,membersSize,app)
-	{ build(ia,dataPort,controlPort,iface); }
+		{ build(ia,dataPort,controlPort,iface); }
 
 	virtual size_t dispatchBYE(const std::string &str)
-	{
-	return QueueRTCPManager::dispatchBYE(str);
-	}
+		{
+			return QueueRTCPManager::dispatchBYE(str);
+		}
 
 	inline virtual
 	~TRTPSessionBaseIPV6()
-	{ 
-	dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
-	 endSocket(); 
-	}
+		{
+			dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
+			endSocket();
+		}
 
 	inline RTPDataChannel *getDSO(void)
 		{return dso;};
@@ -703,15 +739,15 @@ protected:
 	 */
 	inline bool
 	isPendingData(microtimeout_t timeout)
-	{ return dso->isPendingRecv(timeout); }
+		{ return dso->isPendingRecv(timeout); }
 
 	inline IPV6Host
 	getDataSender(tpport_t *port = NULL) const
-        { return dso->getSender(port); }
+		{ return dso->getSender(port); }
 
 	inline size_t
 	getNextDataPacketSize() const
-	{ return dso->getNextPacketSize(); }
+		{ return dso->getNextPacketSize(); }
 
 	/**
 	 * Receive data from the data channel/socket.
@@ -723,13 +759,13 @@ protected:
 	 * @return Number of octets actually read.
 	 */
 	inline size_t
-	recvData(unsigned char* buffer, size_t len, 
+	recvData(unsigned char* buffer, size_t len,
 		 IPV6Host& na, tpport_t& tp)
-	{ na = dso->getSender(tp); return dso->recv(buffer, len); }
+		{ na = dso->getSender(tp); return dso->recv(buffer, len); }
 
         inline void
         setDataPeer(const IPV6Host &host, tpport_t port)
-	{ dso->setPeer(host,port); }
+		{ dso->setPeer(host,port); }
 
 	/**
 	 * @param buffer memory region to write from
@@ -737,10 +773,10 @@ protected:
 	 */
 	inline size_t
 	sendData(const unsigned char* const buffer, size_t len)
-	{ return dso->send(buffer, len); }
+		{ return dso->send(buffer, len); }
 
 	inline SOCKET getDataRecvSocket() const
-	{ return dso->getRecvSocket(); }
+		{ return dso->getRecvSocket(); }
 
 	/**
 	 * @param timeout maximum timeout to wait, in microseconds
@@ -748,11 +784,11 @@ protected:
 	 */
         inline bool
 	isPendingControl(microtimeout_t timeout)
-	{ return cso->isPendingRecv(timeout); }
+		{ return cso->isPendingRecv(timeout); }
 
 	inline IPV6Host
 	getControlSender(tpport_t *port = NULL) const
-        { return cso->getSender(port); }
+		{ return cso->getSender(port); }
 
 	/**
 	 * Receive data from the control channel/socket.
@@ -766,11 +802,11 @@ protected:
         inline size_t
 	recvControl(unsigned char *buffer, size_t len,
 		    IPV6Host& na, tpport_t& tp)
-	{ na = cso->getSender(tp); return cso->recv(buffer,len); }
+		{ na = cso->getSender(tp); return cso->recv(buffer,len); }
 
         inline void
         setControlPeer(const IPV6Host &host, tpport_t port)
-	{ cso->setPeer(host,port); }
+		{ cso->setPeer(host,port); }
 
 	/**
 	 * @return number of octets actually written
@@ -779,97 +815,97 @@ protected:
 	 */
         inline size_t
 	sendControl(const unsigned char* const buffer, size_t len)
-	{ return cso->send(buffer,len); }
+		{ return cso->send(buffer,len); }
 
 	inline SOCKET getControlRecvSocket() const
-	{ return cso->getRecvSocket(); }
-	
+		{ return cso->getRecvSocket(); }
+
 	inline void
 	endSocket()
-	{ 
-		dso->endSocket();
-		cso->endSocket();
-		if (dso) delete dso;
-		dso = NULL;
-		if (cso) delete cso;
-		cso = NULL;
-	}
+		{
+			dso->endSocket();
+			cso->endSocket();
+			if (dso) delete dso;
+			dso = NULL;
+			if (cso) delete cso;
+			cso = NULL;
+		}
 
 private:
-	void 
-	build(const IPV6Host& ia, tpport_t dataPort, 
+	void
+	build(const IPV6Host& ia, tpport_t dataPort,
 	      tpport_t controlPort)
-	{
-		if ( 0 == controlPort ) {
-			dataBasePort = even_port(dataPort); 
-			controlBasePort = dataBasePort + 1;
-		} else {
-			dataBasePort = dataPort;
-			controlBasePort = controlPort;
+		{
+			if ( 0 == controlPort ) {
+				dataBasePort = even_port(dataPort);
+				controlBasePort = dataBasePort + 1;
+			} else {
+				dataBasePort = dataPort;
+				controlBasePort = controlPort;
+			}
+			dso = new RTPDataChannel(ia,dataBasePort);
+			cso = new RTCPChannel(ia,controlBasePort);
 		}
-		dso = new RTPDataChannel(ia,dataBasePort);
-		cso = new RTCPChannel(ia,controlBasePort);
-	}
 
-	void 
-	build(const IPV6Multicast& ia, tpport_t dataPort, 
+	void
+	build(const IPV6Multicast& ia, tpport_t dataPort,
 	      tpport_t controlPort, uint32 iface)
-	{
-		if ( 0 == controlPort ) {
-			dataBasePort = even_port(dataPort); 
-			controlBasePort = dataBasePort + 1;
-		} else {
-			dataBasePort = dataPort;
-			controlBasePort = controlPort;
+		{
+			if ( 0 == controlPort ) {
+				dataBasePort = even_port(dataPort);
+				controlBasePort = dataBasePort + 1;
+			} else {
+				dataBasePort = dataPort;
+				controlBasePort = controlPort;
+			}
+			dso = new RTPDataChannel(IPV6Host("0.0.0.0"),dataBasePort);
+			cso = new RTCPChannel(IPV6Host("0.0.0.0"),controlBasePort);
+			joinGroup(ia,iface);
 		}
-		dso = new RTPDataChannel(IPV6Host("0.0.0.0"),dataBasePort);
-		cso = new RTCPChannel(IPV6Host("0.0.0.0"),controlBasePort);
-		joinGroup(ia,iface);
-	}
 
 	/**
-	 * Join a multicast group. 
+	 * Join a multicast group.
 	 *
 	 * @param ia address of the multicast group
 	 * @return error code from the socket operation
 	 */
 	inline Socket::Error
 	joinGroup(const IPV6Multicast& ia, uint32 iface)
-	{ 
-		Socket::Error error  = dso->setMulticast(true);
-		if ( error ) return error;
-		error = dso->join(ia,iface); 
-		if ( error ) return error;
-		error = cso->setMulticast(true);
-		if ( error ) {
-			dso->drop(ia);
-			return error;
+		{
+			Socket::Error error  = dso->setMulticast(true);
+			if ( error ) return error;
+			error = dso->join(ia,iface);
+			if ( error ) return error;
+			error = cso->setMulticast(true);
+			if ( error ) {
+				dso->drop(ia);
+				return error;
+			}
+			error = cso->join(ia,iface);
+			if ( error ) {
+				dso->drop(ia);
+				return error;
+			}
+			return Socket::errSuccess;
 		}
-		error = cso->join(ia,iface);
-		if ( error ) {
-			dso->drop(ia);
-			return error;
-		}
-		return Socket::errSuccess;
-	}
 
 	/**
-	 * Leave a multicast group. 
-	 * 
+	 * Leave a multicast group.
+	 *
 	 * @param ia address of the multicast group
 	 * @return error code from the socket operation
 	 */
 	inline Socket::Error
 	leaveGroup(const IPV6Multicast& ia)
-	{
-		Socket::Error error = dso->setMulticast(false);
-		if ( error ) return error;
-		error = dso->leaveGroup(ia);
-		if ( error ) return error;
-		error = cso->setMulticast(false);
-		if ( error ) return error;
-		return cso->leaveGroup(ia);
-	}
+		{
+			Socket::Error error = dso->setMulticast(false);
+			if ( error ) return error;
+			error = dso->leaveGroup(ia);
+			if ( error ) return error;
+			error = cso->setMulticast(false);
+			if ( error ) return error;
+			return cso->leaveGroup(ia);
+		}
 
 	/**
 	 * Set the value of the TTL field in the sent packets.
@@ -879,15 +915,15 @@ private:
 	 */
 	inline Socket::Error
 	setMcastTTL(uint8 ttl)
-	{
-		Socket::Error error = dso->setMulticast(true);
-		if ( error ) return error;
-		error = dso->setTimeToLive(ttl);
-		if ( error ) return error;
-		error = cso->setMulticast(true);
-		if ( error ) return error;
-		return cso->setTimeToLive(ttl);
-	}
+		{
+			Socket::Error error = dso->setMulticast(true);
+			if ( error ) return error;
+			error = dso->setTimeToLive(ttl);
+			if ( error ) return error;
+			error = cso->setMulticast(true);
+			if ( error ) return error;
+			return cso->setTimeToLive(ttl);
+		}
 
 	/**
 	 * Ensure a port number is odd. If it is an even number, return
@@ -898,7 +934,7 @@ private:
 	 */
 	inline tpport_t
 	odd_port(tpport_t port)
-	{ return (port & 0x01)? (port) : (port - 1); }
+		{ return (port & 0x01)? (port) : (port - 1); }
 
 	/**
 	 * Ensure a port number is even. If it is an odd number, return
@@ -909,7 +945,7 @@ private:
 	 */
 	inline tpport_t
 	even_port(tpport_t port)
-	{ return (port & 0x01)? (port - 1) : (port); }
+		{ return (port & 0x01)? (port - 1) : (port); }
 
 	tpport_t dataBasePort;
 	tpport_t controlBasePort;
@@ -931,143 +967,143 @@ protected:
  * @author David Sugar <dyfet@gnutelephony.org>
  **/
 template
-<class RTPDataChannel = DualRTPUDPIPv6Channel, 
- class RTCPChannel = DualRTPUDPIPv6Channel, 
+<class RTPDataChannel = DualRTPUDPIPv6Channel,
+ class RTCPChannel = DualRTPUDPIPv6Channel,
  class ServiceQueue = AVPQueue>
-class __EXPORT SingleThreadRTPSessionIPV6 : 
+class __EXPORT SingleThreadRTPSessionIPV6 :
 	protected Thread,
 	public TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
 {
 public:
-	SingleThreadRTPSessionIPV6(const IPV6Host& ia, 
-			       tpport_t dataPort = DefaultRTPDataPort, 
-			       tpport_t controlPort = 0,
-			       int pri = 0,
-			       uint32 memberssize = 
-			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication()
+	SingleThreadRTPSessionIPV6(const IPV6Host& ia,
+				   tpport_t dataPort = DefaultRTPDataPort,
+				   tpport_t controlPort = 0,
+				   int pri = 0,
+				   uint32 memberssize =
+				   MembershipBookkeeping::defaultMembersHashSize,
+				   RTPApplication& app = defaultApplication()
 #if defined(_MSC_VER) && _MSC_VER >= 1300
-				   );
+		);
 #else
-				   ):
-			Thread(pri),
-		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+	):
+	Thread(pri),
+	TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
 	(ia,dataPort,controlPort,memberssize,app)
-	{ }
+{ }
 #endif
-	
-	SingleThreadRTPSessionIPV6(const IPV6Multicast& ia, 
-			       tpport_t dataPort = DefaultRTPDataPort, 
-			       tpport_t controlPort = 0, 
-			       int pri = 0,
-			       uint32 memberssize = 
-			       MembershipBookkeeping::defaultMembersHashSize,
-			       RTPApplication& app = defaultApplication(),
-			       uint32 iface = 0)
+
+SingleThreadRTPSessionIPV6(const IPV6Multicast& ia,
+			   tpport_t dataPort = DefaultRTPDataPort,
+			   tpport_t controlPort = 0,
+			   int pri = 0,
+			   uint32 memberssize =
+			   MembershipBookkeeping::defaultMembersHashSize,
+			   RTPApplication& app = defaultApplication(),
+			   uint32 iface = 0
 #if defined(_MSC_VER) && _MSC_VER >= 1300
-				   ;
+	);
 #else
-				   :
-			Thread(pri),
-		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app,iface)
-	{ }
+        ):
+        Thread(pri),
+        TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+        (ia,dataPort,controlPort,memberssize,app,iface)
+{ }
 #endif
 
-	~SingleThreadRTPSessionIPV6()
-	{ terminate(); }
+~SingleThreadRTPSessionIPV6()
+{ terminate(); }
 
-#if defined(_MSC_VER) && _MSC_VER >= 1300 
-	virtual void startRunning();
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+virtual void startRunning();
 #else
-	/**
-	 * Activate stack and start service thread.
-	 **/
-	void
-	startRunning()
-	{ enableStack(); Thread::start(); }
+/**
+ * Activate stack and start service thread.
+ **/
+void
+startRunning()
+{ enableStack(); Thread::start(); }
 #endif
 
 
 protected:
-	inline void enableStack(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+inline void enableStack(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
 
-	inline microtimeout_t getSchedulingTimeout(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
+inline microtimeout_t getSchedulingTimeout(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
 
-	inline void controlReceptionService(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
+inline void controlReceptionService(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
 
-	inline void controlTransmissionService(void)
-		{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
+inline void controlTransmissionService(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
 
-	inline timeval getRTCPCheckInterval(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
+inline timeval getRTCPCheckInterval(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
 
-	inline size_t dispatchDataPacket(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
+inline size_t dispatchDataPacket(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
-	virtual void run(void);
+virtual void run(void);
 
-	virtual void timerTick(void);
+virtual void timerTick(void);
 
-	virtual bool isPendingData(microtimeout_t timeout); 
+virtual bool isPendingData(microtimeout_t timeout);
 #else
 
-	virtual void timerTick(void)
-		{return;}
+virtual void timerTick(void)
+{return;}
 
-	virtual bool isPendingData(microtimeout_t timeout)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
+virtual bool isPendingData(microtimeout_t timeout)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
 
-	/**
-	 * Single runnable method for this RTP stacks, schedules
-	 * outgoing and incoming RTP data and RTCP packets.
-	 **/
-	virtual void run(void)
-	{
-		microtimeout_t timeout = 0;
-		while ( ServiceQueue::isActive() ) {
-			if ( timeout < 1000 ){ // !(timeout/1000)
-				timeout = getSchedulingTimeout();
-			}
-			setCancel(cancelDeferred);
-			controlReceptionService();
-			controlTransmissionService();
-			setCancel(cancelImmediate);
-			microtimeout_t maxWait = 
-				timeval2microtimeout(getRTCPCheckInterval());
-			// make sure the scheduling timeout is
-			// <= the check interval for RTCP
-			// packets
-			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( timeout < 1000 ) { // !(timeout/1000)
-				setCancel(cancelDeferred);
-				dispatchDataPacket();
-				setCancel(cancelImmediate);
-				timerTick();
-			} else {
-				if ( isPendingData(timeout/1000) ) {
-					setCancel(cancelDeferred);
-					takeInDataPacket();
-					setCancel(cancelImmediate);
-				}
-				timeout = 0;
-			}
+/**
+ * Single runnable method for this RTP stacks, schedules
+ * outgoing and incoming RTP data and RTCP packets.
+ **/
+virtual void run(void)
+{
+	microtimeout_t timeout = 0;
+	while ( ServiceQueue::isActive() ) {
+		if ( timeout < 1000 ){ // !(timeout/1000)
+			timeout = getSchedulingTimeout();
 		}
-		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep((timeout_t)~0);
+		setCancel(cancelDeferred);
+		controlReceptionService();
+		controlTransmissionService();
+		setCancel(cancelImmediate);
+		microtimeout_t maxWait =
+			timeval2microtimeout(getRTCPCheckInterval());
+		// make sure the scheduling timeout is
+		// <= the check interval for RTCP
+		// packets
+		timeout = (timeout > maxWait)? maxWait : timeout;
+		if ( timeout < 1000 ) { // !(timeout/1000)
+			setCancel(cancelDeferred);
+			dispatchDataPacket();
+			setCancel(cancelImmediate);
+			timerTick();
+		} else {
+			if ( isPendingData(timeout/1000) ) {
+				setCancel(cancelDeferred);
+				takeInDataPacket();
+				setCancel(cancelImmediate);
+			}
+			timeout = 0;
+		}
 	}
+	dispatchBYE("GNU ccRTP stack finishing.");
+	sleep((timeout_t)~0);
+}
 
 #endif
 
-	inline size_t takeInDataPacket(void)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
+inline size_t takeInDataPacket(void)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
 
-	inline size_t dispatchBYE(const std::string &str)
-		{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
+inline size_t dispatchBYE(const std::string &str)
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
 };
 
 /**
@@ -1094,9 +1130,9 @@ typedef RTPSessionIPV6 RTPSocketIPV6;
  * transmission/reception.
  *
  * @short Symmetric UDP/IPv6 RTP session scheduled by one thread of execution.
- **/\
-typedef SingleThreadRTPSessionIPV6<SymmetricRTPChannelIPV6,
-			       SymmetricRTPChannelIPV6> SymmetricRTPSessionIPV6;
+ **/
+ typedef SingleThreadRTPSessionIPV6<SymmetricRTPChannelIPV6,
+				    SymmetricRTPChannelIPV6> SymmetricRTPSessionIPV6;
 
 
 #endif

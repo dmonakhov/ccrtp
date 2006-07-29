@@ -1,27 +1,27 @@
 // Copyright (C) 1999-2002 Open Source Telecom Corporation.
-//  
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -112,7 +112,7 @@ streambuf()
 #else
 ,ostream((streambuf *)this)
 #endif
-{ 
+{
 #ifdef	HAVE_OLD_IOSTREAM
 	init((streambuf *)this);
 #endif
@@ -191,23 +191,23 @@ static inline unsigned long F(unsigned long x, unsigned long y, unsigned long z)
 {
 	return (x & y) | (~x & z);
 }
- 
+
 static inline unsigned long G(unsigned long x, unsigned long y, unsigned long z)
 {
 	return (x & z) | (y & ~z);
 }
- 
+
 static inline unsigned long H(unsigned long x, unsigned long y, unsigned long z)
 {
 	return x ^ y ^ z;
 }
- 
+
 static inline unsigned long md5I(unsigned long x, unsigned long y, unsigned long z)
 {
 	return y ^ (x | ~z);
 }
 
-   
+
 static void FF(unsigned long &a, unsigned long b, unsigned long c, unsigned long d, unsigned long x, unsigned long s, unsigned long ac)
 {
 	a += F(b, c, d) + x + ac;
@@ -339,7 +339,7 @@ void MD5Digest::update(void)
 	HH(a, b, c, d, x[ 9], S31, 0xd9d4d039);
 	HH(d, a, b, c, x[12], S32, 0xe6db99e5);
 	HH(c, d, a, b, x[15], S33, 0x1fa27cf8);
-	HH(b, c, d, a, x[ 2], S34, 0xc4ac5665); 
+	HH(b, c, d, a, x[ 2], S34, 0xc4ac5665);
 
 	II(a, b, c, d, x[ 0], S41, 0xf4292244);
 	II(d, a, b, c, x[ 7], S42, 0x432aff97);
@@ -471,10 +471,10 @@ static uint32 MD5BasedRandom32()
 
 	gettimeofday(&(message.data.time),NULL);
 	message.array[0] =
-		static_cast<uint8>(message.data.time.tv_sec * 
+		static_cast<uint8>(message.data.time.tv_sec *
 				   message.data.time.tv_usec);
 
-	message.data.address = &message;	
+	message.data.address = &message;
 	memcpy(message.data.cname,
 	       defaultApplication().getSDESItem(SDESItemTypeCNAME).c_str(),10);
 
@@ -483,12 +483,12 @@ static uint32 MD5BasedRandom32()
 	md5.putDigest(reinterpret_cast<unsigned char*>(message.array),
 		      sizeof(message));
 	md5.getDigest(reinterpret_cast<unsigned char*>(digest.buf8));
-	
+
 	// Get result as xor of the four 32-bit words from the MD5 algorithm.
 	uint32 result = 0;
 	for ( int i = 0; i < 4; i ++ )
 		result ^= digest.buf32[i];
-	return result;		
+	return result;
 }
 
 uint32 random32()
@@ -526,6 +526,7 @@ RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 		setLocalSSRC(random32());
 	else
 		setLocalSSRC(*ssrc);
+
 	// assume a default rate and payload type.
 	setPayloadFormat(StaticPayloadFormat(sptPCMU));
 	// queue/session creation time
@@ -534,21 +535,22 @@ RTPQueueBase::RTPQueueBase(uint32 *ssrc)
 
 const uint32 RTPDataQueue::defaultSessionBw = 64000;
 
-RTPDataQueue::RTPDataQueue(uint32 size)	: 
+RTPDataQueue::RTPDataQueue(uint32 size)	:
 	IncomingDataQueue(size), OutgoingDataQueue()
 {
-	initQueue();
-} 
+        initQueue();
+}
 
 RTPDataQueue::RTPDataQueue(uint32* ssrc, uint32 size):
 	RTPQueueBase(ssrc),
 	IncomingDataQueue(size), OutgoingDataQueue(), timeclock()
 {
-	initQueue();
+        initQueue();
+        setLocalSSRC(*ssrc);    // TODO - Strange - ssrc should be initialized via RTPQueueBase constructor
 }
 
 // Initialize everything
-void 
+void
 RTPDataQueue::initQueue()
 {
 	dataServiceActive = false;
@@ -556,7 +558,7 @@ RTPDataQueue::initQueue()
 	sessionBw = getDefaultSessionBandwidth();
 }
 
-void 
+void
 RTPDataQueue::endQueue(void)
 {
 	// stop executing the data service.
@@ -571,6 +573,11 @@ RTPDataQueue::endQueue(void)
 #ifdef	CCXX_EXCEPTIONS
 	} catch (...) { }
 #endif
+        // remove the outgoing crypto context
+        CryptoContext* pcc = getOutQueueCryptoContext();
+        setOutQueueCryptoContext(NULL);
+        delete pcc;
+        // TODO clean incoming Crypto Context
 }
 
 uint32
@@ -583,7 +590,7 @@ RTPDataQueue::getCurrentTimestamp() const
 	int32 result = now.tv_usec - getInitialTime().tv_usec;
 	result *= (getCurrentRTPClockRate()/1000);
 	result /= 1000;
-	result += (now.tv_sec - getInitialTime().tv_sec) * 
+	result += (now.tv_sec - getInitialTime().tv_sec) *
 		getCurrentRTPClockRate();
 
 	//result -= initialTimestamp;

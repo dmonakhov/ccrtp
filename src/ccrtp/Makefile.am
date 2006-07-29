@@ -1,9 +1,9 @@
 # Copyright (C) 2002 Open Source Telecom Corporation.
-#  
+#
 # This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without 
+# unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -12,10 +12,11 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ccxxincludedir=$(includedir)/ccrtp
 
 ccxxinclude_HEADERS = base.h formats.h rtppkt.h rtcppkt.h sources.h channel.h \
-	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h rtp.h pool.h
+	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h rtp.h pool.h \
+	CryptoContext.h
 
 kdoc_headers = base.h formats.h rtppkt.h rtcppkt.h sources.h channel.h \
-	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h
+	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h CryptoContext.h
 
 kdoc:
 	kdoc -f html -d $(KDOC_DIR) -L$(KDOC_DIR) -n ccrtp $(kdoc_headers)
