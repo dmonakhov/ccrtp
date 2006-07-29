@@ -1,0 +1,53 @@
+/*
+  Copyright (C) 2005, 2004 Erik Eliasson, Johan Bilien
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/*
+ * Authors: Erik Eliasson <eliasson@it.kth.se>
+ *          Johan Bilien <jobi@via.ecp.fr>
+*/
+
+
+#include<config.h>
+
+#include <openssl/hmac.h>
+#include <crypto/openssl/hmac.h>
+
+void hmac_sha1( uint8 * key, int32 key_length,
+		const uint8* data, uint32 data_length,
+		uint8* mac, int32* mac_length ){
+                        HMAC( EVP_sha1(), key, key_length,
+                              data, data_length, mac,
+                              reinterpret_cast<uint32*>(mac_length) );
+}
+
+void hmac_sha1( uint8* key, int32 key_length,
+		const uint8* data_chunks[],
+		uint32 data_chunck_length[],
+		uint8* mac, int32* mac_length ){
+	HMAC_CTX ctx;
+	HMAC_CTX_init( &ctx );
+	HMAC_Init_ex( &ctx, key, key_length, EVP_sha1(), NULL );
+	while( *data_chunks ){
+		HMAC_Update( &ctx, *data_chunks, *data_chunck_length );
+		data_chunks ++;
+		data_chunck_length ++;
+	}
+        HMAC_Final( &ctx, mac, reinterpret_cast<uint32*>(mac_length) );
+	HMAC_CTX_cleanup( &ctx );
+}
+
