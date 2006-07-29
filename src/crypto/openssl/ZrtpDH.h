@@ -14,6 +14,19 @@
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+ * In addition, as a special exception, the copyright holders give
+ * permission to link the code of portions of this program with the
+ * OpenSSL library under certain conditions as described in each
+ * individual source file, and distribute linked combinations
+ * including the two.
+ * You must obey the GNU General Public License in all respects
+ * for all of the code used other than OpenSSL.  If you modify
+ * file(s) with this exception, you may extend this exception to your
+ * version of the file(s), but you are not obligated to do so.  If you
+ * do not wish to do so, delete this exception statement from your
+ * version.  If you delete this exception statement from all source
+ * files in the program, then also delete it here.
  */
 
 /*
@@ -49,7 +62,7 @@ public:
     ~ZrtpDH();
 
     /**
-     * Generates a public key based on the DH parameters and a random 
+     * Generates a public key based on the DH parameters and a random
      * private key.
      *
      * @return 1 on success, 0 on failure
@@ -85,7 +98,7 @@ public:
     /**
      * Compute the secret key and return it to caller.
      *
-     * This method computes the secret key based on the DH parameters, the 
+     * This method computes the secret key based on the DH parameters, the
      * private key and the peer's public key.
      *
      * @param pubKeyBytes
@@ -95,7 +108,7 @@ public:
      *    Length in bytes of the peer's public key.
      *
      * @param secret
-     *    Pointer to a buffer that receives the secret key. This buffer must 
+     *    Pointer to a buffer that receives the secret key. This buffer must
      *    have a length of at least <code>getSecretSize()</code> bytes.
      *
      * @return the size of the shared secret on success, -1 on error.
