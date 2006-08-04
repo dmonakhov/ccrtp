@@ -21,7 +21,8 @@ lib_LTLIBRARIES = libccrtp1.la
 libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp source.cpp data.cpp incqueue.cpp \
 	outqueue.cpp queue.cpp control.cpp members.cpp socket.cpp duplex.cpp pool.cpp \
 	CryptoContext.cxx crypto/openssl/hmac256.cxx crypto/openssl/hmac.cxx \
-	crypto/openssl/sha256.cxx crypto/openssl/AesSrtp.cxx
+	crypto/openssl/sha256.cxx crypto/openssl/AesSrtp.cxx \
+	crypto/openssl/InitializeOpenSSL.cxx
 
 libccrtp1_la_LDFLAGS = $(RELEASE)
 

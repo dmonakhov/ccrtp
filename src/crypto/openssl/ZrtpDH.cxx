@@ -47,6 +47,8 @@
 // #include <libmcrypto/init.h>
 #include <crypto/openssl/ZrtpDH.h>
 
+extern void initializeOpenSSL();
+
 static BIGNUM *bnP3072 = NULL;
 static BIGNUM *bnP4096 = NULL;
 
@@ -141,7 +143,7 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
 
     uint8_t random[64];
 
-    //    libmcryptoInit();
+    initializeOpenSSL();
 
     if (!dhinit) {
 	bnP3072 = BN_bin2bn(P3072,sizeof(P3072),NULL);

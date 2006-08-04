@@ -36,7 +36,7 @@
  */
 
 
-void initializeOpenSSL();
+extern void initializeOpenSSL();
 
 #include <crypto/openssl/AesSrtp.h>
 #include<string.h>
@@ -46,7 +46,7 @@ AesSrtp::AesSrtp():key(NULL){
 
 AesSrtp::AesSrtp( uint8* key, int32 key_length ) {
 
-    // void initializeOpenSSL();
+    void initializeOpenSSL();
 
     this->key = (AES_KEY *) malloc( sizeof( AES_KEY ) );
     memset( this->key, 0, sizeof( AES_KEY ) );;
