@@ -45,8 +45,42 @@ AM_PROG_LIBTOOL
 AM_INIT_AUTOMAKE(ccrtp,[$VERSION])
 AM_CONFIG_HEADER(src/config.h)
 
-# check availability of openSSL crypto library
-AC_CHECK_LIB([crypto], [EVP_CipherInit_ex], [], AC_MSG_ERROR([OpenSSL crypto library not found.]))
+# SRTP support
+AC_ARG_ENABLE(srtp,
+    AS_HELP_STRING([--enable-srtp],
+        [enable SRTP support (default enabled)]))
+if test -z "$enable_srtp"; then
+   enable_srtp="yes"
+fi
+if test "${enable_srtp}" = "yes"
+then
+   AC_DEFINE(SRTP_SUPPORT, [], [SRTP support])
+fi
+AM_CONDITIONAL(SRTP_SUPPORT, test "${enable_srtp}" = "yes")
+
+# ZRTP support
+AC_ARG_ENABLE(zrtp,
+    AS_HELP_STRING([--enable-zrtp],
+        [enable ZRTP support (default disabled)]))
+if test -z "$enable_zrtp"; then
+   enable_zrtp = "no"
+fi
+if test "${enable_zrtp}" = "yes"
+then
+    if test "${enable_srtp}" != "yes"
+    then
+        AC_MSG_ERROR([You need SRTP support to enable ZRTP])
+    fi
+    AC_DEFINE(ZRTP_SUPPORT, [], [ZRTP support])
+fi
+AM_CONDITIONAL(ZRTP_SUPPORT, test "${enable_zrtp}" = "yes")
+
+# check availability of openSSL crypto library if SRTP support enabled
+if test "${enable_srtp}" = "yes"
+then
+    AC_CHECK_LIB([crypto], [EVP_CipherInit_ex],
+                 [], AC_MSG_ERROR([OpenSSL crypto library not found.]))
+fi
 
 OST_PROG_COMMON
 OST_PROG_LIBVER
@@ -74,8 +108,12 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 	])
 ])
 
-AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
-                 [], AC_MSG_ERROR([OpenSSL headers not found.]))
+# check availability of openSSL crypto headers if SRTP support enabled
+if test "${enable_srtp}" = "yes"
+then
+     AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
+                      [], AC_MSG_ERROR([OpenSSL headers not found.]))
+fi
 
 KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
