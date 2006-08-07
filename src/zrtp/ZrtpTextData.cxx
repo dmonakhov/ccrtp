@@ -37,6 +37,7 @@ char *DHPart2Msg =  "DHPart2 ";
 char *Confirm1Msg = "Confirm1";
 char *Confirm2Msg = "Confirm2";
 char *Conf2AckMsg = "Conf2ACK";
+char *ErrorMsg =    "Error ";
 char *GoClearMsg =  "GoClear ";
 char *ClearAckMsg = "ClearACK";
 

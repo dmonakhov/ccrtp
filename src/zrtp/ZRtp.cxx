@@ -404,10 +404,6 @@ ZrtpPacketDHPart* ZRtp::prepareDHPart2(ZrtpPacketDHPart *dhPart1) {
     // Thus get the singleton instance to the open file
     ZIDFile *zid = ZIDFile::getInstance();
     zid->getRecord(&zidRec);
-
-    uint32_t macLen;
-    uint8_t randBuf[RS_LENGTH];
-
     /*
      * After the next function call my set of shared secrets and the expected
      * set of shared secrets are ready. The expected shared secrets are in the

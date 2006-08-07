@@ -34,7 +34,7 @@
  *
  * <p/>
  *
- * This ZRTP needs only six callback methods to be implemented by the host
+ * This ZRTP needs only seven callback methods to be implemented by the host
  * environment.
  *
  * @author: Werner Dittmann <Werner.Dittmann@t-online.de>

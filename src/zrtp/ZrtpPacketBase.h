@@ -59,13 +59,13 @@ class ZrtpPacketBase {
       virtual ~ZrtpPacketBase() {};
 
     const uint8_t* getHeaderBase() { return (const uint8_t*)zrtpHeader; };
-    bool isZrtpPacket()            { return (ntoh16(zrtpHeader->zrtpId) == zrtpId); };
-    uint16_t getLength()           { return ntoh16(zrtpHeader->length); };
+    bool isZrtpPacket()            { return (ntohs(zrtpHeader->zrtpId) == zrtpId); };
+    uint16_t getLength()           { return ntohs(zrtpHeader->length); };
     uint8_t* getMessage()          { return zrtpHeader->message; };
 
-    void setLength(uint16_t len)  { zrtpHeader->length = hton16(len); };
+    void setLength(uint16_t len)  { zrtpHeader->length = htons(len); };
     void setMessage(uint8_t *msg) { memcpy(zrtpHeader->message, msg, ZRTP_MSG_SIZE); };
-    void setZrtpId()              { zrtpHeader->zrtpId = hton16(zrtpId); }
+    void setZrtpId()              { zrtpHeader->zrtpId = htons(zrtpId); }
 };
 
 #endif // ZRTPPACKETBASE

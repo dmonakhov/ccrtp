@@ -124,11 +124,11 @@ typedef struct GoClear {
     uint8_t clearHmac[32];
 } GoClear_t;
 
-#define CLEARACK_LENGTH         8 /* plus MESSAGE_LENGTH = 10 */
+#define GOCLEAR_LENGTH         8 /* plus MESSAGE_LENGTH = 10 */
 typedef struct GoClearPacket {
     zrtpPacketHeader_t hdr;
     GoClear goClear;
-} GoClearPacket_t
+} GoClearPacket_t;
 
 #define CLEARACK_LENGTH         2
 typedef struct ClearAck {
