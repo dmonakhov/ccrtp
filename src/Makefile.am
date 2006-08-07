@@ -15,11 +15,10 @@ AM_CXXFLAGS= @WARN_FLAGS@
 RELEASE = $(LT_VERSION) -release $(LT_RELEASE) @GNULIBS@
 LIBS = @GNULIBS@
 
-SUBDIRS = ccrtp
+SUBDIRS = ccrtp crypto/openssl zrtp
 lib_LTLIBRARIES = libccrtp1.la
 
 if SRTP_SUPPORT
-SRTP_FLAGS="-DSRTP_SUPPORT"
 srtp_src = crypto/openssl/hmac256.cxx \
 		crypto/openssl/hmac.cxx \
 		crypto/openssl/sha256.cxx \
@@ -28,7 +27,6 @@ srtp_src = crypto/openssl/hmac256.cxx \
 endif
 
 if ZRTP_SUPPORT
-ZRTP_FLAGS="-DZRTP_SUPPORT"
 zrtp_src = zrtp/ZIDFile.cxx \
 		zrtp/ZIDRecord.cxx \
 		zrtp/ZRtp.cxx \
@@ -41,11 +39,10 @@ zrtp_src = zrtp/ZIDFile.cxx \
 		zrtp/ZrtpPacketHello.cxx \
 		zrtp/ZrtpStateClass.cxx \
 		zrtp/ZrtpTextData.cxx \
-		zrtp/Base32.cxx
+		zrtp/Base32.cxx \
+		zrtp/ZrtpQueue.cpp \
+		crypto/openssl/ZrtpDH.cxx
 endif
-
-# enable conditional compilation depending on required support modules
-AM_CXXFLAGS+=$(SRTP_FLAGS) $(ZRTP_FLAGS)
 
 libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp source.cpp data.cpp incqueue.cpp \
 	outqueue.cpp queue.cpp control.cpp members.cpp socket.cpp duplex.cpp pool.cpp \
