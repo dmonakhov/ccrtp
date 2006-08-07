@@ -53,8 +53,9 @@
 #ifndef AESSRTP_H
 #define AESSRTP_H
 
+#include <malloc.h>
 #include <openssl/aes.h>                // the include of openSSL
-#include <private.h>
+#include <cc++/config.h>
 
 typedef struct _f8_ctx {
     unsigned char *S;

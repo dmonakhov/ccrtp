@@ -29,13 +29,11 @@
  * files in the program, then also delete it here.
  */
 
-/*
- * Authors: Erik Eliasson <eliasson@it.kth.se>
+/**
+ * @author Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  *	    Werner Dittmann <Werner.Dittmann@t-online.de>
-*/
-
-#include<config.h>
+ */
 
 #include <crypto/openssl/sha256.h>
 

@@ -41,7 +41,7 @@
 #include <openssl/crypto.h>
 #include <openssl/sha.h>
 
-#include <private.h>
+#include <cc++/config.h>
 
 /**
  * Compute SHA256 digest.

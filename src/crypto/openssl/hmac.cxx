@@ -34,18 +34,16 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-
-#include<config.h>
-
 #include <openssl/hmac.h>
 #include <crypto/openssl/hmac.h>
 
 void hmac_sha1( uint8 * key, int32 key_length,
 		const uint8* data, uint32 data_length,
-		uint8* mac, int32* mac_length ){
-                        HMAC( EVP_sha1(), key, key_length,
-                              data, data_length, mac,
-                              reinterpret_cast<uint32*>(mac_length) );
+		uint8* mac, int32* mac_length )
+{
+    HMAC( EVP_sha1(), key, key_length,
+          data, data_length, mac,
+          reinterpret_cast<uint32*>(mac_length) );
 }
 
 void hmac_sha1( uint8* key, int32 key_length,

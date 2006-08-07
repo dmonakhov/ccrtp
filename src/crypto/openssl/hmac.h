@@ -39,7 +39,7 @@
 #ifndef HMAC_H
 #define HMAC_H
 
-#include <private.h>
+#include <cc++/config.h>
 
 /**
  * Compute SHA1 HMAC.

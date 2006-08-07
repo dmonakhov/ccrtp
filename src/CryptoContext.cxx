@@ -25,7 +25,6 @@
  *          Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-
 #include <iostream>
 
 #include <ccrtp/CryptoContext.h>
@@ -34,7 +33,7 @@
 namespace ost {
 #endif
 
-    CryptoContext::CryptoContext( uint32 ssrc ):
+CryptoContext::CryptoContext( uint32 ssrc ):
 	ssrc(ssrc),
 	using_mki(false),mkiLength(0),mki(NULL),
 	roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
@@ -48,7 +47,7 @@ namespace ost {
 	encr(0), auth(0), seqNumSet(false)
     {}
 
-    CryptoContext::CryptoContext( uint32 ssrc, int32 roc,
+CryptoContext::CryptoContext( uint32 ssrc, int32 roc,
 				  int64 key_deriv_rate,
 				  //enum encr_method encryption,
 				  const int32 ealg,
@@ -119,7 +118,7 @@ namespace ost {
 	}
     }
 
-    CryptoContext::~CryptoContext(){
+CryptoContext::~CryptoContext(){
 	if (mki)
 	    delete [] mki;
 
@@ -139,7 +138,7 @@ namespace ost {
 	    delete [] k_s;
     }
 
-    void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
+void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 
 	if (ealg == SrtpEncryptionNull) {
 	    return;
@@ -216,7 +215,7 @@ namespace ost {
     }
 
 /* Warning: tag must have been initialized */
-    void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
+void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
     {
 	int32 tag_length;
 

@@ -35,7 +35,6 @@
  * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-
 extern void initializeOpenSSL();
 
 #include <crypto/openssl/AesSrtp.h>

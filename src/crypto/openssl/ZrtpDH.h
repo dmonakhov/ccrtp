@@ -42,6 +42,8 @@
 #include <openssl/rand.h>
 #include <openssl/dh.h>
 
+#include <cc++/config.h>
+
 /**
  * Implementation of Diffie-Helman for ZRTP
  *

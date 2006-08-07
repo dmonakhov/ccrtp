@@ -41,8 +41,8 @@
 #define HMAC_SHA256_H
 
 #include <openssl/hmac.h>
+#include <cc++/config.h>
 
-#include <private.h>
 
 /**
  * Compute SHA256 HMAC.

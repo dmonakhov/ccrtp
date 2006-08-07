@@ -35,22 +35,21 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-
-#include<config.h>
-
 #include <openssl/hmac.h>
 #include <crypto/openssl/hmac256.h>
 
-void hmac_sha256( unsigned char * key, unsigned int key_length,
-		unsigned char * data, unsigned int data_length,
-		unsigned char * mac, unsigned int * mac_length ){
+void hmac_sha256(uint8* key, uint32 key_length,
+		uint8* data, int32 data_length,
+		uint8* mac, uint32* mac_length)
+{
 	HMAC( EVP_sha256(), key, key_length, data, data_length, mac, mac_length );
 }
 
-void hmac_sha256( unsigned char * key, unsigned int key_length,
-		unsigned char * data_chunks[],
-		unsigned int data_chunck_length[],
-		unsigned char * mac, unsigned int * mac_length ){
+void hmac_sha256( uint8* key, uint32 key_length,
+		uint8* data_chunks[],
+		uint32 data_chunck_length[],
+		uint8* mac, uint32* mac_length )
+{
 	HMAC_CTX ctx;
 	HMAC_CTX_init( &ctx );
 	HMAC_Init_ex( &ctx, key, key_length, EVP_sha256(), NULL );

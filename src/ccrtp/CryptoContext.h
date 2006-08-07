@@ -24,7 +24,8 @@
 #include <crypto/openssl/AesSrtp.h>
 #include <crypto/openssl/hmac.h>
 
-#include "private.h"
+#include <cc++/config.h>
+
 #include <ccrtp/rtppkt.h>
 
 #define REPLAY_WINDOW_SIZE 64
@@ -91,12 +92,12 @@ namespace ost {
 	 * algorithms are enabled, keys are computed and so on. This SRTP
 	 * cryptographic context can protect a RTP SSRC stream.
 	 *
-	 * @param ssrc 
+	 * @param ssrc
 	 *    The RTP SSRC that this SRTP cryptographic context protects.
 	 *
 	 * @param roc
-	 *    The initial Roll-Over-Counter according to RFC 3711. These are the 
-	 *    upper 32 bit of the overall 48 bit SRTP packet index. Refer to 
+	 *    The initial Roll-Over-Counter according to RFC 3711. These are the
+	 *    upper 32 bit of the overall 48 bit SRTP packet index. Refer to
 	 *    chapter 3.2.1 of the RFC.
 	 *
 	 * @param keyDerivRate
@@ -121,8 +122,8 @@ namespace ost {
 	 *    3.2.1 of the RFC about the role of the master key.
 	 *
 	 * @param masterKeyLength
-	 *    The length in bytes of the master key in bytes. The length must 
-	 *    match the selected encryption algorithm. Because SRTP uses AES 
+	 *    The length in bytes of the master key in bytes. The length must
+	 *    match the selected encryption algorithm. Because SRTP uses AES
 	 *    based  encryption only, then master key length may be 16 or 32
 	 *    bytes (128 or 256 bit master key)
 	 *
@@ -132,20 +133,20 @@ namespace ost {
 	 *    authentication key and the session salt.
 	 *
 	 * @param masterSaltLength
-	 *    The length in bytes of the master salt data in bytes. SRTP uses 
-	 *    AES as encryption algorithm. AES encrypts 16 byte blocks 
+	 *    The length in bytes of the master salt data in bytes. SRTP uses
+	 *    AES as encryption algorithm. AES encrypts 16 byte blocks
 	 *    (independent of the key length). According to RFC3711 the standard
 	 *    value for the master salt length should be 112 bit (14 bytes).
 	 *
 	 * @param ekeyl
 	 *    The length in bytes of the session encryption key that SRTP shall
 	 *    compute and use. Usually the same length as for the master key
-	 *    length. But you may use a different length as well. Be carefull 
+	 *    length. But you may use a different length as well. Be carefull
 	 *    that the key management mechanisms supports different key lengths.
 	 *
 	 * @param akeyl
-	 *    The length in bytes of the session authentication key. SRTP 
-	 *    computes this key and uses it as input to the authentication 
+	 *    The length in bytes of the session authentication key. SRTP
+	 *    computes this key and uses it as input to the authentication
 	 *    algorithm.
 	 *    The standard value is 160 bits (20 bytes).
 	 *
@@ -160,7 +161,7 @@ namespace ost {
 	 *    (MIKEY).
 	 *
 	 * @param auth
-	 *    If set to zero doe not perform authentication (not used inside 
+	 *    If set to zero doe not perform authentication (not used inside
 	 *    this implementation) but available for some key management systems
 	 *    (MIKEY).
 	 *
@@ -225,7 +226,7 @@ namespace ost {
 	 *    The RTP packet that contains the data to encrypt.
 	 *
 	 * @param index
-	 *    The 48 bit SRTP packet index. See the <code>guessIndex</code> 
+	 *    The 48 bit SRTP packet index. See the <code>guessIndex</code>
 	 *    method.
 	 *
 	 * @param ssrc
@@ -259,13 +260,13 @@ namespace ost {
 	 * SRTP Cryptograhic context was set up.
 	 *
 	 * @param index
-	 *    The 48 bit SRTP packet index. See the <code>guessIndex</code> 
+	 *    The 48 bit SRTP packet index. See the <code>guessIndex</code>
 	 *    method.
 	 */
 	    void deriveSrtpKeys(uint64 index);
 
 	/**
-	 * Compute (guess) the new SRTP index based on the sequence number of 
+	 * Compute (guess) the new SRTP index based on the sequence number of
 	 * a received RTP packet.
 	 *
 	 * The method uses the algorithm show in RFC3711, Appendix A, to compute
@@ -284,12 +285,12 @@ namespace ost {
 	 * The method check if a received packet is either to old or was already
 	 * received.
 	 *
-	 * The method supports a 64 packet history relative the the given 
+	 * The method supports a 64 packet history relative the the given
 	 * sequence number.
 	 *
 	 * @param newSeqNumber
 	 *    The sequence number of the received RTP packet in host order.
-	 * 
+	 *
 	 * @return <code>true</code> if no replay, <code>false</code> if packet
 	 *    is too old ar was already received.
 	 */
