@@ -11,9 +11,9 @@
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ccxxincludedir=$(includedir)/crypto/openssl
 
-ccxxinclude_HEADERS = AesSrtp.h hmac256.h hmac.h sha256.h
+ccxxinclude_HEADERS = AesSrtp.h hmac256.h hmac.h sha256.h ZrtpDH.h
 
-kdoc_headers = AesSrtp.h hmac256.h hmac.h sha256.h
+kdoc_headers = AesSrtp.h hmac256.h hmac.h sha256.h ZrtpDH.h
 
 kdoc:
 	kdoc -f html -d $(KDOC_DIR) -L$(KDOC_DIR) -n ccrtp $(kdoc_headers)
