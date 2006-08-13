@@ -323,8 +323,6 @@ ZrtpPacketDHPart* ZRtp::prepareDHPart1(ZrtpPacketCommit *commit) {
     }
     dhContext->getPubKeyBytes(pubKeyBytes);
 
-    hexdump("pub key gen", pubKeyBytes, 32);
-
     // Initialize a ZID record to get retained secrets for this peer
     memcpy(peerZid, commit->getZid(), 12);
     ZIDRecord zidRec(peerZid);
@@ -453,8 +451,6 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
 	return NULL;
     }
     data[0] = pvi = dhPart2->getPv();
-    hexdump("pub key initiator", pvi, 32);
-
     /*
      * Prepare the data to compute the SAS hash.
      */
