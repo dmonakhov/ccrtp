@@ -132,11 +132,10 @@ ZrtpQueue::takeInDataPacket(void)
     }
 
     bool doZrtp = false;
-    unsigned char* magic = const_cast<uint8*>(packet->getHdrExtContent());
-    if (magic != NULL) {
-        uint16 tmp = *(reinterpret_cast<uint16*>(magic));
-        tmp = ntohs(tmp);
-        if (tmp == ZRTP_EXT_PACKET) {
+    uint16 magic = packet->getHdrExtUndefined();
+    if (magic != 0) {
+        magic = ntohs(magic);
+        if (magic == ZRTP_EXT_PACKET) {
             doZrtp = true;
             packet->checkZrtpChecksum(false);
         }
@@ -278,7 +277,7 @@ int32_t ZrtpQueue::sendDataRTP(const unsigned char *data, int32_t length) {
     packet->setTimestamp(ts);
 
     packet->enableZrtpChecksum();
-    packet->protect(getLocalSSRC());
+    packet->computeZrtpChecksum();
 
     dispatchImmediate(packet);
     delete packet;
@@ -312,7 +311,13 @@ int32_t ZrtpQueue::sendDataSRTP(const unsigned char *dataHeader, int32_t lengthH
     packet->setTimestamp(ts);
 
     packet->enableZrtpChecksum();
-    packet->protect(getLocalSSRC());
+    if (zfoneDeadBeef) {
+        packet->protect(0xdeadbeef);
+    }
+    else {
+        packet->protect(getLocalSSRC());
+    }
+    packet->computeZrtpChecksum();
 
     dispatchImmediate(packet);
     delete packet;
@@ -328,7 +333,7 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
     // encrypting packets, intiator uses initiator keys, responder uses responders keys
         if (secrets->role == Initiator) {
             cryptoContext = new CryptoContext(
-                    senderSsrc,
+                    getLocalSSRC(),
                     0 /*roc*/,
                     0L,                                      // keydr << 48,
                     SrtpEncryptionAESCM,                   // encryption algo
@@ -346,7 +351,7 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
         }
         else {
             cryptoContext = new CryptoContext(
-                    senderSsrc,
+                    getLocalSSRC(),
                     0 /*roc*/,
                     0L,                                      // keydr << 48,
                     SrtpEncryptionAESCM,                   // encryption algo

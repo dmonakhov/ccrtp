@@ -23,10 +23,8 @@
 #ifndef ZRTPPACKET_H
 #define ZRTPPACKET_H
 
-#include <config.h>
 #include <stdio.h>
-
-#include <private.h>
+#include <cc++/config.h>
 
 #define	ZRTP_EXT_PACKET		0x505a
 
