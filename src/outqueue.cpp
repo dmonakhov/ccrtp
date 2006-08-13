@@ -350,7 +350,7 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 			packet->setMarker(false);
 		}
                 if (cContext != NULL) {
-                        packet->protect(getLocalSSRC());
+                    packet->protect(getLocalSSRC());
                 }
 		// insert the packet into the "tail" of the sending queue
 		sendLock.writeLock();
@@ -400,7 +400,7 @@ OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
                         packet->setMarker(false);
                 }
                 if (cContext != NULL) {
-                        packet->protect(getLocalSSRC());
+                    packet->protect(getLocalSSRC());
                 }
 		dispatchImmediate(packet);
 		delete packet;

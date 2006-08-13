@@ -436,6 +436,10 @@ protected:
         virtual void
         setControlPeer(const InetAddress &host, tpport_t port) = 0;
 
+        // The crypto context for outgoing SRTP sessions. Only one CryptoContext
+        // for an outgoing queue.
+        CryptoContext* cContext;
+
 private:
         /**
 	 * A hook to filter packets being sent that have been expired.
@@ -471,9 +475,6 @@ private:
 	// how old a packet can reach in the sending queue before deletetion
 	microtimeout_t expireTimeout;
 
-        // The crypto context for outgoing SRTP sessions. Only one CryptoContext
-        // for an outgoing queue.
-        CryptoContext* cContext;
 
 	struct {
 		// number of packets sent from the beginning

@@ -117,7 +117,7 @@ RTPPacket::RTPPacket(const unsigned char* const block, size_t len,
 	hdrSize = sizeof(RTPFixedHeader) + (header->cc << 2);
 	if ( header->extension ){
 		RTPHeaderExt *ext = (RTPHeaderExt *)(block + hdrSize);
-                hdrSize += sizeof(uint32) + (ntohl(ext->length) * 4);
+                hdrSize += sizeof(uint32) + (ntohs(ext->length) * 4);
 	}
 	if ( header->padding )
 		len -= block[len - 1];
@@ -155,7 +155,7 @@ RTPPacket::RTPPacket(size_t hdrlen, size_t plen, uint8 paddinglen, CryptoContext
 
 	// now we know the actual total length of the packet, get  some memory
         // but take SRTP data into account. Don't change total because some RTP
-        // functions rely on th fact that total is the overall size (without
+        // functions rely on the fact that total is the overall size (without
         // the SRTP data)
 	buffer = new unsigned char[total + srtpLength];
 	*(reinterpret_cast<uint32*>(getHeader())) = 0;
@@ -202,6 +202,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	// add data.
         cContext = pcc;
         setbuffer(data,datalen,pointer);
+        zrtpChecksumLength = 0;
 }
 
 OutgoingRTPPkt::OutgoingRTPPkt(
@@ -223,6 +224,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	// add data.
         cContext = pcc;
 	setbuffer(data,datalen,pointer);
+        zrtpChecksumLength = 0;
 }
 
 OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen,
@@ -236,6 +238,7 @@ OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen,
 
         cContext = pcc;
 	setbuffer(data,datalen,getSizeOfFixedHeader());
+        zrtpChecksumLength = 0;
 }
 
 void
@@ -252,7 +255,13 @@ void
 OutgoingRTPPkt::protect(uint32 ssrc)
 {
         /* Encrypt the packet */
-        uint64 index = ((uint64)cContext->getRoc() << 16) | (uint64)(getSeqNum());
+        uint64 index = ((uint64)cContext->getRoc() << 16) | (uint64)getSeqNum();
+
+        // if it's a ZRTP packet adjust data to accomodate ZRTP checksum
+        srtpDataOffset -= zrtpChecksumLength;
+        total -= zrtpChecksumLength;
+        payloadSize -= zrtpChecksumLength;
+
         cContext->srtpEncrypt(this, index, ssrc);
 
         // NO MKI support yet - here we assume MKI is zero. To build in MKI
@@ -261,12 +270,38 @@ OutgoingRTPPkt::protect(uint32 ssrc)
         /* Compute MAC */
         cContext->srtpAuthenticate(this, cContext->getRoc(),
                                    const_cast<uint8*>(getRawPacket()+srtpDataOffset) );
+        total += zrtpChecksumLength;
 
         /* Update the ROC if necessary */
         if (getSeqNum() == 0xFFFF ) {
                 cContext->setRoc(cContext->getRoc() + 1);
         }
+}
 
+#define CKSUM_CARRY(x) (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))
+void
+OutgoingRTPPkt::computeZrtpChecksum()
+{
+    uint8* cdata = const_cast<uint8*>(getRawPacket());
+    uint16* data =(uint16*)cdata;
+
+    int32 length = total + srtpLength - zrtpChecksumLength-20+2 ; // TODO This strange -20+2 is an error in Zfone
+
+    uint32_t sum = 0;
+    uint16_t ans = 0;
+
+    while (length > 1) {
+        sum += *data++;
+        length -= 2;
+    }
+    if (length == 1) {
+        *(uint8_t *)(&ans) = *(uint8_t*)data;
+        sum += ans;
+    }
+    uint16 ret = CKSUM_CARRY(sum);
+
+    uint8* tmp = const_cast<uint8*>(getRawPacket());
+    memcpy(tmp+total+srtpLength-zrtpChecksumLength, &ret, 2);
 }
 
 // These masks are valid regardless of endianness.
@@ -293,6 +328,17 @@ IncomingRTPPkt::IncomingRTPPkt(const unsigned char* const block, size_t len) :
 	cachedTimestamp = getRawTimestamp();
 	cachedSeqNum = ntohs(getHeader()->sequence);
 	cachedSSRC = ntohl(getHeader()->sources[0]);
+}
+
+bool
+IncomingRTPPkt::checkZrtpChecksum(bool check)
+{
+    // TODO do a real check, for now adjust length only
+    total -= 2;
+    if (payloadSize >= 2) {
+        payloadSize -= 2;
+    }
+    return true;
 }
 
 bool
@@ -342,13 +388,9 @@ IncomingRTPPkt::unprotect(CryptoContext* pcc)
 
         uint32 guessedRoc = guessedIndex >> 16;
         pcc->srtpAuthenticate(this, guessedRoc, mac);
-        for( int i = 0; i < pcc->getTagLength(); i++ ) {
-                if( tag[i] != mac[i] ) {
-                        tag = NULL;
-                        mki = NULL;
-                        std::cerr << "SRTP: Authentication failed" << std::endl;
-                        return false;
-                }
+        if (memcmp(tag, mac, pcc->getTagLength()) != 0) {
+            std::cerr << "SRTP: Authentication failed" << std::endl;
+            return false;
         }
         delete [] mac;
 

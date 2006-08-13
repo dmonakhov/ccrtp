@@ -52,6 +52,10 @@
 #include <ccrtp/cqueue.h>
 #include <ccrtp/channel.h>
 
+#ifdef ZRTP_SUPPORT
+#include <zrtp/ZrtpQueue.h>
+#endif
+
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 #endif
@@ -616,6 +620,24 @@ typedef RTPSession RTPSocket;
 typedef SingleThreadRTPSession<SymmetricRTPChannel,
 			       SymmetricRTPChannel> SymmetricRTPSession;
 
+#ifdef ZRTP_SUPPORT
+/**
+ * @typedef SymmetricZRTPSession
+ *
+ * Uses one pair of sockets, (1) for RTP data and (2) for RTCP
+ * transmission/reception.
+ *
+ * This session uses the ZrtpQueue instead of the AVPQueue. The ZrtpQueue
+ * inherits from AVPQueue and adds support for ZRTP thus enabling
+ * ad-hoc key negotiation to setup SRTP sessions.
+ *
+ * @short Symmetric UDP/IPv4 RTP session scheduled by one thread of execution.
+ **/
+typedef SingleThreadRTPSession<SymmetricRTPChannel,
+                               SymmetricRTPChannel,
+                               ZrtpQueue> SymmetricZRTPSession;
+
+#endif
 
 #ifdef	CCXX_IPV6
 
