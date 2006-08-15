@@ -34,6 +34,8 @@ zrtp_src = zrtp/ZIDFile.cxx \
 		zrtp/ZrtpPacketConf2Ack.cxx \
 		zrtp/ZrtpPacketConfirm.cxx \
 		zrtp/ZrtpPacketDHPart.cxx \
+		zrtp/ZrtpPacketGoClear.cxx \
+		zrtp/ZrtpPacketClearAck.cxx \
 		zrtp/ZrtpPacketError.cxx \
 		zrtp/ZrtpPacketHelloAck.cxx \
 		zrtp/ZrtpPacketHello.cxx \

@@ -715,11 +715,29 @@ IncomingDataQueue::setInQueueCryptoContext(CryptoContext* cc)
         // remove it from list before inserting the new one.
         for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
                 if( (*i)->getSsrc() == cc->getSsrc() ) {
-                        cryptoContexts.erase(i);
-                        break;
+                    CryptoContext* tmp = *i;
+                    cryptoContexts.erase(i);
+                    delete tmp;
+                    break;
                 }
         }
         cryptoContexts.push_back(cc);
+}
+
+void
+IncomingDataQueue::removeInQueueCryptoContext(CryptoContext* cc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+    std::list<CryptoContext *>::iterator i;
+
+    for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == cc->getSsrc() ) {
+            CryptoContext* tmp = *i;
+            cryptoContexts.erase(i);
+            delete tmp;
+            return;
+        }
+    }
 }
 
 CryptoContext*

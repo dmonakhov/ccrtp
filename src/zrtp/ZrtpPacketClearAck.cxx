@@ -36,7 +36,7 @@ ZrtpPacketClearAck::ZrtpPacketClearAck() {
     setMessage((uint8_t*)ClearAckMsg);
 }
 
-ZrtpPacketClearAck::ZrtpPacketClearAck(char *data) {
+ZrtpPacketClearAck::ZrtpPacketClearAck(uint8_t *data) {
     DEBUGOUT((fprintf(stdout, "Creating Conf2Ack packet from data\n")));
 
     allocated = NULL;

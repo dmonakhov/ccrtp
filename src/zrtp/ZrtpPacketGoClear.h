@@ -16,8 +16,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-#ifndef _ZRTPPACKETERROR_H_
-#define _ZRTPPACKETERROR_H_
+#ifndef _ZRTPPACKETGOCLEAR_H_
+#define _ZRTPPACKETGOCLEAR_H_
 
 #include "ZrtpPacketBase.h"
 
@@ -37,15 +37,15 @@ class ZrtpPacketGoClear : public ZrtpPacketBase {
 
  public:
      ZrtpPacketGoClear();		/* Creates a Error packet with default data */
-     ZrtpPacketGoClear(char* data);	/* Creates a Error packet from received data */
+     ZrtpPacketGoClear(uint8_t* data);	/* Creates a Error packet from received data */
      virtual ~ZrtpPacketGoClear();
 
      uint8_t* getClearHmac() { return clearHeader->clearHmac; };
 
-     void setClearHmac(uint8_t *text) { memcpy(clearHeader->clearHamac, text, 32); };
+     void setClearHmac(uint8_t *text) { memcpy(clearHeader->clearHmac, text, 32); };
 
  private:
 };
 
-#endif // ZRTPPACKETERROR
+#endif // ZRTPPACKETGOCLEAR
 

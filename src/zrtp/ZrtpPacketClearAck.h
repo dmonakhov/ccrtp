@@ -16,8 +16,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-#ifndef _ZRTPPACKETCON2FACK_H_
-#define _ZRTPPACKETCON2FACK_H_
+#ifndef _ZRTPPACKETCLEARACK_H_
+#define _ZRTPPACKETCLEARACK_H_
 
 #include "ZrtpPacketBase.h"
 
@@ -29,15 +29,15 @@
  *
  * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
-class ZrtpPacketClearAck : public ZrtpPacketClearAck {
+class ZrtpPacketClearAck : public ZrtpPacketBase {
 
  public:
      ZrtpPacketClearAck();		/* Creates a Conf2Ack packet with default data */
-     ZrtpPacketClearAck(char* data);	/* Creates a Conf2Ack packet from received data */
+     ZrtpPacketClearAck(uint8_t* data);	/* Creates a Conf2Ack packet from received data */
      virtual ~ZrtpPacketClearAck();
 
  private:
 };
 
-#endif // ZRTPPACKETCONF2ACK
+#endif // ZRTPPACKETCLEARACK
 

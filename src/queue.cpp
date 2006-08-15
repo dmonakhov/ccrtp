@@ -574,10 +574,22 @@ RTPDataQueue::endQueue(void)
 	} catch (...) { }
 #endif
         // remove the outgoing crypto context
-        CryptoContext* pcc = getOutQueueCryptoContext();
-        setOutQueueCryptoContext(NULL);
-        delete pcc;
-        // TODO clean incoming Crypto Context
+        if (cContext != NULL) {
+            CryptoContext* pcc = cContext;
+            cContext = NULL;
+            delete pcc;
+        }
+
+        // Remove any incoming crypto contexts
+        if (cryptoContexts.size() > 0) {
+            std::list<CryptoContext *>::iterator i;
+
+            for (i = cryptoContexts.begin(); i != cryptoContexts.end(); i++) {
+                CryptoContext* tmp = *i;
+                cryptoContexts.erase(i);
+                delete tmp;
+            }
+        }
 }
 
 uint32

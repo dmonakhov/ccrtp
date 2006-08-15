@@ -32,6 +32,8 @@
 #include "ZrtpPacketDHPart.h"
 #include "ZrtpPacketConfirm.h"
 #include "ZrtpPacketConf2Ack.h"
+#include "ZrtpPacketGoClear.h"
+#include "ZrtpPacketClearAck.h"
 #include "ZrtpCallback.h"
 #include "ZIDRecord.h"
 #include <crypto/openssl/ZrtpDH.h>
@@ -125,6 +127,19 @@ class ZRtp {
 	 *
          */
 	int32_t processTimeout();
+        /**
+         * Check for and handle GoClear ZRTP packet header.
+         *
+         * This method checks if this is a GoClear packet. If not, just return
+         * false. Otherwise handle it according to the specification.
+         *
+         * @param extHeader
+         *    A pointer to the first byte of the extension header. Refer to
+         *    RFC3550.
+         * @return
+         *    False if not a GoClear, true otherwise.
+         */
+        bool handleGoClear(uint8_t *extHeader);
 
  private:
      friend class ZrtpStateClass;
@@ -466,7 +481,7 @@ class ZRtp {
      * Confirm1 packet received from our peer. The peer sends the Confirm1 packet
      * as response of our DHPart2. Here we are in the role of the Initiator
      */
-    ZrtpPacketConfirm *prepareConfirm2(ZrtpPacketConfirm *confirm1);
+    ZrtpPacketConfirm* prepareConfirm2(ZrtpPacketConfirm *confirm1);
 
     /**
      * Prepare the Conf2Ack packet.
@@ -475,7 +490,21 @@ class ZRtp {
      * Confirm2 packet received from our peer. The peer sends the Confirm2 packet
      * as response of our Confirm1. Here we are in the role of the Initiator
      */
-    ZrtpPacketConf2Ack *prepareConf2Ack(ZrtpPacketConfirm *confirm2);
+    ZrtpPacketConf2Ack* prepareConf2Ack(ZrtpPacketConfirm *confirm2);
+
+    /**
+     * Prepare a ClearAck packet.
+     *
+     * This method checks if the GoClear message is valid. If yes then switch
+     * off SRTP processing, stop sending of RTP packets (pause transmit) and
+     * inform the user about the fact. Only if user confirms the GoClear message
+     * normal RTP processing is resumed.
+     *
+     * @return
+     *     NULL if GoClear could not be authenticated, a ClearAck packet
+     *     otherwise.
+     */
+    ZrtpPacketClearAck* prepareClearAck(ZrtpPacketGoClear* gpkt);
 
     /**
      * Compare the hvi values.

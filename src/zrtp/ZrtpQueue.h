@@ -124,6 +124,18 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      */
     void srtpSecretsOff(EnableSecurity part);
 
+    /**
+     * This method shall handle GoClear requests.
+     *
+     * According to the ZRTP specification the user must be informed about
+     * this message because the ZRTP implementation switches off security
+     * if it could authenticate the GoClear packet.
+     *
+     */
+    void handleGoClear() {
+        fprintf(stderr, "Need to process a GoClear message!");
+    }
+
     /*
      * End of ZrtpCallback functions.
      */

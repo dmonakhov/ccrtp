@@ -31,19 +31,19 @@ ZrtpPacketGoClear::ZrtpPacketGoClear() {
     if (allocated == NULL) {
     }
     zrtpHeader = (zrtpPacketHeader_t *)&((GoClearPacket_t *)allocated)->hdr;	// the standard header
-    clearHeader = (GoClear_t *)&((GoClearPacket_t *)allocated)->clearHmac;
+    clearHeader = (GoClear_t *)&((GoClearPacket_t *)allocated)->goClear;
 
     setZrtpId();
     setLength(MESSAGE_LENGTH + GOCLEAR_LENGTH);
     setMessage((uint8_t*)GoClearMsg);
 }
 
-ZrtpPacketGoClear::ZrtpPacketGoClear(char *data) {
+ZrtpPacketGoClear::ZrtpPacketGoClear(uint8_t *data) {
     DEBUGOUT((fprintf(stdout, "Creating GoClear packet from data\n")));
 
     allocated = NULL;
     zrtpHeader = (zrtpPacketHeader_t *)&((GoClearPacket_t *)data)->hdr;	// the standard header
-    clearHeader = (GoClear_t *)&((GoClearPacket_t *)data)->clearHmac;
+    clearHeader = (GoClear_t *)&((GoClearPacket_t *)data)->goClear;
 }
 
 ZrtpPacketGoClear::~ZrtpPacketGoClear() {

@@ -125,7 +125,7 @@ typedef struct GoClear {
 #define GOCLEAR_LENGTH         8 /* plus MESSAGE_LENGTH = 10 */
 typedef struct GoClearPacket {
     zrtpPacketHeader_t hdr;
-    GoClear goClear;
+    GoClear_t goClear;
 } GoClearPacket_t;
 
 #define CLEARACK_LENGTH         2

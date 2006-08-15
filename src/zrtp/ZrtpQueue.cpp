@@ -35,19 +35,27 @@ namespace ost {
 int32_t
 ZrtpQueue::initialize(const char *zidFilename)
 {
+    if (staticTimeoutProvider != NULL) {
+        staticTimeoutProvider->stopThread();
+        delete staticTimeoutProvider;
+    }
     staticTimeoutProvider = new TimeoutProvider<std::string, ZrtpQueue*>();
     staticTimeoutProvider->start();
 
+    std::string fname;
     if (zidFilename == NULL) {
         char *home = getenv("HOME");
 
         std::string baseDir = (home != NULL) ? (std::string(home) + std::string("/."))
                                              : std::string(".");
-        std::string fname = baseDir + std::string("GNUccRTP.zid");
+        fname = baseDir + std::string("GNUccRTP.zid");
         zidFilename = fname.c_str();
     }
     ZIDFile *zf = ZIDFile::getInstance();
-    zf->open((char *)zidFilename);
+    if (zf->open((char *)zidFilename) < 0) {
+        enableZrtp = false;
+        sendInfo(Error, "cannot open ZID file");
+    }
     return 1;
 }
 
@@ -91,13 +99,17 @@ void ZrtpQueue::start() {
 }
 
 void ZrtpQueue::stop() {
-    staticTimeoutProvider->stopThread();
-    delete staticTimeoutProvider;
-    staticTimeoutProvider = NULL;
+    if (staticTimeoutProvider != NULL) {
+        staticTimeoutProvider->stopThread();
+        delete staticTimeoutProvider;
+        staticTimeoutProvider = NULL;
+    }
 
-    zrtpEngine->stopZrtp();
-    delete zrtpEngine;
-    zrtpEngine = NULL;
+    if (zrtpEngine != NULL) {
+        zrtpEngine->stopZrtp();
+        delete zrtpEngine;
+        zrtpEngine = NULL;
+    }
 }
 
 /*
@@ -132,35 +144,48 @@ ZrtpQueue::takeInDataPacket(void)
     }
 
     bool doZrtp = false;
-    uint16 magic = packet->getHdrExtUndefined();
-    if (magic != 0) {
-        magic = ntohs(magic);
-        if (magic == ZRTP_EXT_PACKET) {
-            doZrtp = true;
-            packet->checkZrtpChecksum(false);
+    if (enableZrtp) {
+        uint16 magic = packet->getHdrExtUndefined();
+        if (magic != 0) {
+            magic = ntohs(magic);
+            if (magic == ZRTP_EXT_PACKET) {
+                doZrtp = true;
+                packet->checkZrtpChecksum(false);
+                if (zrtpEngine != NULL) {
+                    unsigned char* extHeader =
+                            const_cast<unsigned char*>(packet->getHdrExtContent());
+                    // this now points beyond the undefined and length field.
+                    // We need them, thus adjust
+                    extHeader -= 4;
+                    if (zrtpEngine->handleGoClear(extHeader)) {
+                        delete packet;
+                        return 0;
+                    }
+                }
+            }
         }
-    }
 
-   /*
-    * In case this is not a special Zfone packet and we
-    * have not seen a packet with a valid SSRC then set
-    * the found SSRC as the stream's SSRC. We need the real
-    * SSRC for encryption/decryption. Thus we rely on the fact
-    * that we receive at least one real RTP packet, i.e. not
-    * a Zfone ZRTP packet from our peer before we do some
-    * SRTP encryption/decryption. This is usually the case
-    * because RTP clients send data very fast and ZRTP protocl
-    * handling takes some more milliseconds. ZRTP
-    * implementations that do not use special marker SSRC
-    * are always ok.
-    */
-    if (packet->getSSRC() != 0xdeadbeef) {
-        if (receiverSsrc == 0) {
-            receiverSsrc = packet->getSSRC();
+       /*
+        * In case this is not a special Zfone packet and we
+        * have not seen a packet with a valid SSRC then set
+        * the found SSRC as the stream's SSRC. We need the real
+        * SSRC for encryption/decryption. Thus we rely on the fact
+        * that we receive at least one real RTP packet, i.e. not
+        * a Zfone ZRTP packet from our peer before we do some
+        * SRTP encryption/decryption. This is usually the case
+        * because RTP clients send data very fast and ZRTP protocl
+        * handling takes some more milliseconds. ZRTP
+        * implementations that do not use special marker SSRC
+        * are always ok.
+        */
+        if (packet->getSSRC() != 0xdeadbeef) {
+            if (receiverSsrc == 0) {
+                receiverSsrc = packet->getSSRC();
+            }
         }
-    }
-    else {
-        zfoneDeadBeef = 1;
+        else {
+            zfoneDeadBeef = 1;
+        }
     }
     CryptoContext* pcc = getInQueueCryptoContext(receiverSsrc);
     if (pcc != NULL) {
@@ -335,9 +360,9 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cryptoContext = new CryptoContext(
                     getLocalSSRC(),
                     0 /*roc*/,
-                    0L,                                      // keydr << 48,
-                    SrtpEncryptionAESCM,                   // encryption algo
-                    SrtpAuthenticationSha1Hmac,                // authtication algo
+                    0L,                                      // keyderivation << 48,
+                    SrtpEncryptionAESCM,                     // encryption algo
+                    SrtpAuthenticationSha1Hmac,              // authtication algo
                     (unsigned char*)secrets->keyInitiator,   // Master Key
                     secrets->initKeyLen / 8,                 // Master Key length
                     (unsigned char*)secrets->saltInitiator,  // Master Salt
@@ -353,9 +378,9 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cryptoContext = new CryptoContext(
                     getLocalSSRC(),
                     0 /*roc*/,
-                    0L,                                      // keydr << 48,
-                    SrtpEncryptionAESCM,                   // encryption algo
-                    SrtpAuthenticationSha1Hmac,                // authtication algo
+                    0L,                                      // keyderivation << 48,
+                    SrtpEncryptionAESCM,                     // encryption algo
+                    SrtpAuthenticationSha1Hmac,              // authtication algo
                     (unsigned char*)secrets->keyResponder,   // Master Key
                     secrets->respKeyLen / 8,                 // Master Key length
                     (unsigned char*)secrets->saltResponder,  // Master Salt
@@ -371,7 +396,6 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cContext = cryptoContext;
             snprintf(buffer, 120, "SAS Value(S): %s\n", secrets->sas.c_str());
             sendInfo(Info, buffer);
-            secureParts += (int32_t)ForSender;
     }
     if (part == ForReceiver || part == (EnableSecurity)ForSender+ForReceiver) {
     // decrypting packets, intiator uses responder keys, responder initiator keys
@@ -379,9 +403,9 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cryptoContext = new CryptoContext(
                     receiverSsrc,
                     0 /*roc*/,
-                    0L,                                      // keydr << 48,
-                    SrtpEncryptionAESCM,                   // encryption algo
-                    SrtpAuthenticationSha1Hmac,                // authtication algo
+                    0L,                                      // keyderivation << 48,
+                    SrtpEncryptionAESCM,                     // encryption algo
+                    SrtpAuthenticationSha1Hmac,              // authtication algo
                     (unsigned char*)secrets->keyResponder,   // Master Key
                     secrets->respKeyLen / 8,                 // Master Key length
                     (unsigned char*)secrets->saltResponder,  // Master Salt
@@ -397,9 +421,9 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cryptoContext = new CryptoContext(
                     receiverSsrc,
                     0 /*roc*/,
-                    0L,                                      // keydr << 48,
-                    SrtpEncryptionAESCM,                   // encryption algo
-                    SrtpAuthenticationSha1Hmac,                // authtication algo
+                    0L,                                      // keyderivation << 48,
+                    SrtpEncryptionAESCM,                     // encryption algo
+                    SrtpAuthenticationSha1Hmac,              // authtication algo
                     (unsigned char*)secrets->keyInitiator,   // Master Key
                     secrets->initKeyLen / 8,                 // Master Key length
                     (unsigned char*)secrets->saltInitiator,  // Master Salt
@@ -411,12 +435,10 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
                     1,
                     secrets->srtpAuthTagLen / 8);            // authentication tag len
         }
-        // roc << 16 | seqNo
         cryptoContext->deriveSrtpKeys(receiverSeqNo);
         setInQueueCryptoContext(cryptoContext);
-        snprintf(buffer, 120, "SAS Value: %s\n", secrets->sas.c_str());
+        snprintf(buffer, 120, "SAS Value(R): %s\n", secrets->sas.c_str());
         sendInfo(Info, buffer);
-        secureParts += (int32_t)ForReceiver;
     }
 }
 
@@ -424,13 +446,17 @@ void ZrtpQueue::srtpSecretsOff(EnableSecurity part)
 {
     CryptoContext* cryptoContext;
 
-    if (part == ForSender || part == (EnableSecurity)ForSender+ForReceiver) {
-        cryptoContext = new CryptoContext(senderSsrc);
-        setInQueueCryptoContext(cryptoContext);
+    if (part == ForSender) {
+        if (cContext != NULL) {
+            CryptoContext* tmp = cContext;
+            cContext = NULL;
+            delete tmp;
+        }
     }
-    if (part == ForReceiver || part == (EnableSecurity)ForSender+ForReceiver) {
-        cryptoContext = new CryptoContext(receiverSsrc);
-        cContext = cryptoContext;
+    if (part == ForReceiver) {
+        cryptoContext = new CryptoContext(receiverSsrc); // a dummy CC just needed for remove method
+        removeInQueueCryptoContext(cryptoContext);
+        delete cryptoContext;
     }
 }
 

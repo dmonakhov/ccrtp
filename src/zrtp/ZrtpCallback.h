@@ -227,6 +227,16 @@ class ZrtpCallback {
      */
     virtual void srtpSecretsOff(EnableSecurity part) =0;
 
+    /**
+     * This method shall handle GoClear requests.
+     *
+     * According to the ZRTP specification the user must be informed about
+     * this message because the ZRTP implementation switches off security
+     * if it could authenticate the GoClear packet.
+     *
+     */
+    virtual void handleGoClear() =0;
+
 };
 
 #endif // ZRTPCALLBACK

@@ -1047,13 +1047,24 @@ public:
         /**
          * Set input queue CryptoContext.
          *
-         * The endQueue method (provided by RTPQueue) also deletes all
+         * The endQueue method (provided by RTPQueue) deletes all
          * registered CryptoContexts.
          *
-         * @param cc Pointer to initialized CryptoContext to set.
+         * @param cc Pointer to initialized CryptoContext.
          */
         void
         setInQueueCryptoContext(CryptoContext* cc);
+
+        /**
+         * Remove input queue CryptoContext.
+         *
+         * The endQueue method (provided by RTPQueue) also deletes all
+         * registered CryptoContexts.
+         *
+         * @param cc Pointer to initialized CryptoContext to remove.
+         */
+        void
+        removeInQueueCryptoContext(CryptoContext* cc);
 
         /**
          * Get a input queue CryptoContext identified by SSRC

@@ -117,6 +117,28 @@ int32_t ZRtp::processTimeout() {
     return stateEngine->processEvent(&ev);
 }
 
+bool ZRtp::handleGoClear(uint8_t *extHeader)
+{
+    char *msg, first, last;
+
+    msg = (char *)extHeader + 4;
+    first = tolower(*msg);
+    last = tolower(*(msg+6));
+
+    if (first == 'g' && last == 'r') {
+        Event_t ev;
+
+        ev.type = ZrtpGoClear;
+        ev.data.packet = extHeader;
+        ev.content = NULL;
+        stateEngine->processEvent(&ev);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void ZRtp::startZrtpEngine() {
     Event_t ev;
 
@@ -584,6 +606,14 @@ ZrtpPacketConf2Ack* ZRtp::prepareConf2Ack(ZrtpPacketConfirm *confirm2) {
     }
     return zrtpConf2Ack;
 }
+
+// TODO Implement GoClear handling
+ZrtpPacketClearAck* ZRtp::prepareClearAck(ZrtpPacketGoClear* gpkt)
+{
+    sendInfo(Warning, "Received a GoClear message");
+    return NULL;
+}
+
 
 SupportedHashes ZRtp::findBestHash(ZrtpPacketHello *hello) {
 
