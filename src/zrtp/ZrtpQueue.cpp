@@ -60,7 +60,7 @@ ZrtpQueue::initialize(const char *zidFilename)
 }
 
 ZrtpQueue::ZrtpQueue(uint32 size, RTPApplication& app) :
-        AVPQueue(size,app), enableZrtp(true), zfoneDeadBeef(0)
+        AVPQueue(size,app), zrtpUserCallback(NULL), enableZrtp(true), zfoneDeadBeef(0)
 {
     secureParts = 0;
     zrtpEngine = NULL;
@@ -85,7 +85,18 @@ ZrtpQueue::ZrtpQueue(uint32 ssrc, uint32 size, RTPApplication& app) :
 }
 
 ZrtpQueue::~ZrtpQueue() {
+    if (staticTimeoutProvider != NULL) {
+        staticTimeoutProvider->stopThread();
+        delete staticTimeoutProvider;
+        staticTimeoutProvider = NULL;
+    }
+
     stop();
+
+    if (zrtpUserCallback != NULL) {
+        delete zrtpUserCallback;
+        zrtpUserCallback = NULL;
+    }
 }
 
 void ZrtpQueue::start() {
@@ -99,12 +110,6 @@ void ZrtpQueue::start() {
 }
 
 void ZrtpQueue::stop() {
-    if (staticTimeoutProvider != NULL) {
-        staticTimeoutProvider->stopThread();
-        delete staticTimeoutProvider;
-        staticTimeoutProvider = NULL;
-    }
-
     if (zrtpEngine != NULL) {
         zrtpEngine->stopZrtp();
         delete zrtpEngine;
@@ -396,6 +401,7 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
             cContext = cryptoContext;
             snprintf(buffer, 120, "SAS Value(S): %s\n", secrets->sas.c_str());
             sendInfo(Info, buffer);
+            secureParts++;
     }
     if (part == ForReceiver || part == (EnableSecurity)ForSender+ForReceiver) {
     // decrypting packets, intiator uses responder keys, responder initiator keys
@@ -439,6 +445,10 @@ void ZrtpQueue::srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part)
         setInQueueCryptoContext(cryptoContext);
         snprintf(buffer, 120, "SAS Value(R): %s\n", secrets->sas.c_str());
         sendInfo(Info, buffer);
+        secureParts++;
+    }
+    if (secureParts == 2) {
+        // Sender and receiver are secure now
     }
 }
 
@@ -446,18 +456,18 @@ void ZrtpQueue::srtpSecretsOff(EnableSecurity part)
 {
     CryptoContext* cryptoContext;
 
-    if (part == ForSender) {
-        if (cContext != NULL) {
-            CryptoContext* tmp = cContext;
-            cContext = NULL;
-            delete tmp;
-        }
+    if (part == ForSender && cContext != NULL) {
+        CryptoContext* tmp = cContext;
+        cContext = NULL;
+        delete tmp;
     }
-    if (part == ForReceiver) {
+    if (part == ForReceiver && cryptoContexts.size() > 0) {
         cryptoContext = new CryptoContext(receiverSsrc); // a dummy CC just needed for remove method
         removeInQueueCryptoContext(cryptoContext);
         delete cryptoContext;
     }
+    secureParts = 0;
+    // Report to user interface
 }
 
 

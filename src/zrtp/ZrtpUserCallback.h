@@ -23,7 +23,7 @@
 
 // For message severity codes
 #include "ZrtpCallback.h"
-
+#include "ZrtpQueue.h"
 
 /**
  * This class defines the user callback functions supported by ZRTP.
@@ -42,13 +42,16 @@
  * This class also defines standard methods to interact with the ZrtpQueue
  * to control ZRTP behaviour.
  *
+ * The destructor does not destroy any objects, it only sets pointers to
+ * referenced classes to <ode>NULL</code>.
+ *
  * @author: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
 class ZrtpUserCallback {
 
     public:
-        ZrtpUserCallback(ZrtpQueue* queue) : zrtpQueue(queue) {}
+        ZrtpUserCallback(ost::ZrtpQueue* queue) : zrtpQueue(queue) {}
 
         virtual ~ZrtpUserCallback() {};
 
@@ -68,7 +71,7 @@ class ZrtpUserCallback {
          * left secure mode.
          *
          */
-        virtual void secureOn() =0;
+        virtual void secureOff() =0;
 
         /**
          * Show the Short Authentication String (SAS) on user interface.
@@ -108,7 +111,6 @@ class ZrtpUserCallback {
          */
         virtual void showMessage(MessageSeverity sev, std::string message) =0;
 
-
         /**
          * A user interface implementation uses the following methods to
          * control ZRTP. The standard methods are just proxies to the
@@ -122,8 +124,13 @@ class ZrtpUserCallback {
          * Call this method to enable ZRTP processing an switch to secure
          * mode eventually. This can be done before a call or at any time
          * during a call.
+         *
+         * @param onOff
+         *     If set to true enable ZRTP, disable otherwise
          */
-        virtual void enableZrtp()   { zrtpQueue->enableZrtp(); }
+        virtual void enableZrtp(bool onOff) {
+            zrtpQueue->setEnableZrtp(onOff);
+        }
 
         /**
          * Set SAS as verified.
@@ -131,14 +138,18 @@ class ZrtpUserCallback {
          * Call this method if the user confirmed (verfied) the SAS. ZRTP
          * remembers this together with the retained secrets data.
          */
-        virtual void SASVerified()  { zrtpQueue->SASVerified(); }
+        virtual void SASVerified() {
+            zrtpQueue->SASVerified();
+        }
 
         /**
          * Confirm a go clear request.
          *
          * Call this method if the user confirmed a go clear (secure mode off).
          */
-        virtual void goClearOk()    { zrtpQueue->goClearOk(); }
+        virtual void goClearOk() {
+            zrtpQueue->goClearOk();
+        }
 
         /**
          * Request to switch off secure mode.
@@ -148,10 +159,55 @@ class ZrtpUserCallback {
          * ZRTP immediatly switch off SRTP processing. Every RTP data is sent
          * in clear after the go clear request.
          */
-        virtual void requestGoclear()  { zrtpQueue->requestGoClear(); }
+        virtual void requestGoClear()  {
+            zrtpQueue->requestGoClear();
+        }
+
+        /**
+         * Set the sigs secret.
+         *
+         * Use this method to set the sigs secret data. Refer to ZRTP
+         * specification, chapter 3.2.1
+         *
+         * @param data
+         *     Points to the sigs secret data. The data must have a length
+         *     of 32 bytes (length of SHA256 hash)
+         */
+        virtual void setSigsSecret(uint8* data)  {
+            zrtpQueue->setSigsSecret(data);
+        }
+
+        /**
+         * Set the srtps secret.
+         *
+         * Use this method to set the srtps secret data. Refer to ZRTP
+         * specification, chapter 3.2.1
+         *
+         * @param data
+         *     Points to the srtps secret data. The data must have a length
+         *     of 32 bytes (length of SHA256 hash)
+         */
+        virtual void setSrtpsSecret(uint8* data)  {
+            zrtpQueue->setSrtpsSecret(data);
+        }
+
+        /**
+         * Set the other secret.
+         *
+         * Use this method to set the other secret data. Refer to ZRTP
+         * specification, chapter 3.2.1
+         *
+         * @param data
+         *     Points to the other secret data.
+         * @param length
+         *     The length in bytes of the data.
+         */
+        virtual void setOtherSecret(uint8* data, int32 length)  {
+            zrtpQueue->setOtherSecret(data, length);
+        }
 
     private:
-        ZrtpQueue* zrtpQueue;
+        ost::ZrtpQueue* zrtpQueue;
 
 };
 

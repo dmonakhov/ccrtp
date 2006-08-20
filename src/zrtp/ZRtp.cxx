@@ -812,13 +812,13 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     int matchingSecrets = 0;
     if (setC[0] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs1 found\n", zid[0])));
-	setD[matchingSecrets] = zidRec.getRs1();
+        setD[matchingSecrets] = zidRec.getRs1();
 	setE[matchingSecrets++] = rs1IDi;  // rs1IDi will be sent in DHPart2 message
     }
 
     if (setC[1] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs2 found\n", zid[0])));
-	setD[matchingSecrets] = zidRec.getRs2();
+        setD[matchingSecrets] = zidRec.getRs2();
 	setE[matchingSecrets++] = rs2IDi;  // rs2IDi will be sent in DHPart2 message
     }
 
@@ -898,13 +898,13 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     int matchingSecrets = 0;
     if (setC[0] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs1 found\n", zid[0])));
-	setD[matchingSecrets] = zidRec.getRs1();
+        setD[matchingSecrets] = zidRec.getRs1();
 	setE[matchingSecrets++] = rs1IDi;
     }
 
     if (setC[1] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs2 found\n", zid[0])));
-	setD[matchingSecrets] = zidRec.getRs2();
+        setD[matchingSecrets] = zidRec.getRs2();
 	setE[matchingSecrets++] = rs2IDi;  // rs2IDi will be sent in DHPart2 message
     }
 
@@ -937,9 +937,9 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     }
 
     /*
-    * ready to generate s0 here.
-    * Hash the DH shared secret and the available shared secrets (max. 5).
-    */
+     * ready to generate s0 here.
+     * Hash the DH shared secret and the available shared secrets (max. 5).
+     */
     unsigned char* data[7];
     uint32_t  length[7];
 

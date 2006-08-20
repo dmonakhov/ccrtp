@@ -127,6 +127,7 @@ class ZRtp {
 	 *
          */
 	int32_t processTimeout();
+
         /**
          * Check for and handle GoClear ZRTP packet header.
          *
@@ -140,6 +141,44 @@ class ZRtp {
          *    False if not a GoClear, true otherwise.
          */
         bool handleGoClear(uint8_t *extHeader);
+
+        /**
+         * Set the sigs secret.
+         *
+         * USe this method to set the sigs secret data. Refer to ZRTP
+         * specification, chapter 3.2.1
+         *
+         * @param data
+         *     Points to the sigs secret data. The data must have a length
+         *     of 32 bytes (length of SHA256 hash)
+         */
+       void setSigsSecret(uint8* data)  { }
+
+       /**
+        * Set the srtps secret.
+        *
+        * USe this method to set the srtps secret data. Refer to ZRTP
+        * specification, chapter 3.2.1
+        *
+        * @param data
+        *     Points to the srtps secret data. The data must have a length
+        *      of 32 bytes (length of SHA256 hash)
+        */
+       void setSrtpsSecret(uint8* data)  {  }
+
+       /**
+        * Set the other secret.
+        *
+        * USe this method to set the other secret data. Refer to ZRTP
+        * specification, chapter 3.2.1
+        *
+        * @param data
+        *     Points to the other secret data.
+        * @param length
+        *     The length in bytes of the data.
+        */
+       void setOtherSecret(uint8* data, int32 length)  {  }
+
 
  private:
      friend class ZrtpStateClass;

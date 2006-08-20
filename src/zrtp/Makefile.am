@@ -15,13 +15,13 @@ ccxxinclude_HEADERS = Base32.h TimeoutProvider.h ZIDFile.h ZIDRecord.h ZrtpCallb
 	ZrtpPacketBase.h ZrtpPacketClearAck.h ZrtpPacketCommit.h ZrtpPacketConf2Ack.h \
 	ZrtpPacketConfirm.h ZrtpPacketDHPart.h ZrtpPacketError.h ZrtpPacketGoClear.h \
 	zrtpPacket.h ZrtpPacketHelloAck.h ZrtpPacketHello.h ZrtpQueue.h ZrtpStateClass.h \
-	ZrtpStates.h ZrtpTextData.h
+	ZrtpStates.h ZrtpTextData.h ZrtpUserCallback.h
 
 kdoc_headers =Base32.h TimeoutProvider.h ZIDFile.h ZIDRecord.h ZrtpCallback.h ZRtp.h \
 	ZrtpPacketBase.h ZrtpPacketClearAck.h ZrtpPacketCommit.h ZrtpPacketConf2Ack.h \
 	ZrtpPacketConfirm.h ZrtpPacketDHPart.h ZrtpPacketError.h ZrtpPacketGoClear.h \
 	zrtpPacket.h ZrtpPacketHelloAck.h ZrtpPacketHello.h ZrtpQueue.h ZrtpStateClass.h \
-	ZrtpStates.h ZrtpTextData.h
+	ZrtpStates.h ZrtpTextData.h ZrtpUserCallback.h
 
 kdoc:
 	kdoc -f html -d $(KDOC_DIR) -L$(KDOC_DIR) -n ccrtp $(kdoc_headers)

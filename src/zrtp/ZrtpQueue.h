@@ -46,6 +46,9 @@
  *
  * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
+
+class ZrtpUserCallback;
+
 #ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
@@ -54,6 +57,107 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
 
  public:
     int32_t initialize(const char *zidFilename);
+
+    /*
+     * The following methods implement the external interface to control
+     * ZRTP behaviour.
+     */
+
+    /**
+     * Enable overall ZRTP processing.
+     *
+     * Call this method to enable ZRTP processing and switch to secure
+     * mode eventually. This can be done before a call or at any time
+     * during a call.
+     *
+     * @param onOff
+     *     If set to true enable ZRTP, disable otherwise
+     */
+    void setEnableZrtp(bool onOff)   { enableZrtp = onOff; }
+
+    /**
+     * Set SAS as verified.
+     *
+     * Call this method if the user confirmed (verfied) the SAS. ZRTP
+     * remembers this together with the retained secrets data.
+     */
+    void SASVerified()  { }
+
+    /**
+     * Confirm a go clear request.
+     *
+     * Call this method if the user confirmed a go clear (secure mode off).
+     */
+    void goClearOk()    {  }
+
+    /**
+     * Request to switch off secure mode.
+     *
+     * Call this method is the user itself wants to switch off secure
+     * mode (go clear). After sending the "go clear" request to the peer
+     * ZRTP immediatly switch off SRTP processing. Every RTP data is sent
+     * in clear after the go clear request.
+     */
+    void requestGoClear()  { }
+
+    /**
+     * Set the sigs secret.
+     *
+     * Use this method to set the sigs secret data. Refer to ZRTP
+     * specification, chapter 3.2.1
+     *
+     * @param data
+     *     Points to the sigs secret data. The data must have a length
+     *     of 32 bytes (length of SHA256 hash)
+     */
+    void setSigsSecret(uint8* data)  {
+        if (zrtpEngine != NULL)
+            zrtpEngine->setSigsSecret(data);
+    }
+
+    /**
+     * Set the srtps secret.
+     *
+     * Use this method to set the srtps secret data. Refer to ZRTP
+     * specification, chapter 3.2.1
+     *
+     * @param data
+     *     Points to the srtps secret data. The data must have a length
+     *     of 32 bytes (length of SHA256 hash)
+     */
+    void setSrtpsSecret(uint8* data)  {
+        if (zrtpEngine != NULL)
+            zrtpEngine->setSrtpsSecret(data);
+    }
+
+    /**
+     * Set the other secret.
+     *
+     * Use this method to set the other secret data. Refer to ZRTP
+     * specification, chapter 3.2.1
+     *
+     * @param data
+     *     Points to the other secret data.
+     * @param length
+     *     The length in bytes of the data.
+     */
+    void setOtherSecret(uint8* data, int32 length)  {
+        if (zrtpEngine != NULL)
+            zrtpEngine->setOtherSecret(data, length);
+    }
+
+    /**
+     * The the callback class for UI intercation.
+     *
+     * The destructior of ZrtpQueue also destorys the user callback
+     * class if it was set.
+     *
+     * @param ucb
+     *     Implementation of the ZrtpUserCallback interface class
+     */
+    void setUserCallback(ZrtpUserCallback* ucb) {
+        zrtpUserCallback = ucb;
+    }
 
     void start();
     void stop();
@@ -82,8 +186,8 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
     };
 
     /*
-    * Refer to ZrtpCallback.h
-    */
+     * Refer to ZrtpCallback.h
+     */
     int32_t sendDataRTP(const unsigned char* data, int32_t length);
 
     int32_t sendDataSRTP(const unsigned char* dataHeader, int32_t lengthHeader,
@@ -93,10 +197,7 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
 
     int32_t cancelTimer();
 
-    void sendInfo(MessageSeverity severity, char* msg) {
-        fprintf(stderr, "Severity: %d - %s\n", severity, msg);
-    }
-
+    void sendInfo(MessageSeverity severity, char* msg);
     /**
      * Switch on the security for the defined part.
      *
@@ -155,6 +256,8 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
 
     private:
         ZRtp *zrtpEngine;
+        ZrtpUserCallback* zrtpUserCallback;
+
         SrtpSecret_t secret;
         bool enableZrtp;
 
@@ -175,6 +278,25 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      */
         int8_t zfoneDeadBeef;
 };
+
+#ifdef  CCXX_NAMESPACES
+}
+#endif
+
+#include "ZrtpUserCallback.h"
+
+#ifdef  CCXX_NAMESPACES
+namespace ost {
+#endif
+
+inline void ZrtpQueue::sendInfo(MessageSeverity severity, char* msg) {
+    if (zrtpUserCallback != NULL) {
+        zrtpUserCallback->showMessage(severity, msg);
+    }
+    else {
+        fprintf(stderr, "Severity: %d - %s\n", severity, msg);
+    }
+}
 
 #ifdef  CCXX_NAMESPACES
 }
