@@ -15,35 +15,35 @@ AM_CXXFLAGS= @WARN_FLAGS@
 RELEASE = $(LT_VERSION) -release $(LT_RELEASE) @GNULIBS@
 LIBS = @GNULIBS@
 
-SUBDIRS = ccrtp crypto/openssl zrtp
+SUBDIRS = ccrtp ccrtp/crypto/openssl ccrtp/zrtp
 lib_LTLIBRARIES = libccrtp1.la
 
 if SRTP_SUPPORT
-srtp_src = crypto/openssl/hmac256.cxx \
-		crypto/openssl/hmac.cxx \
-		crypto/openssl/sha256.cxx \
-		crypto/openssl/AesSrtp.cxx \
-		crypto/openssl/InitializeOpenSSL.cxx
+srtp_src = ccrtp/crypto/openssl/hmac256.cxx \
+		ccrtp/crypto/openssl/hmac.cxx \
+		ccrtp/crypto/openssl/sha256.cxx \
+		ccrtp/crypto/openssl/AesSrtp.cxx \
+		ccrtp/crypto/openssl/InitializeOpenSSL.cxx
 endif
 
 if ZRTP_SUPPORT
-zrtp_src = zrtp/ZIDFile.cxx \
-		zrtp/ZIDRecord.cxx \
-		zrtp/ZRtp.cxx \
-		zrtp/ZrtpPacketCommit.cxx \
-		zrtp/ZrtpPacketConf2Ack.cxx \
-		zrtp/ZrtpPacketConfirm.cxx \
-		zrtp/ZrtpPacketDHPart.cxx \
-		zrtp/ZrtpPacketGoClear.cxx \
-		zrtp/ZrtpPacketClearAck.cxx \
-		zrtp/ZrtpPacketError.cxx \
-		zrtp/ZrtpPacketHelloAck.cxx \
-		zrtp/ZrtpPacketHello.cxx \
-		zrtp/ZrtpStateClass.cxx \
-		zrtp/ZrtpTextData.cxx \
-		zrtp/Base32.cxx \
-		zrtp/ZrtpQueue.cpp \
-		crypto/openssl/ZrtpDH.cxx
+zrtp_src = ccrtp/zrtp/ZIDFile.cxx \
+		ccrtp/zrtp/ZIDRecord.cxx \
+		ccrtp/zrtp/ZRtp.cxx \
+		ccrtp/zrtp/ZrtpPacketCommit.cxx \
+		ccrtp/zrtp/ZrtpPacketConf2Ack.cxx \
+		ccrtp/zrtp/ZrtpPacketConfirm.cxx \
+		ccrtp/zrtp/ZrtpPacketDHPart.cxx \
+		ccrtp/zrtp/ZrtpPacketGoClear.cxx \
+		ccrtp/zrtp/ZrtpPacketClearAck.cxx \
+		ccrtp/zrtp/ZrtpPacketError.cxx \
+		ccrtp/zrtp/ZrtpPacketHelloAck.cxx \
+		ccrtp/zrtp/ZrtpPacketHello.cxx \
+		ccrtp/zrtp/ZrtpStateClass.cxx \
+		ccrtp/zrtp/ZrtpTextData.cxx \
+		ccrtp/zrtp/Base32.cxx \
+		ccrtp/zrtp/ZrtpQueue.cpp \
+		ccrtp/crypto/openssl/ZrtpDH.cxx
 endif
 
 libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp source.cpp data.cpp incqueue.cpp \
