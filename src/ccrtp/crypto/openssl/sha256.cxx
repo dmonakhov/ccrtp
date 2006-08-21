@@ -35,7 +35,7 @@
  *	    Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#include <crypto/openssl/sha256.h>
+#include <ccrtp/crypto/openssl/sha256.h>
 
 void sha256(unsigned char *data, unsigned int data_length,
 	    unsigned char *digest ){

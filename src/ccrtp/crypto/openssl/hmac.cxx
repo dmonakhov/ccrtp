@@ -35,7 +35,7 @@
  */
 
 #include <openssl/hmac.h>
-#include <crypto/openssl/hmac.h>
+#include <ccrtp/crypto/openssl/hmac.h>
 
 void hmac_sha1( uint8 * key, int32 key_length,
 		const uint8* data, uint32 data_length,

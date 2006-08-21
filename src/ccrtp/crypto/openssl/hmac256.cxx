@@ -35,8 +35,7 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#include <openssl/hmac.h>
-#include <crypto/openssl/hmac256.h>
+#include <ccrtp/crypto/openssl/hmac256.h>
 
 void hmac_sha256(uint8* key, uint32 key_length,
 		uint8* data, int32 data_length,

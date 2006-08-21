@@ -37,7 +37,7 @@
 
 extern void initializeOpenSSL();
 
-#include <crypto/openssl/AesSrtp.h>
+#include <ccrtp/crypto/openssl/AesSrtp.h>
 #include<string.h>
 
 AesSrtp::AesSrtp():key(NULL){

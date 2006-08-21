@@ -43,7 +43,7 @@
 #include <openssl/dh.h>
 #include <openssl/evp.h>
 
-#include <crypto/openssl/ZrtpDH.h>
+#include <ccrtp/crypto/openssl/ZrtpDH.h>
 
 extern void initializeOpenSSL();
 
