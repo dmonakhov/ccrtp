@@ -55,7 +55,7 @@ class ZrtpPacketHello : public ZrtpPacketBase {
     uint8_t* getZid()                        { return helloHeader->zid; };
 
     void setVersion(uint8_t *text)                   { memcpy(helloHeader->version, text, 4); }
-    void setClientId(uint8_t *text)                  { memcpy(helloHeader->clientId, text, 15); }
+    void setClientId(const uint8_t *text)            { memcpy(helloHeader->clientId, text, 15); }
     void setHashType(uint32_t number, char *text)    { memcpy(helloHeader->hashes[number], text, 8); };
     void setCipherType(uint32_t number, char *text)  { memcpy(helloHeader->ciphers[number], text, 8); };
     void setAuthLen(uint32_t number, char *text)     { memcpy(helloHeader->authlengths[number], text, 8); };

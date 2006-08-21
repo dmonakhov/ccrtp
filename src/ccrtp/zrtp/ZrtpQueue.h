@@ -147,7 +147,7 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
     }
 
     /**
-     * The the callback class for UI intercation.
+     * Set the callback class for UI intercation.
      *
      * The destructior of ZrtpQueue also destorys the user callback
      * class if it was set.
@@ -157,6 +157,21 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      */
     void setUserCallback(ZrtpUserCallback* ucb) {
         zrtpUserCallback = ucb;
+    }
+
+    /**
+     * Set the client ID for ZRTP Hello message.
+     *
+     * The GNU ccRTP client may set its id to identify itself in the
+     * ZRTP HELLO message. The maximum length is 15 characters. Shorter
+     * id string are allowed, the will be filled with blanks. Longer id
+     * will be truncated to 15 characters.
+     *
+     * @param id
+     *     The client's id
+     */
+    void setClientId(std::string id) {
+        clientIdString = id;
     }
 
     void start();
@@ -257,6 +272,8 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
     private:
         ZRtp *zrtpEngine;
         ZrtpUserCallback* zrtpUserCallback;
+
+        std::string clientIdString;
 
         SrtpSecret_t secret;
         bool enableZrtp;

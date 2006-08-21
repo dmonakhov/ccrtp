@@ -23,7 +23,7 @@
 /**
  *
  */
-char *clientId = "Minisip        "; // must be 15 chars
+char *clientId = "GNUccRTP      "; // must be 15 chars
 char *zrtpVersion = "0.01";	// must be 4 chars
 
 /**
@@ -37,7 +37,7 @@ char *DHPart2Msg =  "DHPart2 ";
 char *Confirm1Msg = "Confirm1";
 char *Confirm2Msg = "Confirm2";
 char *Conf2AckMsg = "Conf2ACK";
-char *ErrorMsg =    "Error ";
+char *ErrorMsg =    "Error   ";
 char *GoClearMsg =  "GoClear ";
 char *ClearAckMsg = "ClearACK";
 

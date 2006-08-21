@@ -69,6 +69,7 @@ ZrtpQueue::ZrtpQueue(uint32 size, RTPApplication& app) :
     receiverSecure = 0;
 
     receiverSsrc = 0;
+    clientIdString = clientId;
 }
 
 ZrtpQueue::ZrtpQueue(uint32 ssrc, uint32 size, RTPApplication& app) :
@@ -105,6 +106,7 @@ void ZrtpQueue::start() {
 
     if (zrtpEngine == NULL) {
         zrtpEngine = new ZRtp((uint8_t*)ownZid, (ZrtpCallback*)this);
+        zrtpEngine->setClientId(clientIdString);
         zrtpEngine->startZrtpEngine();
     }
 }

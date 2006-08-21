@@ -179,6 +179,26 @@ class ZRtp {
         */
        void setOtherSecret(uint8* data, int32 length)  {  }
 
+       /**
+        * Set the client ID for ZRTP Hello message.
+        *
+        * The GNU ccRTP client may set its id to identify itself in the
+        * ZRTP HELLO message. The maximum length is 15 characters. Shorter
+        * id string are allowed, the will be filled with blanks. A Longer id
+        * is truncated to 15 characters.
+        *
+        * @param id
+        *     The client's id
+        */
+        void setClientId(std::string id) {
+            const char* tmp = "                ";
+            if (id.size() < 15) {
+                zrtpHello->setClientId((unsigned char*)tmp);
+            }
+            zrtpHello->setClientId((unsigned char*)id.c_str());
+       }
+
+
 
  private:
      friend class ZrtpStateClass;

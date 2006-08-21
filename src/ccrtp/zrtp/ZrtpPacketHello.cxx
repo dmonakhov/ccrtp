@@ -39,7 +39,6 @@ ZrtpPacketHello::ZrtpPacketHello() {
     setLength(HELLO_LENGTH + MESSAGE_LENGTH);
     setMessage((uint8_t*)HelloMsg);
 
-    setClientId((uint8_t*)clientId);
     setVersion((uint8_t*)zrtpVersion);
 
     setHashType(0, supportedHashes[0]);
