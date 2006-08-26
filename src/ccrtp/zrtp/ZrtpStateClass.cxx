@@ -16,8 +16,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/*
- * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
+/**
+ * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
 #include <iostream>
@@ -544,9 +544,10 @@ int32_t ZrtpStateClass::evWaitDHPart2(void) {
                 return(Fail);
             }
 	    nextState(WaitConfirm2);
-            // switch on security for both, send confirm1 encrypted, await
-            // conf2Ack which is also encrypted
-            parent->srtpSecretsReady((EnableSecurity)(ForSender + ForReceiver));
+            // switch on security for both directions, send confirm1 encrypted,
+            // wait for conf2Ack which is also encrypted
+            parent->srtpSecretsReady(ForSender);
+            parent->srtpSecretsReady(ForReceiver);
 
 	    if (!parent->sendPacketSRTP(static_cast<ZrtpPacketBase *>(confirm))){
 		delete confirm;

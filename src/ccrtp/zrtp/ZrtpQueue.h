@@ -224,7 +224,7 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      * @param secrets
      *    The secret keys and salt negotiated by ZRTP
      * @param part
-     *    An enum that defines sender, receiver, or both.
+     *    An enum that defines wich direction to switch on: sender or receiver
      */
     void srtpSecretsReady(SrtpSecret_t* secrets, EnableSecurity part);
 
@@ -236,7 +236,7 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      * active context. This effectively disables SRTP.
      *
      * @param part
-     *    An enum that defines sender, receiver, or both.
+     *    An enum that defines wich direction to switch off: sender or receiver
      */
     void srtpSecretsOff(EnableSecurity part);
 
@@ -275,25 +275,18 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
 
         std::string clientIdString;
 
-        SrtpSecret_t secret;
         bool enableZrtp;
 
-        int32_t secureParts;
+        int32 secureParts;
 
-        uint32_t receiverSsrc;
-        uint32_t receiverSecure;
-        uint16_t receiverSeqNo;
+        uint32 recvZrtpSsrc;
+        uint16 recvZrtpSeqNo;
+        CryptoContext* recvCryptoContext;
 
-        uint32_t senderSsrc;
-        uint32_t senderSecure;
+        uint32 senderZrtpSsrc;
+        uint16 senderZrtpSeqNo;
+        CryptoContext* senderCryptoContext;
 
-    /**
-     * This flag is true if we saw the special <em>0xdeadbeef</em> marker
-     * SSRC. The Zfone implementation uses this in its ZRTP packets. Other
-     * ZRTP implementation may not require such a marker SSRC.
-     * (maybe even Zfone could live without it but ...)
-     */
-        int8_t zfoneDeadBeef;
 };
 
 #ifdef  CCXX_NAMESPACES

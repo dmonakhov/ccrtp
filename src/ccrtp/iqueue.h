@@ -1061,13 +1061,15 @@ public:
          * The endQueue method (provided by RTPQueue) also deletes all
          * registered CryptoContexts.
          *
-         * @param cc Pointer to initialized CryptoContext to remove.
+         * @param cc
+         *     Pointer to initialized CryptoContext to remove. If pointer
+         *     if <code>NULL</code> then delete the whole queue
          */
         void
         removeInQueueCryptoContext(CryptoContext* cc);
 
         /**
-         * Get a input queue CryptoContext identified by SSRC
+         * Get an input queue CryptoContext identified by SSRC
          *
          * @param ssrc Request CryptoContext for this incoming SSRC
          * @return Pointer to CryptoContext of the SSRC of NULL if no context

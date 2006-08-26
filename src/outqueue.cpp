@@ -117,7 +117,7 @@ OutgoingDataQueue::OutgoingDataQueue():
 	OutgoingDataQueueBase(),
 	DestinationListHandler(),
 	sendLock(),
-        sendFirst(NULL), sendLast(NULL), cContext(NULL)
+        sendFirst(NULL), sendLast(NULL)
 {
 	setInitialTimestamp(random32());
 	setSchedulingTimeout(getDefaultSchedulingTimeout());
@@ -332,11 +332,14 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 		step = ( remainder > getMaxSendSegmentSize() ) ?
 			getMaxSendSegmentSize() : remainder;
 
-		OutgoingRTPPkt* packet;
+                CryptoContext* pcc = getOutQueueCryptoContext(getLocalSSRC());
+
+                OutgoingRTPPkt* packet;
 		if ( sendInfo.sendCC )
-			packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen, cContext);
+                    packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,
+                                                sendInfo.paddinglen, pcc);
 		else
-			packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen, cContext);
+                    packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen, pcc);
 
 		packet->setPayloadType(getCurrentPayloadType());
 		packet->setSeqNum(sendInfo.sendSeq++);
@@ -349,8 +352,8 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 		} else {
 			packet->setMarker(false);
 		}
-                if (cContext != NULL) {
-                    packet->protect(getLocalSSRC());
+                if (pcc != NULL) {
+                    packet->protect(getLocalSSRC(), pcc);
                 }
 		// insert the packet into the "tail" of the sending queue
 		sendLock.writeLock();
@@ -382,11 +385,14 @@ OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
                 step = ( remainder > getMaxSendSegmentSize() ) ?
                         getMaxSendSegmentSize() : remainder;
 
+                CryptoContext* pcc = getOutQueueCryptoContext(getLocalSSRC());
+
                 OutgoingRTPPkt* packet;
                 if ( sendInfo.sendCC )
-                        packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,sendInfo.paddinglen,cContext);
+                    packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,
+                                                sendInfo.paddinglen, pcc);
                 else
-                        packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen,cContext);
+                    packet = new OutgoingRTPPkt(data + offset,step,sendInfo.paddinglen, pcc);
 
 
 		packet->setPayloadType(getCurrentPayloadType());
@@ -399,8 +405,8 @@ OutgoingDataQueue::sendImmediate(uint32 stamp, const unsigned char *data,
                 } else {
                         packet->setMarker(false);
                 }
-                if (cContext != NULL) {
-                    packet->protect(getLocalSSRC());
+                if (pcc != NULL) {
+                    packet->protect(getLocalSSRC(), pcc);
                 }
 		dispatchImmediate(packet);
 		delete packet;
@@ -498,6 +504,64 @@ OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data,
 	       data, max);
 	sendLock.unlock();
 	return max;
+}
+
+void
+OutgoingDataQueue::setOutQueueCryptoContext(CryptoContext* cc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+    std::list<CryptoContext *>::iterator i;
+
+        // check if a CryptoContext for a SSRC already exists. If yes
+        // remove it from list before inserting the new one.
+    for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == cc->getSsrc() ) {
+            CryptoContext* tmp = *i;
+            cryptoContexts.erase(i);
+            delete tmp;
+            break;
+        }
+    }
+    cryptoContexts.push_back(cc);
+}
+
+void
+OutgoingDataQueue::removeOutQueueCryptoContext(CryptoContext* cc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+    std::list<CryptoContext *>::iterator i;
+
+    if (cc == NULL) {     // Remove any incoming crypto contexts
+        for (i = cryptoContexts.begin(); i != cryptoContexts.end(); ) {
+            CryptoContext* tmp = *i;
+            i = cryptoContexts.erase(i);
+            delete tmp;
+        }
+    }
+    else {
+        for( i = cryptoContexts.begin(); i != cryptoContexts.end(); i++ ){
+            if( (*i)->getSsrc() == cc->getSsrc() ) {
+                CryptoContext* tmp = *i;
+                cryptoContexts.erase(i);
+                delete tmp;
+                return;
+            }
+        }
+    }
+}
+
+CryptoContext*
+OutgoingDataQueue::getOutQueueCryptoContext(uint32 ssrc)
+{
+        // TODO - check if we need a mutex here to support multithreading
+    std::list<CryptoContext *>::iterator i;
+
+    for( i = cryptoContexts.begin(); i != cryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == ssrc) {
+            return (*i);
+        }
+    }
+    return NULL;
 }
 
 #ifdef  CCXX_NAMESPACES

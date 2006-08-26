@@ -155,16 +155,6 @@ namespace ost {
 	 *    key and uses it as input during encryption. The length usually
 	 *    is the same as the master salt length.
 	 *
-	 * @param encr
-	 *    If set to zero do not perform encryption (not used inside this
-	 *    implementation) but available for some key management systems
-	 *    (MIKEY).
-	 *
-	 * @param auth
-	 *    If set to zero doe not perform authentication (not used inside
-	 *    this implementation) but available for some key management systems
-	 *    (MIKEY).
-	 *
 	 * @param tagLength
 	 *    The length is bytes of the authentication tag that SRTP appends
 	 *    to the RTP packet. Refer to chapter 4.2. in the RFC 3711.
@@ -180,8 +170,6 @@ namespace ost {
 			   int32  ekeyl,
 			   int32  akeyl,
 			   int32  skeyl,
-			   int32  encr,
-			   int32  auth,
 			   int32  tagLength );
 
 	/**
@@ -335,6 +323,30 @@ namespace ost {
 	    getSsrc() const
 	    {return ssrc;}
 
+        /**
+         * Derive a new Crypto Context for use with a new SSRC
+         *
+         * This method returns a new Crypto Context initialized with the data
+         * of this crypto context. Replacing the SSRC, Roll-over-Counter, and
+         * the key derivation rate the application cab use this Crypto Context
+         * to encrypt / decrypt a new stream (Synchronization source) inside
+         * one RTP session.
+         *
+         * Before the application can use this crypto context it must call
+         * the <code>deriveSrtpKeys</code> method.
+         *
+         * @param ssrc
+         *     The SSRC for this context
+         * @param roc
+         *     The Roll-Over-Counter for this context
+         * @param keyDerivRate
+         *     The key derivation rate for this context
+         * @return
+         *     a new CryptoContext with all relevant data set.
+         */
+
+            CryptoContext* newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate);
+
 	private:
 
 	    uint32 ssrc;
@@ -370,8 +382,6 @@ namespace ost {
 	    uint8 ekeyl;
 	    uint8 akeyl;
 	    uint8 skeyl;
-	    uint8 encr;
-	    uint8 auth;
 	    uint8 tagLength;
 	    bool  seqNumSet;
     };

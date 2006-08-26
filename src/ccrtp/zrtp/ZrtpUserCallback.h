@@ -121,7 +121,7 @@ class ZrtpUserCallback {
         /**
          * Enable overall ZRTP processing.
          *
-         * Call this method to enable ZRTP processing an switch to secure
+         * Call this method to enable ZRTP processing and switch to secure
          * mode eventually. This can be done before a call or at any time
          * during a call.
          *

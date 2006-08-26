@@ -42,7 +42,7 @@ static void hexdump(const char* title, const unsigned char *s, int l) {
 }
 
 
-ZRtp:: ZRtp(uint8_t *myZid, ZrtpCallback *cb):
+ZRtp::ZRtp(uint8_t *myZid, ZrtpCallback *cb):
     callback(cb), dhContext(NULL) {
 
     zrtpHello = NULL;
@@ -149,10 +149,22 @@ void ZRtp::startZrtpEngine() {
 void ZRtp::stopZrtp() {
     Event_t ev;
 
+    /*
+     * If we need to stop the state engine before we reached SecureState
+     * reset to initial state only. This state ignores any event except ZrtpInitial
+     * and effectively stops the engine.
+     */
+    if (!stateEngine->inState(SecureState)) {
+        stateEngine->nextState(Initial);
+    }
     ev.type = ZrtpClose;
     stateEngine->processEvent(&ev);
 }
 
+int32 ZRtp::checkState(int32 state)
+{
+    return stateEngine->inState(state);
+}
 
 ZrtpPacketCommit* ZRtp::prepareCommit(ZrtpPacketHello *hello) {
 
@@ -797,6 +809,7 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     uint8_t* setC[5];
     const uint8_t* setD[5];
     const uint8_t* setE[5];
+    int32 rsFound = 0;
 
     setC[0] = (memcmp(rs1IDr, dhPart->getRs1Id(), 8) == 0) ? rs1IDr : NULL;
     setC[1] = (memcmp(rs2IDr, dhPart->getRs2Id(), 8) == 0) ? rs2IDr : NULL;
@@ -814,12 +827,27 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs1 found\n", zid[0])));
         setD[matchingSecrets] = zidRec.getRs1();
 	setE[matchingSecrets++] = rs1IDi;  // rs1IDi will be sent in DHPart2 message
+        rsFound = 0x1;
     }
 
     if (setC[1] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs2 found\n", zid[0])));
         setD[matchingSecrets] = zidRec.getRs2();
 	setE[matchingSecrets++] = rs2IDi;  // rs2IDi will be sent in DHPart2 message
+        rsFound |= 0x2;
+    }
+
+    if (rsFound == 0) {
+        sendInfo(Info, "No retained secret matches - verfiy SAS");
+    }
+    if ((rsFound & 0x1) && (rsFound & 0x2)) {
+        sendInfo(Info, "Both retained secrets match - security OK");
+    }
+    if ((rsFound & 0x1) && !(rsFound & 0x2)) {
+        sendInfo(Info, "Only first retained secret matches - verfiy SAS");
+    }
+    if (!(rsFound & 0x1) && (rsFound & 0x2)) {
+        sendInfo(Info, "Only second retained secret matches - verfiy SAS");
     }
 
     // other shared secrets not yet supported - set to NULL
@@ -883,6 +911,7 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     uint8_t* setC[5];
     const uint8_t* setD[5];
     const uint8_t* setE[5];     // Set E is the "compressed" C (no NULLs) for sort
+    int32 rsFound = 0;
 
     setC[0] = (memcmp(rs1IDi, dhPart->getRs1Id(), 8) == 0) ? rs1IDi : NULL;
     setC[1] = (memcmp(rs2IDi, dhPart->getRs2Id(), 8) == 0) ? rs2IDi : NULL;
@@ -900,14 +929,27 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs1 found\n", zid[0])));
         setD[matchingSecrets] = zidRec.getRs1();
 	setE[matchingSecrets++] = rs1IDi;
+        rsFound = 0x1;
     }
 
     if (setC[1] != NULL) {
 	DEBUGOUT((fprintf(stdout, "%c: Match for Rs2 found\n", zid[0])));
         setD[matchingSecrets] = zidRec.getRs2();
 	setE[matchingSecrets++] = rs2IDi;  // rs2IDi will be sent in DHPart2 message
+        rsFound |= 0x2;
     }
-
+    if (rsFound == 0) {
+        sendInfo(Info, "No retained secret matches - verfiy SAS");
+    }
+    if ((rsFound & 0x1) && (rsFound & 0x2)) {
+        sendInfo(Info, "Both retained secrets match - security OK");
+    }
+    if ((rsFound & 0x1) && !(rsFound & 0x2)) {
+        sendInfo(Info, "Only first retained secret matches - verfiy SAS");
+    }
+    if (!(rsFound & 0x1) && (rsFound & 0x2)) {
+        sendInfo(Info, "Only second retained secret matches - verfiy SAS");
+    }
     // other shared secrets not yet supported - set to NULL
     setD[2] = setE[2] = NULL;
     setD[3] = setE[3] = NULL;

@@ -252,29 +252,29 @@ OutgoingRTPPkt::setCSRCArray(const uint32* const csrcs, uint16 numcsrc)
 }
 
 void
-OutgoingRTPPkt::protect(uint32 ssrc)
+OutgoingRTPPkt::protect(uint32 ssrc, CryptoContext* pcc)
 {
         /* Encrypt the packet */
-        uint64 index = ((uint64)cContext->getRoc() << 16) | (uint64)getSeqNum();
+        uint64 index = ((uint64)pcc->getRoc() << 16) | (uint64)getSeqNum();
 
         // if it's a ZRTP packet adjust data to accomodate ZRTP checksum
         srtpDataOffset -= zrtpChecksumLength;
         total -= zrtpChecksumLength;
         payloadSize -= zrtpChecksumLength;
 
-        cContext->srtpEncrypt(this, index, ssrc);
+        pcc->srtpEncrypt(this, index, ssrc);
 
         // NO MKI support yet - here we assume MKI is zero. To build in MKI
         // take MKI length into account when storing the authentication tag.
 
         /* Compute MAC */
-        cContext->srtpAuthenticate(this, cContext->getRoc(),
+        pcc->srtpAuthenticate(this, cContext->getRoc(),
                                    const_cast<uint8*>(getRawPacket()+srtpDataOffset) );
         total += zrtpChecksumLength;
 
         /* Update the ROC if necessary */
         if (getSeqNum() == 0xFFFF ) {
-                cContext->setRoc(cContext->getRoc() + 1);
+                pcc->setRoc(cContext->getRoc() + 1);
         }
 }
 
@@ -341,7 +341,7 @@ IncomingRTPPkt::checkZrtpChecksum(bool check)
     return true;
 }
 
-bool
+int32
 IncomingRTPPkt::unprotect(CryptoContext* pcc)
 {
         if (pcc == NULL) {
@@ -376,23 +376,20 @@ IncomingRTPPkt::unprotect(CryptoContext* pcc)
 
         /* Replay control */
         if (!pcc->checkReplay(cachedSeqNum)) {
-                tag = NULL;
-                mki = NULL;
-                std::cerr << "SRTP: Replay check failed" << std::endl;
-                return false;
+                return -2;
         }
-        uint8* mac = new uint8[pcc->getTagLength()];
-
         /* Guess the index */
         uint64 guessedIndex = pcc->guessIndex(cachedSeqNum);
 
         uint32 guessedRoc = guessedIndex >> 16;
+        uint8* mac = new uint8[pcc->getTagLength()];
+
         pcc->srtpAuthenticate(this, guessedRoc, mac);
         if (memcmp(tag, mac, pcc->getTagLength()) != 0) {
-            std::cerr << "SRTP: Authentication failed" << std::endl;
-            return false;
+            delete[] mac;
+            return -1;
         }
-        delete [] mac;
+        delete[] mac;
 
         /* Decrypt the content */
         pcc->srtpEncrypt( this, guessedIndex, cachedSSRC );
@@ -400,7 +397,7 @@ IncomingRTPPkt::unprotect(CryptoContext* pcc)
         /* Update the Crypto-context */
         pcc->update(cachedSeqNum);
 
-        return true;
+        return 1;
 }
 
 #ifdef	CCXX_NAMESPACES

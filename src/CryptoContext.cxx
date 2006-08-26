@@ -44,36 +44,30 @@ CryptoContext::CryptoContext( uint32 ssrc ):
 	n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
 	ealg(SrtpEncryptionNull), aalg(SrtpAuthenticationNull),
 	ekeyl(0), akeyl(0), skeyl(0),
-	encr(0), auth(0), seqNumSet(false)
+	seqNumSet(false)
     {}
 
-CryptoContext::CryptoContext( uint32 ssrc, int32 roc,
-				  int64 key_deriv_rate,
-				  //enum encr_method encryption,
-				  const int32 ealg,
-				  //enum auth_method authentication,
-				  const int32 aalg,
-				  uint8* master_key,
-				  int32 master_key_length,
-				  uint8* master_salt,
-				  int32 master_salt_length,
-				  int32 ekeyl,
-				  int32 akeyl,
-				  int32 skeyl,
-				  int32 encr,
-				  int32 auth,
-				  int32 tagLength):
+CryptoContext::CryptoContext( uint32 ssrc,
+                              int32 roc,
+                              int64 key_deriv_rate,
+                              const int32 ealg,
+			      const int32 aalg,
+			      uint8* master_key,
+			      int32 master_key_length,
+			      uint8* master_salt,
+			      int32 master_salt_length,
+			      int32 ekeyl,
+			      int32 akeyl,
+			      int32 skeyl,
+			      int32 tagLength):
 
 	ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
 	roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
 	replay_window(0),
 	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false)
-	//encryption(encryption),authentication(authentication)
     {
 	this->ealg = ealg;
 	this->aalg = aalg;
-	this->encr = encr;
-	this->auth = auth;
 	this->ekeyl = ekeyl;
 	this->akeyl = akeyl;
 	this->skeyl = skeyl;
@@ -404,6 +398,24 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	}
     }
 
+    CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate) {
+        CryptoContext* pcc = new CryptoContext(
+                ssrc,
+                roc,                                     // Roll over Counter,
+                keyDerivRate,                            // keyderivation << 48,
+                this->ealg,                              // encryption algo
+                this->aalg,                              // authentication algo
+                this->master_key,                        // Master Key
+                this->master_key_length,                 // Master Key length
+                this->master_salt,                       // Master Salt
+                this->master_salt_length,                // Master Salt length
+                this->ekeyl,                             // encryption keyl
+                this->akeyl,                             // authentication key len
+                this->skeyl,                             // session salt len
+                this->tagLength);                        // authentication tag len
+
+        return pcc;
+    }
 #ifdef  CCXX_NAMESPACES
 }
 #endif

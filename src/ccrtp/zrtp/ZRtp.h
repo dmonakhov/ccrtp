@@ -198,6 +198,15 @@ class ZRtp {
             zrtpHello->setClientId((unsigned char*)id.c_str());
        }
 
+       /**
+        * Check current state of the ZRTP state engine
+        *
+        * @param state
+        *    The state to check.
+        * @return
+        *    Return true id ZRTP engine is in the given state, false otherwise.
+        */
+       int32_t checkState(int32_t state);
 
 
  private:

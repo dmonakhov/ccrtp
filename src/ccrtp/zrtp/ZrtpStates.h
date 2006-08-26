@@ -54,15 +54,16 @@ class ZrtpStates {
     ZrtpStates(state_t* const zstates,
 	       const int32_t numStates,
 	       const int32_t initialState):
-	numStates(numStates), states(zstates), state(initialState) {};
+	numStates(numStates), states(zstates), state(initialState) {}
 
     int32_t processEvent(ZrtpStateClass& zsc) {
 	DEBUGOUT((fprintf(stdout, "ZrtpStates::processEvent, state: %d\n", state)));
-	return (zsc.*states[state].handler)(); };
+	return (zsc.*states[state].handler)();
+    }
 
-    int32_t inState(const int32_t s) { return ((s == state)? true : false); };
+    int32_t inState(const int32_t s) { return ((s == state)? true : false); }
 
-    void nextState(int32_t s)        { state = s; };
+    void nextState(int32_t s)        { state = s; }
 
  private:
     const int32_t numStates;

@@ -309,27 +309,6 @@ public:
 	{ return sendInfo.octetCount; }
 
         /**
-         * Set the CryptoContext for this outgoing queue.
-         *
-         * The endQueue method (provided by RTPQueue) also deletes the
-         * CryptoContext.
-         *
-         * @param cc Pointer to initialized CryptoContext to set.
-         */
-        inline void
-        setOutQueueCryptoContext(CryptoContext *cc)
-        {cContext = cc;}
-
-        /**
-         * Get the CryptoContext of the outgoing queue
-         *
-         * @return pointer to CryptoContext.
-         */
-        inline CryptoContext*
-        getOutQueueCryptoContext() const
-        { return cContext;}
-
-        /**
          * Get the sequence number of the next outgoing packet.
          *
          * @return the 16 bit sequence number.
@@ -337,6 +316,38 @@ public:
         inline uint16
         getSequenceNumber() const
         { return sendInfo.sendSeq; }
+
+        /**
+         * Set ouput queue CryptoContext.
+         *
+         * The endQueue method (provided by RTPQueue) deletes all
+         * registered CryptoContexts.
+         *
+         * @param cc Pointer to initialized CryptoContext.
+         */
+        void
+        setOutQueueCryptoContext(CryptoContext* cc);
+
+        /**
+         * Remove output queue CryptoContext.
+         *
+         * The endQueue method (provided by RTPQueue) also deletes all
+         * registered CryptoContexts.
+         *
+         * @param cc Pointer to initialized CryptoContext to remove.
+         */
+        void
+        removeOutQueueCryptoContext(CryptoContext* cc);
+
+        /**
+         * Get an output queue CryptoContext identified by SSRC
+         *
+         * @param ssrc Request CryptoContext for this incoming SSRC
+         * @return Pointer to CryptoContext of the SSRC of NULL if no context
+         * available for this SSRC.
+         */
+        CryptoContext*
+        getOutQueueCryptoContext(uint32 ssrc);
 
 
 protected:
@@ -436,9 +447,8 @@ protected:
         virtual void
         setControlPeer(const InetAddress &host, tpport_t port) = 0;
 
-        // The crypto context for outgoing SRTP sessions. Only one CryptoContext
-        // for an outgoing queue.
-        CryptoContext* cContext;
+        // The crypto contexts for outgoing SRTP sessions.
+        std::list<CryptoContext *> cryptoContexts;
 
 private:
         /**

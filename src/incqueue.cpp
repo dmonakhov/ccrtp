@@ -730,12 +730,21 @@ IncomingDataQueue::removeInQueueCryptoContext(CryptoContext* cc)
         // TODO - check if we need a mutex here to support multithreading
     std::list<CryptoContext *>::iterator i;
 
-    for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
-        if( (*i)->getSsrc() == cc->getSsrc() ) {
+    if (cc == NULL) {     // Remove any incoming crypto contexts
+        for (i = cryptoContexts.begin(); i != cryptoContexts.end(); ) {
             CryptoContext* tmp = *i;
-            cryptoContexts.erase(i);
+            i = cryptoContexts.erase(i);
             delete tmp;
-            return;
+        }
+    }
+    else {
+        for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
+            if( (*i)->getSsrc() == cc->getSsrc() ) {
+                CryptoContext* tmp = *i;
+                cryptoContexts.erase(i);
+                delete tmp;
+                return;
+            }
         }
     }
 }

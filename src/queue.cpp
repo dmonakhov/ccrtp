@@ -573,23 +573,8 @@ RTPDataQueue::endQueue(void)
 #ifdef	CCXX_EXCEPTIONS
 	} catch (...) { }
 #endif
-        // remove the outgoing crypto context
-        if (cContext != NULL) {
-            CryptoContext* pcc = cContext;
-            cContext = NULL;
-            delete pcc;
-        }
-
-        // Remove any incoming crypto contexts
-        if (cryptoContexts.size() > 0) {
-            std::list<CryptoContext *>::iterator i;
-
-            for (i = cryptoContexts.begin(); i != cryptoContexts.end(); i++) {
-                CryptoContext* tmp = *i;
-                cryptoContexts.erase(i);
-                delete tmp;
-            }
-        }
+        removeOutQueueCryptoContext(NULL);   // remove the outgoing crypto context
+        removeInQueueCryptoContext(NULL);    // Remove any incoming crypto contexts
 }
 
 uint32

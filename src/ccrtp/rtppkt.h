@@ -636,12 +636,12 @@ public:
 	{ getHeader()->marker = mark; }
 
         /**
-         * Called packet is setup and cContext is not NULL.
+         * Called packet is setup.
          *
          * This private method computes the SRTP data and stores it in the
          * packet. Then encrypt the payload data (ex padding).
          */
-        void protect(uint32 ssrc);
+        void protect(uint32 ssrc, CryptoContext* pcc);
 
 	/**
 	 * Outgoing packets are equal if their sequence numbers match.
@@ -742,8 +742,11 @@ public:
          * Perform SRTP processing on this packet.
          *
          * @param pcc Pointer to SRTP CryptoContext.
+         * @return
+         *     one if no errors, -1 if authentication failed, -2 if
+         *     replay check failed
          */
-        bool
+        int32
         unprotect(CryptoContext* pcc);
 
 	/**
@@ -774,7 +777,7 @@ public:
          *
          * @param check
          *     if <code>true</code> recompute and check, otherwise
-         *     adjust length of data only.
+         *     adjust length of packet data only.
          * @return <code>true</code> if check is ok or only length was
          *     adjusted. If check fails returns <code>false</code>
          */

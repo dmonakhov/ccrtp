@@ -53,7 +53,7 @@
 #include <ccrtp/channel.h>
 
 #ifdef ZRTP_SUPPORT
-#include <zrtp/ZrtpQueue.h>
+#include <ccrtp/zrtp/ZrtpQueue.h>
 #endif
 
 #ifdef	CCXX_NAMESPACES
