@@ -174,8 +174,6 @@ public:
 						128 / 8,                                 // encryption keyl
 						160 / 8,                                 // authentication key len (SHA1))
 						112 / 8,                                 // session salt len
-						1,
-						1,
 						80 / 8);                                 // authentication tag len
                 txCryptoCtx->deriveSrtpKeys(0);
 
@@ -235,8 +233,6 @@ public:
                                 128 / 8,                                 // encryption keyl
                                 160 / 8,                                 // authentication key len (SHA1))
                                 112 / 8,                                 // session salt len
-                                1,
-                                1,
                                 80 / 8);                                 // authentication tag len
                 rxCryptoCtx->deriveSrtpKeys(0);
                 rx.setInQueueCryptoContext(rxCryptoCtx);

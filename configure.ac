@@ -125,4 +125,4 @@ AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
 AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
-ccrtp.list libccrtp1.pc src/crypto/openssl/Makefile src/zrtp/Makefile)
+ccrtp.list libccrtp1.pc src/ccrtp/crypto/openssl/Makefile src/ccrtp/zrtp/Makefile)
