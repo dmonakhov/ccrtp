@@ -136,7 +136,7 @@ void ZrtpQueue::stop() {
 }
 
 /*
- * The takeInDataPacket implementation for ZRTP.
+ * The takeInDataPacket implementation for ZRTPQueue.
  */
 size_t
 ZrtpQueue::takeInDataPacket(void)
@@ -303,9 +303,9 @@ ZrtpQueue::takeInDataPacket(void)
         delete packet;
     }
 
-    // Start the ZRTP engine only after we got a first RTP packet. This is necessary
-    // to have a real SSRC at hand.
-    if (enableZrtp && zrtpEngine == NULL && OutgoingDataQueue::getSendPacketCount() >= 5) {
+    // Start the ZRTP engine only after we got a at least one RTP packet and
+    // sent some as well
+    if (enableZrtp && zrtpEngine == NULL && getSendPacketCount() >= 3) {
         start();
     }
 

@@ -838,16 +838,16 @@ void ZRtp::generateS0Initiator(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
     }
 
     if (rsFound == 0) {
-        sendInfo(Info, "No retained secret matches - verfiy SAS");
+        sendInfo(Warning, "No retained secret matches - verify SAS");
     }
     if ((rsFound & 0x1) && (rsFound & 0x2)) {
         sendInfo(Info, "Both retained secrets match - security OK");
     }
     if ((rsFound & 0x1) && !(rsFound & 0x2)) {
-        sendInfo(Info, "Only first retained secret matches - verfiy SAS");
+        sendInfo(Warning, "Only the first retained secret matches - verify SAS");
     }
     if (!(rsFound & 0x1) && (rsFound & 0x2)) {
-        sendInfo(Info, "Only second retained secret matches - verfiy SAS");
+        sendInfo(Warning, "Only the second retained secret matches - verify SAS");
     }
 
     // other shared secrets not yet supported - set to NULL
@@ -939,16 +939,16 @@ void ZRtp::generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec) {
         rsFound |= 0x2;
     }
     if (rsFound == 0) {
-        sendInfo(Info, "No retained secret matches - verfiy SAS");
+        sendInfo(Warning, "No retained secret matches - verify SAS");
     }
     if ((rsFound & 0x1) && (rsFound & 0x2)) {
         sendInfo(Info, "Both retained secrets match - security OK");
     }
     if ((rsFound & 0x1) && !(rsFound & 0x2)) {
-        sendInfo(Info, "Only first retained secret matches - verfiy SAS");
+        sendInfo(Warning, "Only the first retained secret matches - verify SAS");
     }
     if (!(rsFound & 0x1) && (rsFound & 0x2)) {
-        sendInfo(Info, "Only second retained secret matches - verfiy SAS");
+        sendInfo(Warning, "Only the second retained secret matches - verify SAS");
     }
     // other shared secrets not yet supported - set to NULL
     setD[2] = setE[2] = NULL;

@@ -22,6 +22,7 @@
 // #define UNIT_TEST
 
 #include <time.h>
+#include <stdlib.h>
 
 #include <ccrtp/zrtp/ZIDFile.h>
 
@@ -40,7 +41,6 @@ ZIDFile* ZIDFile::getInstance() {
 
 int ZIDFile::open(char *name) {
     zidrecord_t rec;
-    unsigned int t;
     unsigned int* ip;
 
     // check for an already active ZID file
@@ -49,18 +49,15 @@ int ZIDFile::open(char *name) {
     }
     if ((zidFile = fopen(name, "rb+")) == NULL) {
 	zidFile = fopen(name, "wb+");
-	// New file, generate an associated ZID and save it as first record
-	// should use some other randomize but that's as good as well.
+	// New file, generate an associated randomw ZID and save
+        // it as first record
 	if (zidFile != NULL) {
 	    ip = (unsigned int*)associatedZid;
 	    memset(&rec, 0, sizeof(zidrecord_t));
-	    t = time(NULL);
-	    t += ((unsigned long long)&rec & 0xffffffff);
-	    *ip++ = t;
-            t += ((unsigned long long)zidFile & 0xffffffff);
-	    *ip++ = t;
-            t += ((unsigned long long)name  & 0xffffffff);
-	    *ip = t;
+            srandom(time(NULL));
+	    *ip++ = random();
+	    *ip++ = random();
+	    *ip = random();
 	    memcpy(rec.identifier, associatedZid, IDENTIFIER_LEN);
 	    fseek(zidFile, 0L, SEEK_SET);
 	    rec.ownZid = 1;

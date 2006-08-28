@@ -192,7 +192,9 @@ int32_t ZrtpStateClass::evDetect(void) {
             if ((nextTimer(&T1)) <= 0 || !parent->sendPacketRTP(sentPacket)) {
                 parent->sendInfo(Error, resendError);
                 sentPacket = NULL;
-                nextState(Initial);
+                // Switch state "Detect" tobe prepared to receive Hello from
+                // other side any time later
+                nextState(Detect);
                 return (Fail);
             }
         }
@@ -250,11 +252,11 @@ int32_t ZrtpStateClass::evAckDetected(void) {
 	}
        /*
         * Commit:  (Actually illegal here, but handle it because of problem in Zfone)
-        * - go the responder path
+        * - Act as Responder
         * - send our DHPart1
         * - switch to state WaitDHPart2, wait for peer's DHPart2
         * - don't start timer, we are responder
-                */
+        */
         if (first == 'c') {
 
             ZrtpPacketCommit *cpkt = new ZrtpPacketCommit(pkt);
