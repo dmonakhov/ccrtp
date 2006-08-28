@@ -81,7 +81,10 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      * Call this method if the user confirmed (verfied) the SAS. ZRTP
      * remembers this together with the retained secrets data.
      */
-    void SASVerified()  { }
+    void SASVerified() {
+        if (zrtpEngine != NULL)
+            zrtpEngine->SASVerified();
+    }
 
     /**
      * Confirm a go clear request.

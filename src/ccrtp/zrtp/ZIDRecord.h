@@ -46,6 +46,9 @@ typedef struct zidrecord {
  * @author: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+static const int valid = 0x1;
+static const int SASVerified = 0x2;
+
 class ZIDRecord {
     friend class ZIDFile;
 
@@ -59,11 +62,14 @@ class ZIDRecord {
 	memcpy(record.identifier, idData, IDENTIFIER_LEN);
     }
 
-    int isRs1Valid() { return record.rs1Valid; };
-    int isRs2Valid() { return record.rs2Valid; };
+    int isRs1Valid() { return (record.rs1Valid & valid); }
+    int isRs2Valid() { return (record.rs2Valid & valid); }
 
-    const unsigned char *getRs1() { return record.rs1Data; };
-    const unsigned char *getRs2() { return record.rs2Data; };
+    void setSasVerified() { record.rs1Valid |= SASVerified; }
+    int isSasVerified()   { return (record.rs2Valid & SASVerified); }
+
+    const unsigned char *getRs1() { return record.rs1Data; }
+    const unsigned char *getRs2() { return record.rs2Data; }
 
     void setNewRs1(const unsigned char*data);
 };

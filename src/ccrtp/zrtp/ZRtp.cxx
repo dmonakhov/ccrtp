@@ -526,6 +526,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
     // thus get the singleton instance to the open file
     ZIDFile *zid = ZIDFile::getInstance();
     zid->getRecord(&zidRec);
+    int sasFlag = zidRec.isSasVerified() ? 1 : 0;
 
     /*
      * The expected shared secret Ids were already computed when we built the
@@ -542,7 +543,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm1(ZrtpPacketDHPart *dhPart2) {
     ZrtpPacketConfirm* zpConf = new ZrtpPacketConfirm();
     zpConf->setMessage((uint8_t*)Confirm1Msg);
     zpConf->setPlainText((uint8_t*)knownPlain);
-    zpConf->setSASFlag(0);
+    zpConf->setSASFlag(sasFlag);
 
     uint8_t confMac[SHA256_DIGEST_LENGTH];
     unsigned int macLen;
@@ -561,8 +562,8 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm *confirm1) {
 
     uint8_t sasFlag = confirm1->getSASFlag();
     if (sasFlag & 0x1) {
-	// prepare the SAS data and display to user
     }
+
     if (memcmp(knownPlain, confirm1->getPlainText(), 15) != 0) {
 	sendInfo(Error, "Cannot read confirm1 message");
 	return NULL;
@@ -586,7 +587,7 @@ ZrtpPacketConfirm* ZRtp::prepareConfirm2(ZrtpPacketConfirm *confirm1) {
     zpConf->setSASFlag(0);
 
     // The HMAC with length 16 includes the SAS flag inside the Confirm packet
-    hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)confirm1->getPlainText(),
+    hmac_sha256(hmacSrtp, SHA256_DIGEST_LENGTH, (unsigned char*)zpConf->getPlainText(),
 		16, confMac, &macLen);
 
     zpConf->setHmac(confMac);
@@ -1056,3 +1057,13 @@ void ZRtp::srtpSecretsOff(EnableSecurity part) {
     callback->srtpSecretsOff(part);
 }
 
+void ZRtp::SASVerified()
+{
+    // Initialize a ZID record to get peer's retained secrets
+    ZIDRecord zidRec(peerZid);
+    ZIDFile *zid = ZIDFile::getInstance();
+
+    zid->getRecord(&zidRec);
+    zidRec.setSasVerified();
+    zid->saveRecord(&zidRec);
+}

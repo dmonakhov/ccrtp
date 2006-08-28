@@ -93,6 +93,7 @@ ZrtpQueue::ZrtpQueue(uint32 ssrc, uint32 size, RTPApplication& app) :
 
 ZrtpQueue::~ZrtpQueue() {
     if (staticTimeoutProvider != NULL) {
+        cancelTimer();
         staticTimeoutProvider->stopThread();
         delete staticTimeoutProvider;
         staticTimeoutProvider = NULL;

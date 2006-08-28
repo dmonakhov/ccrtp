@@ -208,6 +208,13 @@ class ZRtp {
         */
        int32_t checkState(int32_t state);
 
+       /**
+        * Set SAS as verified.
+        *
+        * Call this method if the user confirmed (verfied) the SAS. ZRTP
+        * remembers this together with the retained secrets data.
+        */
+       void SASVerified();
 
  private:
      friend class ZrtpStateClass;
