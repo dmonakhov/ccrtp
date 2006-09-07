@@ -35,7 +35,8 @@
  *          Johan Bilien <jobi@via.ecp.fr>
  */
 
-#include <ccrtp/crypto/gcrypt/hmac256.h>
+#include <gcrypt.h>
+#include <ccrtp/crypto/hmac256.h>
 
 void hmac_sha256(uint8* key, uint32 keyLength,
 		uint8* data, int32 dataLength,

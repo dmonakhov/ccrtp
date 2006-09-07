@@ -40,15 +40,16 @@
 #ifndef HMAC_SHA256_H
 #define HMAC_SHA256_H
 
-#include <openssl/hmac.h>
 #include <cc++/config.h>
 
+#ifndef SHA256_DIGEST_LENGTH
+#define SHA256_DIGEST_LENGTH 32
+#endif
 
 /**
  * Compute SHA256 HMAC.
  *
- * This functions takes one data chunk and computes its SHA256 HMAC. It uses
- * the openSSL HAMAC SHA256 implementation.
+ * This functions takes one data chunk and computes its SHA256 HMAC.
  *
  * @param key
  *    The MAC key.

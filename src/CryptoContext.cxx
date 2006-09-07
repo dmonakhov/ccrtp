@@ -27,6 +27,9 @@
 
 #include <iostream>
 
+#include <ccrtp/crypto/AesSrtp.h>
+#include <ccrtp/crypto/hmac.h>
+
 #include <ccrtp/CryptoContext.h>
 
 #ifdef  CCXX_NAMESPACES
@@ -137,7 +140,6 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	if (ealg == SrtpEncryptionNull) {
 	    return;
 	}
-
 	if (ealg == SrtpEncryptionAESCM) {
 
 	    /* Compute the CM IV (refer to chapter 4.1.1 in RFC 3711):

@@ -20,13 +20,15 @@
  * Authors: Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
+#include <ccrtp/crypto/ZrtpDH.h>
+#include <ccrtp/crypto/hmac256.h>
+#include <ccrtp/crypto/sha256.h>
+
 #include <ccrtp/zrtp/ZRtp.h>
 #include <ccrtp/zrtp/ZrtpStateClass.h>
 #include <ccrtp/zrtp/ZIDFile.h>
 #include <ccrtp/zrtp/ZIDRecord.h>
 #include <ccrtp/zrtp/Base32.h>
-#include <ccrtp/crypto/openssl/ZrtpDH.h>
-
 
 static void hexdump(const char* title, const unsigned char *s, int l) {
     int n=0;

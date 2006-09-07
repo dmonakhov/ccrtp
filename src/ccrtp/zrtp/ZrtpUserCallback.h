@@ -112,6 +112,29 @@ class ZrtpUserCallback {
         virtual void showMessage(MessageSeverity sev, std::string message) =0;
 
         /**
+         * ZRTPQueue calls this if the negotiation failed.
+         *
+         * ZRTPQueue calls this method in case ZRTP negotiation failed. The
+         * parameters show the severity as well as some explanatory text.
+         * Refer to the <code>MessageSeverity</code> enum above.
+         *
+         * @param severity
+         *     This defines the message's severity
+         * @param msg
+         *     The message string, terminated with a null byte.
+         */
+        virtual void zrtpNegotiationFailed(MessageSeverity severity, char* msg) =0;
+
+        /**
+         * ZRTPQueue calls this methof if the other side does not support ZRTP.
+         *
+         * If the other side does not answer the ZRTP <em>Hello</em> packets then
+         * ZRTP calls this method,
+         *
+         */
+        virtual void zrtpNotSuppOther() =0;
+
+        /**
          * A user interface implementation uses the following methods to
          * control ZRTP. The standard methods are just proxies to the
          * according ZrtpQueue methods. An inheriting class may override

@@ -39,10 +39,7 @@
  * <p/>
  *
  * The <code>initialize</code> method stores the timeout provider and
- * reuses it for every instance. To do so the bridge inherits from
- * Minisip's <e>StateMachine<e/> but does use the timeout specific
- * parts only. The destructor frees the StateMachine to maintain the
- * timout provider's reference counter.
+ * reuses it for every instance.
  *
  * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
@@ -73,7 +70,9 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
      * @param onOff
      *     If set to true enable ZRTP, disable otherwise
      */
-    void setEnableZrtp(bool onOff)   { enableZrtp = onOff; }
+    void setEnableZrtp(bool onOff)   {
+        enableZrtp = onOff;
+    }
 
     /**
      * Set SAS as verified.
@@ -255,6 +254,29 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
         fprintf(stderr, "Need to process a GoClear message!");
     }
 
+    /**
+     * ZRTP calls this if the negotiation failed.
+     *
+     * ZRTP calls this method in case ZRTP negotiation failed. The parameters
+     * show the severity as well as some explanatory text.
+     * Refer to the <code>MessageSeverity</code> enum above.
+     *
+     * @param severity
+     *     This defines the message's severity
+     * @param msg
+     *     The message string, terminated with a null byte.
+     */
+    void zrtpNegotiationFailed(MessageSeverity severity, char* msg);
+
+    /**
+     * ZRTP calls this methof if the other side does not support ZRTP.
+     *
+     * If the other side does not answer the ZRTP <em>Hello</em> packets then
+     * ZRTP calls this method,
+     *
+     */
+    void zrtpNotSuppOther();
+
     /*
      * End of ZrtpCallback functions.
      */
@@ -273,6 +295,8 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
         virtual ~ZrtpQueue();
 
     private:
+        void initialize();
+
         ZRtp *zrtpEngine;
         ZrtpUserCallback* zrtpUserCallback;
 
@@ -289,7 +313,6 @@ class ZrtpQueue : public AVPQueue, public ZrtpCallback {
         uint32 senderZrtpSsrc;
         uint16 senderZrtpSeqNo;
         CryptoContext* senderCryptoContext;
-
 };
 
 #ifdef  CCXX_NAMESPACES
@@ -308,6 +331,24 @@ inline void ZrtpQueue::sendInfo(MessageSeverity severity, char* msg) {
     }
     else {
         fprintf(stderr, "Severity: %d - %s\n", severity, msg);
+    }
+}
+
+inline void ZrtpQueue::zrtpNegotiationFailed(MessageSeverity severity, char* msg) {
+    if (zrtpUserCallback != NULL) {
+        zrtpUserCallback->zrtpNegotiationFailed(severity, msg);
+    }
+    else {
+        fprintf(stderr, "Severity: %d - %s\n", severity, msg);
+    }
+}
+
+inline void ZrtpQueue::zrtpNotSuppOther() {
+    if (zrtpUserCallback != NULL) {
+        zrtpUserCallback->zrtpNotSuppOther();
+    }
+    else {
+        fprintf(stderr, "The other (remote) client does not support ZRTP\n");
     }
 }
 

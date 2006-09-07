@@ -36,18 +36,12 @@
 #ifndef _ZRTPDH_H__
 #define _ZRTPDH_H__
 
-
-#include <openssl/crypto.h>
-#include <openssl/bn.h>
-#include <openssl/rand.h>
-#include <openssl/dh.h>
-
 #include <cc++/config.h>
 
 /**
  * Implementation of Diffie-Helman for ZRTP
  *
- * This class uses the OpenSSL fucntions to generate and compute the
+ * This class defines functions to generate and compute the
  * Diffie-Helman public and secret data and the shared secret. According to
  * the ZRTP specification we use the MODP groups as defined by RFC 3526 for
  * length 3072 and 4096.
@@ -57,7 +51,7 @@
 class __EXPORT ZrtpDH {
 
 private:
-    DH *ctx;
+    void* ctx;
 
 public:
     ZrtpDH(int32_t pkLength);
@@ -69,21 +63,21 @@ public:
      *
      * @return 1 on success, 0 on failure
      */
-    int32_t generateKey()                { return DH_generate_key(ctx); };
+    int32_t generateKey();
 
     /**
      * Returns the size in bytes of computed secret key.
      *
      * @return Size in bytes.
      */
-    int32_t getSecretSize() const        { return DH_size(ctx); };
+    int32_t getSecretSize() const;
 
     /**
      * Returns the size in bytes of computed public key.
      *
      * @return Size in bytes.
      */
-    int32_t getPubKeySize() const        { return BN_num_bytes((ctx->pub_key)); };
+    int32_t getPubKeySize() const;
 
     /**
      * Returns the bytes of computed secret key.
@@ -95,7 +89,7 @@ public:
      *
      * @return Size in bytes.
      */
-    int32_t getPubKeyBytes(uint8_t *buf) const { return BN_bn2bin(ctx->pub_key, buf); };
+    int32_t getPubKeyBytes(uint8_t *buf) const;
 
     /**
      * Compute the secret key and return it to caller.
@@ -127,7 +121,7 @@ public:
      * @param length
      *    Number of random bytes to produce.
      */
-    void random(uint8_t *buf, int32_t length) { RAND_bytes(buf, length); };
+    void random(uint8_t *buf, int32_t length);
 };
 
 #endif // ZRTPDH_H

@@ -36,11 +36,13 @@
 #include <ccrtp/zrtp/ZrtpPacketClearAck.h>
 #include <ccrtp/zrtp/ZrtpCallback.h>
 #include <ccrtp/zrtp/ZIDRecord.h>
-#include <ccrtp/crypto/openssl/ZrtpDH.h>
-#include <ccrtp/crypto/openssl/hmac256.h>
-#include <ccrtp/crypto/openssl/sha256.h>
+
+#ifndef SHA256_DIGEST_LENGTH
+#define SHA256_DIGEST_LENGTH 32
+#endif
 
 class ZrtpStateClass;
+class ZrtpDH;
 
 /**
  * The main ZRTP class.
@@ -424,6 +426,11 @@ class ZRtp {
 
     void generateS0Responder(ZrtpPacketDHPart *dhPart, ZIDRecord& zidRec);
 
+    /*
+     * The following methods are helper functions for ZrtpStateClass.
+     * ZrtpStateClass calls them to prepare packets, send data, report
+     * problems, etc.
+     */
     /**
      * Send a ZRTP packet.
      *
@@ -615,6 +622,32 @@ class ZRtp {
      */
     void sendInfo(MessageSeverity severity, char* msg) {
 	callback->sendInfo(severity, msg);
+    }
+
+    /**
+     * ZRTP calls this if the negotiation failed.
+     *
+     * ZRTP calls this method in case ZRTP negotiation failed. The parameters
+     * show the severity as well as some explanatory text.
+     *
+     * @param severity
+     *     This defines the message's severity
+     * @param msg
+     *     The message string, terminated with a null byte.
+     */
+    void zrtpNegotiationFailed(MessageSeverity severity, char* msg) {
+        callback->zrtpNegotiationFailed(severity, msg);
+    }
+
+    /**
+     * ZRTP calls this methof if the other side does not support ZRTP.
+     *
+     * If the other side does not answer the ZRTP <em>Hello</em> packets then
+     * ZRTP calls this method,
+     *
+     */
+    void zrtpNotSuppOther() {
+        callback->zrtpNotSuppOther();
     }
 
     /**

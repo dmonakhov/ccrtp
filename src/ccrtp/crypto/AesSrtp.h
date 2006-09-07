@@ -53,9 +53,11 @@
 #ifndef AESSRTP_H
 #define AESSRTP_H
 
-#include <malloc.h>
-#include <openssl/aes.h>                // the include of openSSL
 #include <cc++/config.h>
+
+#ifndef AES_BLOCK_SIZE
+#define AES_BLOCK_SIZE 16
+#endif
 
 typedef struct _f8_ctx {
     unsigned char *S;
@@ -228,7 +230,7 @@ private:
 		     const uint8* in,
 		     int32 length,
 		     uint8* out);
-    void *key;
+    void* key;
 };
 
 #endif

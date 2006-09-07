@@ -35,13 +35,10 @@ namespace ost {
 int32_t
 ZrtpQueue::initialize(const char *zidFilename)
 {
-    if (staticTimeoutProvider != NULL) {
-        staticTimeoutProvider->stopThread();
-        delete staticTimeoutProvider;
+    if (staticTimeoutProvider == NULL) {
+        staticTimeoutProvider = new TimeoutProvider<std::string, ZrtpQueue*>();
+        staticTimeoutProvider->start();
     }
-    staticTimeoutProvider = new TimeoutProvider<std::string, ZrtpQueue*>();
-    staticTimeoutProvider->start();
-
     std::string fname;
     if (zidFilename == NULL) {
         char *home = getenv("HOME");
@@ -54,30 +51,27 @@ ZrtpQueue::initialize(const char *zidFilename)
     ZIDFile *zf = ZIDFile::getInstance();
     if (zf->open((char *)zidFilename) < 0) {
         enableZrtp = false;
-        sendInfo(Error, "cannot open ZID file");
+        sendInfo(Error, "cannot open or create the ZID file");
     }
     return 1;
 }
 
 ZrtpQueue::ZrtpQueue(uint32 size, RTPApplication& app) :
-        AVPQueue(size,app), zrtpUserCallback(NULL), enableZrtp(true)
+        AVPQueue(size,app)
 {
-    secureParts = 0;
-    zrtpEngine = NULL;
-
-    senderCryptoContext = NULL;
-
-    recvCryptoContext = NULL;
-
-    senderZrtpSsrc = 0xdeadbeef;         // may be a different value (random) as well
-    senderZrtpSeqNo = 1;
-
-    clientIdString = clientId;
+    initialize();
 }
 
 ZrtpQueue::ZrtpQueue(uint32 ssrc, uint32 size, RTPApplication& app) :
-        AVPQueue(ssrc,size,app), zrtpUserCallback(NULL), enableZrtp(true)
+        AVPQueue(ssrc,size,app)
 {
+    initialize();
+}
+
+void ZrtpQueue::initialize()
+{
+    zrtpUserCallback = NULL;
+    enableZrtp = true;
     secureParts = 0;
     zrtpEngine = NULL;
 
@@ -92,13 +86,8 @@ ZrtpQueue::ZrtpQueue(uint32 ssrc, uint32 size, RTPApplication& app) :
 }
 
 ZrtpQueue::~ZrtpQueue() {
-    if (staticTimeoutProvider != NULL) {
-        cancelTimer();
-        staticTimeoutProvider->stopThread();
-        delete staticTimeoutProvider;
-        staticTimeoutProvider = NULL;
-    }
 
+    cancelTimer();
     stop();
 
     if (zrtpUserCallback != NULL) {

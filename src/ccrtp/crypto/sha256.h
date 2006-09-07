@@ -38,16 +38,16 @@
 #ifndef _SHA256_H
 #define _SHA256_H
 
-#include <openssl/crypto.h>
-#include <openssl/sha.h>
-
 #include <cc++/config.h>
+
+#ifndef SHA256_DIGEST_LENGTH
+#define SHA256_DIGEST_LENGTH 32
+#endif
 
 /**
  * Compute SHA256 digest.
  *
- * This functions takes one data chunk and computes its SHA256 digest. It uses
- * the openSSL SHA256 implementation as SHA256 engine.
+ * This functions takes one data chunk and computes its SHA256 digest.
  *
  * @param data
  *    Points to the data chunk.

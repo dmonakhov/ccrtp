@@ -51,12 +51,8 @@ AC_ARG_ENABLE(srtp,
         [enable SRTP support (default enabled)]))
 if test -z "$enable_srtp"; then
    enable_srtp="yes"
-fi
-if test "${enable_srtp}" = "yes"
-then
    AC_DEFINE(SRTP_SUPPORT, [], [SRTP support])
 fi
-AM_CONDITIONAL(SRTP_SUPPORT, test "${enable_srtp}" = "yes")
 
 # ZRTP support
 AC_ARG_ENABLE(zrtp,
@@ -65,22 +61,34 @@ AC_ARG_ENABLE(zrtp,
 if test -z "$enable_zrtp"; then
    enable_zrtp = "no"
 fi
+
 if test "${enable_zrtp}" = "yes"
 then
     if test "${enable_srtp}" != "yes"
     then
-        AC_MSG_ERROR([You need SRTP support to enable ZRTP])
+        AC_MSG_ERROR([SRTP support is required to enable ZRTP])
     fi
     AC_DEFINE(ZRTP_SUPPORT, [], [ZRTP support])
 fi
-AM_CONDITIONAL(ZRTP_SUPPORT, test "${enable_zrtp}" = "yes")
 
-# check availability of openSSL crypto library if SRTP support enabled
+# availability of gcrypt or openSSL crypto library if SRTP support is enabled
 if test "${enable_srtp}" = "yes"
 then
-    AC_CHECK_LIB([crypto], [EVP_CipherInit_ex],
-                 [], AC_MSG_ERROR([OpenSSL crypto library not found.]))
+    AC_CHECK_LIB([gcrypt],
+                 [gcry_cipher_open],
+                 [],
+                 [AC_CHECK_LIB([crypto],
+                               [EVP_CipherInit_ex],
+                               [],
+                               [AC_MSG_ERROR([Cannot find libgcrypt or OpenSSL crypto library.])]
+                              )
+                 ]
+                )
 fi
+AM_CONDITIONAL(SRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
+AM_CONDITIONAL(ZRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
+AM_CONDITIONAL(SRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
+AM_CONDITIONAL(ZRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
 
 OST_PROG_COMMON
 OST_PROG_LIBVER
@@ -125,4 +133,4 @@ AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
 AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
-ccrtp.list libccrtp1.pc src/ccrtp/crypto/openssl/Makefile src/ccrtp/zrtp/Makefile)
+ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile src/ccrtp/zrtp/Makefile)

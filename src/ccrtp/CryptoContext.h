@@ -21,9 +21,6 @@
 #ifndef CRYPTOCONTEXT_H
 #define CRYPTOCONTEXT_H
 
-#include <ccrtp/crypto/openssl/AesSrtp.h>
-#include <ccrtp/crypto/openssl/hmac.h>
-
 #include <cc++/config.h>
 
 #include <ccrtp/rtppkt.h>

@@ -41,11 +41,14 @@
 
 #include <cc++/config.h>
 
+#ifndef SHA1_DIGEST_LENGTH
+#define SHA1_DIGEST_LENGTH 20
+#endif
+
 /**
  * Compute SHA1 HMAC.
  *
- * This functions takes one data chunk and computes its SHA1 HMAC. It uses
- * the openSSL HAMAC SHA1 implementation.
+ * This functions takes one data chunk and computes its SHA1 HMAC.
  *
  * @param key
  *    The MAC key.

@@ -179,7 +179,7 @@ int32_t ZrtpStateClass::evDetect(void) {
 		delete sentPacket;
 		sentPacket = NULL;
 		nextState(Initial);
-		parent->sendInfo(Error, sendErrorText);
+                parent->zrtpNegotiationFailed(Error, sendErrorText);
 		return(Fail);
 	    }
 	    return (Done);
@@ -190,7 +190,7 @@ int32_t ZrtpStateClass::evDetect(void) {
     else if (event->type == Timer) {
 	if (sentPacket != NULL) {
             if ((nextTimer(&T1)) <= 0 || !parent->sendPacketRTP(sentPacket)) {
-                parent->sendInfo(Error, resendError);
+                parent->zrtpNotSuppOther();
                 sentPacket = NULL;
                 // Switch state "Detect" tobe prepared to receive Hello from
                 // other side any time later

@@ -46,7 +46,7 @@
 
 #include <ccrtp/queuebase.h>
 #include <ccrtp/CryptoContext.h>
-#include <list> // TODO: minimal std::list template
+#include <list>
 
 #ifdef	CCXX_NAMESPACES
 namespace ost {

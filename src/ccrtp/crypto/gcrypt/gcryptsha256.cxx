@@ -35,7 +35,8 @@
  *	    Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-#include <ccrtp/crypto/gcrypt/sha256.h>
+#include <gcrypt.h>
+#include <ccrtp/crypto/sha256.h>
 
 void sha256(uint8* data, int32 dataLength,
             uint8* mac)

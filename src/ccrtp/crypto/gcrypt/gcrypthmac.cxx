@@ -33,8 +33,9 @@
  * Authors: Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
  */
+#include <gcrypt.h>
 
-#include <ccrtp/crypto/gcrypt/hmac.h>
+#include <ccrtp/crypto/hmac.h>
 #include <stdio.h>
 
 void hmac_sha1(uint8* key, int32 keyLength,

@@ -43,7 +43,7 @@
 #include <openssl/dh.h>
 #include <openssl/evp.h>
 
-#include <ccrtp/crypto/openssl/ZrtpDH.h>
+#include <ccrtp/crypto/ZrtpDH.h>
 
 extern void initializeOpenSSL();
 
@@ -149,25 +149,27 @@ ZrtpDH::ZrtpDH(int32_t pkLength) {
 	dhinit = 1;
     }
 
-    ctx = DH_new();
+    ctx = static_cast<void*>(DH_new());
 
-    ctx->g = BN_new();
-    BN_set_word(ctx->g, DH_GENERATOR_2);
+    DH* tmpCtx = static_cast<DH*>(ctx);
+
+    tmpCtx->g = BN_new();
+    BN_set_word(tmpCtx->g, DH_GENERATOR_2);
     if (pkLength == 3072) {
-	ctx->p = BN_dup(bnP3072);
+        tmpCtx->p = BN_dup(bnP3072);
 	RAND_bytes(random, 32);
-	ctx->priv_key = BN_bin2bn(random, 32, NULL);
+        tmpCtx->priv_key = BN_bin2bn(random, 32, NULL);
     }
     else {
-	ctx->p = BN_dup(bnP4096);
+        tmpCtx->p = BN_dup(bnP4096);
 	RAND_bytes(random, 64);
-	ctx->priv_key = BN_bin2bn(random, 64, NULL);
+        tmpCtx->priv_key = BN_bin2bn(random, 64, NULL);
     }
 }
 
 ZrtpDH::~ZrtpDH() {
     if (ctx != NULL) {
-	DH_free(ctx);
+        DH_free(static_cast<DH*>(ctx));
     }
 }
 
@@ -175,14 +177,41 @@ int32_t ZrtpDH::computeKey(uint8_t *pubKeyBytes,
 			   int32_t length, uint8_t *secret) {
 
     int32_t result;
+    DH* tmpCtx = static_cast<DH*>(ctx);
 
-    if (ctx->pub_key != NULL) {
-        BN_free(ctx->pub_key);
+    if (tmpCtx->pub_key != NULL) {
+        BN_free(tmpCtx->pub_key);
     }
-    ctx->pub_key = BN_bin2bn(pubKeyBytes, length, NULL);
-    result = DH_compute_key(secret, ctx->pub_key, ctx);
+    tmpCtx->pub_key = BN_bin2bn(pubKeyBytes, length, NULL);
+    result = DH_compute_key(secret, tmpCtx->pub_key, tmpCtx);
 
     return result;
+}
+
+
+int32_t ZrtpDH::generateKey()
+{
+    return DH_generate_key(static_cast<DH*>(ctx));
+}
+
+int32_t ZrtpDH::getSecretSize() const
+{
+    return DH_size(static_cast<DH*>(ctx));
+}
+
+int32_t ZrtpDH::getPubKeySize() const
+{
+    return BN_num_bytes(static_cast<DH*>(ctx)->pub_key);
+}
+
+int32_t ZrtpDH::getPubKeyBytes(uint8_t *buf) const
+{
+    return BN_bn2bin(static_cast<DH*>(ctx)->pub_key, buf);
+}
+
+void ZrtpDH::random(uint8_t *buf, int32_t length)
+{
+    RAND_bytes(buf, length);
 }
 
 /** EMACS **
