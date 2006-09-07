@@ -116,8 +116,13 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 	])
 ])
 
-# check availability of openSSL crypto headers if SRTP support enabled
-if test "${enable_srtp}" = "yes"
+if test "${enable_srtp}" = "yes" -a "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes"
+then
+     AC_CHECK_HEADERS([gcrypt.h],
+                      [], AC_MSG_ERROR([libgcrypt headers not found.]))
+fi
+
+if test "${enable_srtp}" = "yes" -a "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes"
 then
      AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
                       [], AC_MSG_ERROR([OpenSSL headers not found.]))
