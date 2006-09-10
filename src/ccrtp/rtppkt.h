@@ -680,7 +680,6 @@ private:
 	 */
 	void setCSRCArray(const uint32* const csrcs, uint16 numcsrc);
 
-        CryptoContext* cContext;
         int32 zrtpChecksumLength;
 
 };

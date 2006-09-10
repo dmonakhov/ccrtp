@@ -54,23 +54,6 @@ if test -z "$enable_srtp"; then
    AC_DEFINE(SRTP_SUPPORT, [], [SRTP support])
 fi
 
-# ZRTP support
-AC_ARG_ENABLE(zrtp,
-    AS_HELP_STRING([--enable-zrtp],
-        [enable ZRTP support (default disabled)]))
-if test -z "$enable_zrtp"; then
-   enable_zrtp = "no"
-fi
-
-if test "${enable_zrtp}" = "yes"
-then
-    if test "${enable_srtp}" != "yes"
-    then
-        AC_MSG_ERROR([SRTP support is required to enable ZRTP])
-    fi
-    AC_DEFINE(ZRTP_SUPPORT, [], [ZRTP support])
-fi
-
 # availability of gcrypt or openSSL crypto library if SRTP support is enabled
 if test "${enable_srtp}" = "yes"
 then
@@ -86,9 +69,7 @@ then
                 )
 fi
 AM_CONDITIONAL(SRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
-AM_CONDITIONAL(ZRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
 AM_CONDITIONAL(SRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
-AM_CONDITIONAL(ZRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
 
 OST_PROG_COMMON
 OST_PROG_LIBVER
@@ -138,4 +119,4 @@ AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
 AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
-ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile src/ccrtp/zrtp/Makefile)
+ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile)

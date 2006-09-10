@@ -200,7 +200,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	pointer += hdrextlen;
 
 	// add data.
-        cContext = pcc;
         setbuffer(data,datalen,pointer);
         zrtpChecksumLength = 0;
 }
@@ -222,7 +221,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 	// getHeader()->extension = 0;
 
 	// add data.
-        cContext = pcc;
 	setbuffer(data,datalen,pointer);
         zrtpChecksumLength = 0;
 }
@@ -236,7 +234,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen,
 	//getHeader()->cc = 0;
 	//getHeader()->extension = 0;
 
-        cContext = pcc;
 	setbuffer(data,datalen,getSizeOfFixedHeader());
         zrtpChecksumLength = 0;
 }
@@ -268,13 +265,13 @@ OutgoingRTPPkt::protect(uint32 ssrc, CryptoContext* pcc)
         // take MKI length into account when storing the authentication tag.
 
         /* Compute MAC */
-        pcc->srtpAuthenticate(this, cContext->getRoc(),
+        pcc->srtpAuthenticate(this, pcc->getRoc(),
                                    const_cast<uint8*>(getRawPacket()+srtpDataOffset) );
         total += zrtpChecksumLength;
 
         /* Update the ROC if necessary */
         if (getSeqNum() == 0xFFFF ) {
-                pcc->setRoc(cContext->getRoc() + 1);
+                pcc->setRoc(pcc->getRoc() + 1);
         }
 }
 
@@ -285,7 +282,7 @@ OutgoingRTPPkt::computeZrtpChecksum()
     uint8* cdata = const_cast<uint8*>(getRawPacket());
     uint16* data =(uint16*)cdata;
 
-    int32 length = total + srtpLength - zrtpChecksumLength-20+2 ; // TODO This strange -20+2 is an error in Zfone
+    int32 length = total + srtpLength - zrtpChecksumLength;
 
     uint32_t sum = 0;
     uint16_t ans = 0;
@@ -318,9 +315,11 @@ IncomingRTPPkt::IncomingRTPPkt(const unsigned char* const block, size_t len) :
 	//    X bits into account)
 	if ( getProtocolVersion() != CCRTP_VERSION
 	     ||
-	     (getPayloadType() & RTP_INVALID_PT_MASK) == RTP_INVALID_PT_VALUE
+             (getPayloadType() & RTP_INVALID_PT_MASK) == RTP_INVALID_PT_VALUE) {
+            /*
 	     ||
 	     getPayloadSize() <= 0 ) {
+            */
 		headerValid = false;
 		return;
 	}
