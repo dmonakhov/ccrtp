@@ -370,7 +370,8 @@ IncomingRTPPkt::unprotect(CryptoContext* pcc)
         // recompute payloadSize by subtracting SRTP data
         payloadSize -= pcc->getTagLength() + pcc->getMkiLength();
 
-        const uint8* mki = getRawPacket() + srtpDataIndex;
+	// unused??
+        // const uint8* mki = getRawPacket() + srtpDataIndex;
         const uint8* tag = getRawPacket() + srtpDataIndex + pcc->getMkiLength();
 
         /* Replay control */
