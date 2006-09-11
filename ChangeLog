@@ -1,3 +1,8 @@
+2006-09-11  David Sugar <dyfet@gnutelephony.org>
+
+	* configure: Updated to use pkgconfig instead of older Common C++
+	macro.
+
 2006-07-25  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* Added 2 fixes from Yaniv Levy:

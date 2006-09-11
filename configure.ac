@@ -45,6 +45,16 @@ AM_PROG_LIBTOOL
 AM_INIT_AUTOMAKE(ccrtp,[$VERSION])
 AM_CONFIG_HEADER(src/config.h)
 
+if test -z "$PKG_CONFIG_PATH" ; then
+        PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+fi
+
+if test "$prefix" != "NONE" ; then
+        PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
+fi
+
+export PKG_CONFIG_PATH
+
 # SRTP support
 AC_ARG_ENABLE(srtp,
     AS_HELP_STRING([--enable-srtp],
@@ -76,7 +86,11 @@ OST_PROG_LIBVER
 OST_PROG_LIBRARY(CCXX,[$LT_VERSION])
 OST_AUTOMAKE_MODE
 OST_MAINTAINER_MODE
-OST_CCXX2_VERSION([$REQUIRES])
+PKG_CHECK_MODULES(COMMON, libccgnu2 >= $REQUIRES)
+CXXFLAGS="$CXXFLAGS $COMMON_CFLAGS"
+COMMON_LIBPATH=`pkg-config --variable=libdir libccgnu2`
+GNULIBS="-L$COMMON_LIBPATH $COMMON_LIBS"
+AC_SUBST(GNULIBS)
 # OST_CC_ENDIAN - now in Common C++
 # Are we using the GNU compiler?
 if test $GCC = yes ; then
