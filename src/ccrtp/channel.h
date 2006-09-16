@@ -216,7 +216,9 @@ public:
 
 	inline Socket::Error
 	setMulticast(bool enable)
-	{ return recvSocket->setMulticast(enable); }
+	{ Socket::Error error = recvSocket->setMulticast(enable); 
+	  if (error) return error;
+	  return sendSocket->setMulticast(enable); }
 
 	inline Socket::Error
 	join(const InetMcastAddress& ia, uint32 iface)
@@ -228,7 +230,7 @@ public:
 
         inline Socket::Error 
 	setTimeToLive(unsigned char ttl)
-	{ return recvSocket->setTimeToLive(ttl); }
+	{ return sendSocket->setTimeToLive(ttl); }
  
 	inline void 
 	setPeer(const InetAddress& host, tpport_t port)
@@ -397,7 +399,9 @@ public:
 
 	inline Socket::Error
 	setMulticast(bool enable)
-	{ return recvSocket->setMulticast(enable); }
+	{ Socket::Error error = recvSocket->setMulticast(enable); 
+	  if (error) return error;
+	  return sendSocket->setMulticast(enable); }
 
 	inline Socket::Error
 	join(const IPV6Multicast& ia, uint32 iface)
@@ -409,7 +413,7 @@ public:
 
         inline Socket::Error 
 	setTimeToLive(unsigned char ttl)
-	{ return recvSocket->setTimeToLive(ttl); }
+	{ return sendSocket->setTimeToLive(ttl); }
  
 	inline void 
 	setPeer(const IPV6Host& host, tpport_t port)

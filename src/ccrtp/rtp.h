@@ -165,6 +165,24 @@ namespace ost {
 				return QueueRTCPManager::dispatchBYE(str);
 			}
 
+		/**
+		 * Set the value of the TTL field in the sent packets.
+		 *
+		 * @param ttl Time To Live
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		setMcastTTL(uint8 ttl)
+			{
+				Socket::Error error = dso->setMulticast(true);
+				if ( error ) return error;
+				error = dso->setTimeToLive(ttl);
+				if ( error ) return error;
+				error = cso->setMulticast(true);
+				if ( error ) return error;
+				return cso->setTimeToLive(ttl);
+			}
+
 		inline virtual
 		~TRTPSessionBase()
 			{
@@ -262,6 +280,50 @@ namespace ost {
 		inline SOCKET getControlRecvSocket() const
 			{ return cso->getRecvSocket(); }
 
+		/**
+		 * Join a multicast group.
+		 *
+		 * @param ia address of the multicast group
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		joinGroup(const InetMcastAddress& ia, uint32 iface)
+			{
+				Socket::Error error  = dso->setMulticast(true);
+				if ( error ) return error;
+				error = dso->join(ia,iface);
+				if ( error ) return error;
+				error = cso->setMulticast(true);
+				if ( error ) {
+					dso->drop(ia);
+					return error;
+				}
+				error = cso->join(ia,iface);
+				if ( error ) {
+					dso->drop(ia);
+					return error;
+				}
+				return Socket::errSuccess;
+			}
+
+		/**
+		 * Leave a multicast group.
+		 *
+		 * @param ia address of the multicast group
+		 * @return error code from the socket operation
+		 */
+		inline Socket::Error
+		leaveGroup(const InetMcastAddress& ia)
+			{
+				Socket::Error error = dso->setMulticast(false);
+				if ( error ) return error;
+				error = dso->leaveGroup(ia);
+				if ( error ) return error;
+				error = cso->setMulticast(false);
+				if ( error ) return error;
+				return cso->leaveGroup(ia);
+			}
+
 		inline void
 		endSocket()
 			{
@@ -307,68 +369,6 @@ namespace ost {
 				dso = new RTPDataChannel(InetHostAddress("0.0.0.0"),dataBasePort);
 				cso = new RTCPChannel(InetHostAddress("0.0.0.0"),controlBasePort);
 				joinGroup(ia,iface);
-			}
-
-		/**
-		 * Join a multicast group.
-		 *
-		 * @param ia address of the multicast group
-		 * @return error code from the socket operation
-		 */
-		inline Socket::Error
-		joinGroup(const InetMcastAddress& ia, uint32 iface)
-			{
-				Socket::Error error  = dso->setMulticast(true);
-				if ( error ) return error;
-				error = dso->join(ia,iface);
-				if ( error ) return error;
-				error = cso->setMulticast(true);
-				if ( error ) {
-					dso->drop(ia);
-					return error;
-				}
-				error = cso->join(ia,iface);
-				if ( error ) {
-					dso->drop(ia);
-					return error;
-				}
-				return Socket::errSuccess;
-			}
-
-		/**
-		 * Leave a multicast group.
-		 *
-		 * @param ia address of the multicast group
-		 * @return error code from the socket operation
-		 */
-		inline Socket::Error
-		leaveGroup(const InetMcastAddress& ia)
-			{
-				Socket::Error error = dso->setMulticast(false);
-				if ( error ) return error;
-				error = dso->leaveGroup(ia);
-				if ( error ) return error;
-				error = cso->setMulticast(false);
-				if ( error ) return error;
-				return cso->leaveGroup(ia);
-			}
-
-		/**
-		 * Set the value of the TTL field in the sent packets.
-		 *
-		 * @param ttl Time To Live
-		 * @return error code from the socket operation
-		 */
-		inline Socket::Error
-		setMcastTTL(uint8 ttl)
-			{
-				Socket::Error error = dso->setMulticast(true);
-				if ( error ) return error;
-				error = dso->setTimeToLive(ttl);
-				if ( error ) return error;
-				error = cso->setMulticast(true);
-				if ( error ) return error;
-				return cso->setTimeToLive(ttl);
 			}
 
 		/**

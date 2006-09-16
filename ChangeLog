@@ -1,3 +1,15 @@
+2006-09-16  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtp.h: (Template class TRTPSessionBase): setMcastTTL
+	moved to public section so that users have a way of setting TTL
+	(pointed out by Tom Anwyll). joinGroup() and leaveGroup() moved to
+	the protected section.
+
+	* src/ccrtp/channel.h: (Template classes DualRTPChannel and
+	DualRTPChannelIPV6): fixed bugs in setMulticast (only recv socket
+	was set) and setTimeToLive (ttl of the recv socket was changed
+	instead of changing the send ttl).
+	
 2006-09-11  David Sugar <dyfet@gnutelephony.org>
 
 	* configure: Updated to use pkgconfig instead of older Common C++
