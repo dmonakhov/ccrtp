@@ -30,7 +30,7 @@ rtphello_LDFLAGS = ../src/libccrtp1.la
 rtpduphello_SOURCES = rtpduphello.cpp
 rtpduphello_LDFLAGS = ../src/libccrtp1.la
 
-audiorx_SOURCES = audiorx.cpp
+audiorx_SOURCES = audiorx.cpp audio.h
 audiorx_LDFLAGS = ../src/libccrtp1.la
 
 audiotx_SOURCES = audiotx.cpp
