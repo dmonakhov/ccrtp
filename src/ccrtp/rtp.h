@@ -569,7 +569,9 @@ virtual void run(void)
 		} else {
 			if ( isPendingData(timeout/1000) ) {
 				setCancel(cancelDeferred);
-				takeInDataPacket();
+                                if (ServiceQueue::isActive()) { // take in only if active
+                                    takeInDataPacket();
+                                }
 				setCancel(cancelImmediate);
 			}
 			timeout = 0;
