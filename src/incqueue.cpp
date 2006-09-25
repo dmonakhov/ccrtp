@@ -211,7 +211,13 @@ IncomingDataQueue::takeInDataPacket(void)
 
         CryptoContext* pcc = getInQueueCryptoContext( packet->getSSRC());
         if (pcc != NULL) {
-                packet->unprotect(pcc); // TODO - discard packet in case of error
+            int32 ret = packet->unprotect(pcc);
+            if (ret < 0) {
+                if (!onSRTPPacketError(*packet, ret)) {
+                    delete packet;
+                    return 0;
+                }
+            }
         }
 	// virtual for profile-specific validation and processing.
 	if ( !onRTPPacketRecv(*packet) )

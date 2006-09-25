@@ -1216,7 +1216,24 @@ protected:
 	inline virtual void onExpireRecv(IncomingRTPPkt&)
 	{ return; }
 
-	inline virtual bool
+        /**
+         * A hook that gets called if the decoding of an incoming SRTP was erroneous
+         *
+         * @param pkt
+         *     The SRTP packet with error.
+         * @param errorCode
+         *     The error code: -1 - SRTP authentication failure, -2 - replay
+         *     check failed
+         * @return
+         *     True: put the packet in incoming queue for further processing
+         *     by the applications; false: dismiss packet. The default
+         *     implementation returns false.
+         **/
+        inline virtual bool
+        onSRTPPacketError(IncomingRTPPkt& pkt, int32 errorCode)
+        { return false; }
+
+        inline virtual bool
 	end2EndDelayed(IncomingRTPPktLink&)
 	{ return false; }
 
