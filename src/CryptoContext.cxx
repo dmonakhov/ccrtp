@@ -122,7 +122,7 @@ CryptoContext::~CryptoContext(){
 
     if (mki)
 	delete [] mki;
-    
+
     if (master_key_length > 0) {
 	master_key_length = 0;
 	delete [] master_key;
@@ -139,7 +139,7 @@ CryptoContext::~CryptoContext(){
 	n_s = 0;
 	delete [] k_s;
     }
-    if (n_a > 0)
+    if (n_a > 0) {
 	n_a = 0;
 	delete [] k_a;
     }
