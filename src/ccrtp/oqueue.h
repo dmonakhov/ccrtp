@@ -448,6 +448,7 @@ protected:
         setControlPeer(const InetAddress &host, tpport_t port) = 0;
 
         // The crypto contexts for outgoing SRTP sessions.
+	mutable Mutex cryptoMutex;
         std::list<CryptoContext *> cryptoContexts;
 
 private:

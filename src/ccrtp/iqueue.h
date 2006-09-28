@@ -1285,6 +1285,7 @@ protected:
 	uint16 maxPacketDropout;
 	static const size_t defaultMembersSize;
 	uint8 sourceExpirationPeriod;
+	mutable Mutex cryptoMutex;
         std::list<CryptoContext *> cryptoContexts;
 };
 

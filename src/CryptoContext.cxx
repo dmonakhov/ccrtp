@@ -116,24 +116,34 @@ CryptoContext::CryptoContext( uint32 ssrc,
     }
 
 CryptoContext::~CryptoContext(){
-	if (mki)
-	    delete [] mki;
 
-	if (master_key)
-	    delete [] master_key;
+    ealg = SrtpEncryptionNull;
+    aalg = SrtpAuthenticationNull;
 
-	if (master_salt)
-	    delete [] master_salt;
-
-	if (k_e)
-	    delete [] k_e;
-
-	if (k_a)
-	    delete [] k_a;
-
-	if (k_s)
-	    delete [] k_s;
+    if (mki)
+	delete [] mki;
+    
+    if (master_key_length > 0) {
+	master_key_length = 0;
+	delete [] master_key;
     }
+    if (master_salt_length > 0) {
+	master_salt_length = 0;
+	delete [] master_salt;
+    }
+    if (n_e > 0) {
+	n_e = 0;
+	delete [] k_e;
+    }
+    if (n_s > 0) {
+	n_s = 0;
+	delete [] k_s;
+    }
+    if (n_a > 0)
+	n_a = 0;
+	delete [] k_a;
+    }
+}
 
 void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 

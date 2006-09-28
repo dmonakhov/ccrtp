@@ -509,9 +509,9 @@ OutgoingDataQueue::setPartial(uint32 stamp, unsigned char *data,
 void
 OutgoingDataQueue::setOutQueueCryptoContext(CryptoContext* cc)
 {
-        // TODO - check if we need a mutex here to support multithreading
     std::list<CryptoContext *>::iterator i;
 
+    MutexLock lock(cryptoMutex);
         // check if a CryptoContext for a SSRC already exists. If yes
         // remove it from list before inserting the new one.
     for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
@@ -528,9 +528,9 @@ OutgoingDataQueue::setOutQueueCryptoContext(CryptoContext* cc)
 void
 OutgoingDataQueue::removeOutQueueCryptoContext(CryptoContext* cc)
 {
-        // TODO - check if we need a mutex here to support multithreading
     std::list<CryptoContext *>::iterator i;
 
+    MutexLock lock(cryptoMutex);
     if (cc == NULL) {     // Remove any incoming crypto contexts
         for (i = cryptoContexts.begin(); i != cryptoContexts.end(); ) {
             CryptoContext* tmp = *i;
@@ -553,9 +553,9 @@ OutgoingDataQueue::removeOutQueueCryptoContext(CryptoContext* cc)
 CryptoContext*
 OutgoingDataQueue::getOutQueueCryptoContext(uint32 ssrc)
 {
-        // TODO - check if we need a mutex here to support multithreading
     std::list<CryptoContext *>::iterator i;
 
+    MutexLock lock(cryptoMutex);
     for( i = cryptoContexts.begin(); i != cryptoContexts.end(); i++ ){
         if( (*i)->getSsrc() == ssrc) {
             return (*i);

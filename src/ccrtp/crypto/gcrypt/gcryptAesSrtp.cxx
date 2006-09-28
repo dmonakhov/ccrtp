@@ -59,6 +59,9 @@ AesSrtp::AesSrtp( uint8* k, int32 keyLength ) : key(NULL) {
     else if (keyLength == 32) {
         algo = GCRY_CIPHER_AES256;
     }
+    else {
+	return;
+    }
     gcry_cipher_hd_t tmp;
     err = gcry_cipher_open(&tmp, algo, GCRY_CIPHER_MODE_ECB, 0);
     key = tmp;
@@ -73,8 +76,10 @@ AesSrtp::~AesSrtp() {
 }
 
 void AesSrtp::encrypt( const uint8* input, uint8* output ) {
-    int32_t err = gcry_cipher_encrypt (static_cast<gcry_cipher_hd_t>(key),
-                                       output, AES_BLOCK_SIZE, input, AES_BLOCK_SIZE);
+    if (key != NULL) {
+	int32_t err = gcry_cipher_encrypt (static_cast<gcry_cipher_hd_t>(key),
+					   output, AES_BLOCK_SIZE, input, AES_BLOCK_SIZE);
+    }
 }
 
 void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
@@ -113,6 +118,9 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
 void AesSrtp::ctr_encrypt( const uint8* input, uint32 input_length,
 			   uint8* output, uint8* iv ) {
 
+    if (key == NULL)
+	return;
+
     uint8* cipher_stream = new uint8[input_length];
 
     get_ctr_cipher_stream( cipher_stream, input_length, iv );
@@ -124,6 +132,9 @@ void AesSrtp::ctr_encrypt( const uint8* input, uint32 input_length,
 }
 
 void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
+
+    if (key == NULL)
+	return;
 
     //unsigned char cipher_stream[data_length];
     uint8* cipher_stream = new uint8[data_length];
@@ -156,6 +167,8 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
 
     F8_CIPHER_CTX f8ctx;
 
+    if (key == NULL)
+	return;
     /*
      * Get memory for the derived IV (IV')
      */

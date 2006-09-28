@@ -47,6 +47,9 @@ AesSrtp::AesSrtp():key(NULL){
 
 AesSrtp::AesSrtp( uint8* key, int32 key_length ) {
 
+    if (keyLength != 16 || keyLength != 32 ) {
+	return;
+    }
     void initializeOpenSSL();
 
     this->key = malloc( sizeof( AES_KEY ) );
@@ -98,6 +101,9 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
 void AesSrtp::ctr_encrypt( const uint8* input, uint32 input_length,
 			   uint8* output, uint8* iv ) {
 
+    if (key == NULL)
+	return;
+
     uint8* cipher_stream = new uint8[input_length];
 
     get_ctr_cipher_stream( cipher_stream, input_length, iv );
@@ -109,6 +115,9 @@ void AesSrtp::ctr_encrypt( const uint8* input, uint32 input_length,
 }
 
 void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
+
+    if (key == NULL)
+	return;
 
     //unsigned char cipher_stream[data_length];
     uint8* cipher_stream = new uint8[data_length];
@@ -140,6 +149,9 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
     int offset = 0;
 
     F8_CIPHER_CTX f8ctx;
+
+    if (key == NULL)
+	return;
 
     /*
      * Get memory for the derived IV (IV')

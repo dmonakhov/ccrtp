@@ -714,9 +714,9 @@ IncomingDataQueue::recordExtraction(const IncomingRTPPkt&)
 void
 IncomingDataQueue::setInQueueCryptoContext(CryptoContext* cc)
 {
-        // TODO - check if we need a mutex here to support multithreading
         std::list<CryptoContext *>::iterator i;
 
+	MutexLock lock(cryptoMutex);
         // check if a CryptoContext for a SSRC already exists. If yes
         // remove it from list before inserting the new one.
         for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
@@ -733,9 +733,9 @@ IncomingDataQueue::setInQueueCryptoContext(CryptoContext* cc)
 void
 IncomingDataQueue::removeInQueueCryptoContext(CryptoContext* cc)
 {
-        // TODO - check if we need a mutex here to support multithreading
     std::list<CryptoContext *>::iterator i;
 
+    MutexLock lock(cryptoMutex);
     if (cc == NULL) {     // Remove any incoming crypto contexts
         for (i = cryptoContexts.begin(); i != cryptoContexts.end(); ) {
             CryptoContext* tmp = *i;
@@ -758,9 +758,9 @@ IncomingDataQueue::removeInQueueCryptoContext(CryptoContext* cc)
 CryptoContext*
 IncomingDataQueue::getInQueueCryptoContext(uint32 ssrc)
 {
-        // TODO - check if we need a mutex here to support multithreading
         std::list<CryptoContext *>::iterator i;
 
+	MutexLock lock(cryptoMutex);
         for( i = cryptoContexts.begin(); i!= cryptoContexts.end(); i++ ){
                 if( (*i)->getSsrc() == ssrc) {
                         return (*i);
