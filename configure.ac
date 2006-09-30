@@ -68,7 +68,7 @@ fi
 if test "${enable_srtp}" = "yes"
 then
     AC_CHECK_LIB([gcrypt],
-                 [gcry_cipher_open],
+                 [gcry_cipher_open_xx],
                  [],
                  [AC_CHECK_LIB([crypto],
                                [EVP_CipherInit_ex],
@@ -89,7 +89,7 @@ OST_MAINTAINER_MODE
 PKG_CHECK_MODULES(COMMON, libccgnu2 >= $REQUIRES)
 CXXFLAGS="$CXXFLAGS $COMMON_CFLAGS"
 COMMON_LIBPATH=`pkg-config --variable=libdir libccgnu2`
-GNULIBS="-L$COMMON_LIBPATH $COMMON_LIBS"
+GNULIBS="-L$COMMON_LIBPATH $COMMON_LIBS $LIBS"
 AC_SUBST(GNULIBS)
 # OST_CC_ENDIAN - now in Common C++
 # Are we using the GNU compiler?
