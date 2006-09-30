@@ -40,14 +40,15 @@ extern void initializeOpenSSL();
 #include <malloc.h>
 #include <openssl/aes.h>                // the include of openSSL
 #include <ccrtp/crypto/AesSrtp.h>
-#include<string.h>
+#include <string.h>
+#include <stdio.h>
 
 AesSrtp::AesSrtp():key(NULL){
 }
 
 AesSrtp::AesSrtp( uint8* key, int32 key_length ) {
 
-    if (keyLength != 16 || keyLength != 32 ) {
+    if (!(key_length == 16 || key_length == 32)) {
 	return;
     }
     void initializeOpenSSL();
@@ -243,7 +244,7 @@ int AesSrtp::processBlock(F8_CIPHER_CTX *f8ctx, const uint8* in, int32 length, u
     /*
      * Now compute the new key stream using AES encrypt
      */
-    AES_encrypt(f8ctx->S, f8ctx->S, (AES_KEY *) key);
+    AES_encrypt(f8ctx->S, f8ctx->S, (AES_KEY *)key);
     /*
      * as the last step XOR the plain text with the key stream to produce
      * the ciphertext.
