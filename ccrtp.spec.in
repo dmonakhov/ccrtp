@@ -3,25 +3,24 @@ Name: ccrtp
 Version: @VERSION@
 Release: 1
 Epoch: 0
-License: GPL
+License: LGPL
 Group: Development/Libraries
-URL: http://www.gnu.org/software/ccrtp
-Source: ftp://ftp.gnu.org/gnu/ccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
-BuildRoot: %{_tmppath}/rtp-root
-Packager: David Sugar <dyfet@ostel.com>
-Requires: commoncpp2 >= 1.1.0
-BuildRequires: commoncpp2-devel
-BuildRequires: doxygen
-BuildRequires: info
+URL: http://www.gnu.org/software/commoncpp/commoncpp.html
+Source0: ftp://ftp.gnu.org/gnu/cccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
+Requires: commoncpp2 >= 1.4.0
+Requires: libgcrypt
+BuildRequires: commoncpp2-devel >= 1.4.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
+BuildRequires: libgcrypt-devel
 
 %package devel
-Requires: %{name} = %{epoch}:%{version}-%{release}
-Requires: commoncpp2-devel
-Requires(post,postun): info
 Group: Development/Libraries
-Summary: headers and link libraries for ccrtp
+Summary: Headers and static link library for ccrtp.
+Requires: %{name} = %{epoch}:%{version}-%{release} 
+Requires: commoncpp2-devel >= 1.4.0
+Requires: libgcrypt-devel
 
 %description
 ccRTP is a generic, extensible and efficient C++ framework for
@@ -34,50 +33,38 @@ automatically, supports different threading models and is generic as
 for underlying network and transport protocols.
 
 %description devel
-This package holds documentation, header files, and static link libraries
-for building applications that use GNU ccRTP.
+This package provides the header files, link libraries, and 
+documentation for building applications that use GNU ccrtp. 
 
 %prep
 %setup
 %build
 %configure
-make %{?_smp_mflags} CXXFLAGS="-I%{_includedir}/cc++2 $RPM_OPT_FLAGS" LDFLAGS="-s"
+
+make %{?_smp_mflags} LDFLAGS="-s" CXXFLAGS="$RPM_OPT_FLAGS"
 
 %install
-rm -fr %{buildroot}
 
 %makeinstall
+rm -rf %{buildroot}/%{_infodir} 
 
 %clean
-rm -fr %{buildroot}
+rm -rf %{buildroot}
 
 %files
-#%exclude %{_libdir}/*.la
-%defattr(-,root,root,-)
-%doc AUTHORS COPYING COPYING.addendum README
-%{_libdir}/libccrtp*.so.*
+%defattr(-,root,root,0755)
+%doc AUTHORS COPYING ChangeLog README COPYING.addendum
+%{_libdir}/*.so.*
 
 %files devel
-%defattr(-,root,root,-)
-%doc doc/html/*.html doc/html/*.*g*
-%{_libdir}/libccrtp*.a
-%{_libdir}/libccrtp*.so
-%{_libdir}/libccrtp*.la
+%defattr(-,root,root,0755)
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_libdir}/*.la   
+%{_libdir}/pkgconfig/*.pc
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
-%{_infodir}/ccrtp*info*
-%{_libdir}/pkgconfig/libccrtp1.pc
 
 %post -p /sbin/ldconfig
 
-%post devel
-/sbin/install-info %{_infodir}/ccrtp.info %{_infodir}/dir
-
-%postun -p /sbin/ldconfig
-
-%postun devel
-/sbin/install-info --delete %{_infodir}/ccrtp.info %{_infodir}/dir
-
-%changelog
-* Tue Jan 16 2004 David Sugar <dyfet[AT]ostel.com> 0:1.1.0-1
-- "modernized" for more current RPM systems.
+%postun -p /sbin/ldconfig  
