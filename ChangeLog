@@ -1,3 +1,7 @@
+2006-10-01  David Sugar <dyfet@gnutelephony.org>
+
+	Prep for release 1.5.0 with Werner Dittmen's SRTP changes merged.
+
 2006-09-16  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtp.h: (Template class TRTPSessionBase): setMcastTTL
