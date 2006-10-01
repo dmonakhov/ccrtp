@@ -1,27 +1,27 @@
 // Copyright (C) 2000,2001,2004,2005,2006 Federico Montesino Pouzols <fedemp@altern.org>
-//  
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -60,9 +60,9 @@ RTPSessionPool::addSession(RTPSessionBase& session)
 #ifndef WIN32
 	bool result = false;
 	poolLock.writeLock();
-	// insert in list. 
+	// insert in list.
 	PredEquals predEquals(&session);
-	if ( sessionList.end() == 
+	if ( sessionList.end() ==
 	     std::find_if(sessionList.begin(),sessionList.end(),predEquals) ) {
 		result = true;
 		sessionList.push_back(new SessionListElement(&session));
@@ -82,11 +82,11 @@ RTPSessionPool::removeSession(RTPSessionBase& session)
 #ifndef WIN32
 	bool result = false;
 	poolLock.writeLock();
-	// remove from list. 
+	// remove from list.
 	PredEquals predEquals(&session);
 	PoolIterator i;
-	if ( sessionList.end() != 
-	     (i = find_if(sessionList.begin(),sessionList.end(),predEquals)) ) { 
+	if ( sessionList.end() !=
+	     (i = find_if(sessionList.begin(),sessionList.end(),predEquals)) ) {
 		(*i)->clear();
 		result = true;
 	} else {
@@ -143,7 +143,7 @@ SingleRTPSessionPool::run()
 		FD_ZERO(&recvSocketSet);
 		poolLock.readLock();
 		highestSocket = 0;
-		for (PoolIterator j = sessions.begin(); j != 
+		for (PoolIterator j = sessions.begin(); j !=
 			     sessions.end (); j++) {
 			if (!(*j)->isCleared()) {
 				RTPSessionBase* session((*j)->get());
@@ -154,11 +154,11 @@ SingleRTPSessionPool::run()
 			}
 		}
 		poolLock.unlock();
-		
-		
+
+
 		int n = select(highestSocket,&recvSocketSet,NULL,NULL,
 			       &timeout);
-		
+
 		i = sessions.begin();
 		while ( (i != sessions.end()) ) {
 			poolLock.readLock();
@@ -168,14 +168,14 @@ SingleRTPSessionPool::run()
 				if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
 					takeInDataPacket(*session);
 				}
-			
+
 				// schedule by timestamp, as in
 				// SingleThreadRTPSession (by Joergen
 				// Terner)
 				if (packetTimeout < 1000) {
 					packetTimeout = getSchedulingTimeout(*session);
 				}
-				microtimeout_t maxWait = 
+				microtimeout_t maxWait =
 					timeval2microtimeout(getRTCPCheckInterval(*session));
 				// make sure the scheduling timeout is
 				// <= the check interval for RTCP
@@ -222,8 +222,8 @@ SingleRTPSessionPool::run()
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-		const InetHostAddress& ia, 
-			       tpport_t dataPort, 
+		const InetHostAddress& ia,
+			       tpport_t dataPort,
 			       tpport_t controlPort,
 			       int pri,
 			       uint32 memberssize,
@@ -235,12 +235,12 @@ SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::Si
 
 SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
 	const InetMcastAddress& ia,
-			       tpport_t dataPort, 
-			       tpport_t controlPort, 
+			       tpport_t dataPort,
+			       tpport_t controlPort,
 			       int pri,
 			       uint32 memberssize,
 			       RTPApplication& app,
-			       uint32 iface): 
+			       uint32 iface):
 		Thread(pri),
 		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
 	(ia,dataPort,controlPort,memberssize,app,iface)
@@ -272,7 +272,7 @@ void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue
 			controlReceptionService();
 			controlTransmissionService();
 			setCancel(cancelImmediate);
-			microtimeout_t maxWait = 
+			microtimeout_t maxWait =
 				timeval2microtimeout(getRTCPCheckInterval());
 			// make sure the scheduling timeout is
 			// <= the check interval for RTCP
@@ -293,15 +293,15 @@ void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue
 			}
 		}
 		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep(~0);
+                Thread::exit();
 }
 
 
 #ifdef	CCXX_IPV6
 
 SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-		const IPV6Host& ia, 
-			       tpport_t dataPort, 
+		const IPV6Host& ia,
+			       tpport_t dataPort,
 			       tpport_t controlPort,
 			       int pri,
 			       uint32 memberssize,
@@ -313,12 +313,12 @@ SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>
 
 SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
 	const IPV6Multicast& ia,
-			       tpport_t dataPort, 
-			       tpport_t controlPort, 
+			       tpport_t dataPort,
+			       tpport_t controlPort,
 			       int pri,
 			       uint32 memberssize,
 			       RTPApplication& app,
-			       uint32 iface): 
+			       uint32 iface):
 		Thread(pri),
 		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
 	(ia,dataPort,controlPort,memberssize,app,iface)
@@ -350,7 +350,7 @@ void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQ
 			controlReceptionService();
 			controlTransmissionService();
 			setCancel(cancelImmediate);
-			microtimeout_t maxWait = 
+			microtimeout_t maxWait =
 				timeval2microtimeout(getRTCPCheckInterval());
 			// make sure the scheduling timeout is
 			// <= the check interval for RTCP
@@ -371,7 +371,7 @@ void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQ
 			}
 		}
 		dispatchBYE("GNU ccRTP stack finishing.");
-		sleep(~0);
+                Thread::exit();
 }
 
 

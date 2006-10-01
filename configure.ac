@@ -68,7 +68,7 @@ fi
 if test "${enable_srtp}" = "yes"
 then
     AC_CHECK_LIB([gcrypt],
-                 [gcry_cipher_open_xx],
+                 [gcry_cipher_open],
                  [],
                  [AC_CHECK_LIB([crypto],
                                [EVP_CipherInit_ex],

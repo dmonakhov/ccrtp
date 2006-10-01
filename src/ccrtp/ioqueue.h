@@ -1,27 +1,27 @@
 // Copyright (C) 2001,2002,2004 Federico Montesino Pouzols <fedemp@altern.org>.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software 
+// along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // As a special exception, you may use this file as part of a free software
 // library without restriction.  Specifically, if other files instantiate
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -35,8 +35,8 @@
 // If you do not wish that, delete this exception notice.
 //
 
-/** 
- * @file ioqueue.h 
+/**
+ * @file ioqueue.h
  *
  * @short Generic RTP input/output queues.
  **/
@@ -72,14 +72,14 @@ namespace ost {
  * method.
  *
  * @author David Sugar <dyfet@ostel.com>
- * @short RTP data queue handler.  
+ * @short RTP data queue handler.
  */
-class __EXPORT RTPDataQueue : 
+class __EXPORT RTPDataQueue :
 	public IncomingDataQueue,
 	public OutgoingDataQueue
 {
 public:
-	/** 
+	/**
 	 * @enum Tos rtp.h cc++/rtp.h
 	 * @short Type of network service the application uses.
 	 *
@@ -104,15 +104,15 @@ public:
 	}       Tos;
 
 	/**
-	 * Specify the kind of service the application expects to use.  
+	 * Specify the kind of service the application expects to use.
 	 *
 	 * @param tos type of service the application expects to use
 	 *
 	 * @note If enhanced service is specified but packet loss is
 	 * high (the requested service does not appear to actually be
 	 * delivered) ccRTP defaults to best-effort suitable
-	 * behaviour: guarantee fair competition with TCP. 
-	 * 
+	 * behaviour: guarantee fair competition with TCP.
+	 *
 	 * @todo Implement fair competition with tcp
 	 **/
 	inline void
@@ -125,13 +125,19 @@ public:
 	 **/
 	inline void enableStack()
 	{ dataServiceActive = true; }
- 
+
+        /**
+         * Disable packet queue processing in the stack.
+         **/
+        inline void disableStack()
+        { dataServiceActive = false; }
+
 	/**
 	 * Get active connection state flag.
 	 *
 	 * @return true if connection "active".
 	 */
-	inline bool 
+	inline bool
 	isActive() const
 	{ return dataServiceActive; }
 
@@ -147,7 +153,7 @@ public:
 	 * of the provided timestamp, since several computations
 	 * assume that there is a certain degree of correspondence
 	 * between the timestamp and the system clock.
-	 * 
+	 *
 	 * It is recommended that applications use this method in
 	 * order to <em>periodically adjust the RTP timestamp</em>.
 	 *
@@ -168,7 +174,7 @@ public:
 	 * would be obtained from this method, whereas the following
 	 * ones would be computed adding 80 every time. Also the
 	 * timestamp should be increased for every block whether
-	 * it is put in the queue or dropped. 
+	 * it is put in the queue or dropped.
 	 *
 	 * The aforementioned increment can be obtained from the
 	 * RTPDataQueue::getTimestampIncrement() method rather than
@@ -194,11 +200,11 @@ public:
 	 * timestamps with a restrictively regulated object;
 	 * suggestions are gladly welcomed</em>
 	 **/
-	uint32 
+	uint32
 	getCurrentTimestamp() const;
 
 	/**
-	 * Specify the bandwidth of the current session.  
+	 * Specify the bandwidth of the current session.
 	 *
 	 * @param bw bandwidth of the current session, in bits/s.
 	 *
@@ -219,19 +225,19 @@ public:
  	/**
  	 * Set the packet timeclock for synchronizing timestamps.
  	 **/
- 	inline void 
+ 	inline void
 	setTimeclock()
 	{ timeclock.setTimer(); }
- 
+
  	/**
  	 * Get the packet timeclock for synchronizing timestamps.
  	 *
  	 * @return runtime in milliseconds since last set.
  	 */
- 	inline timeout_t 
+ 	inline timeout_t
 	getTimeclock() const
 	{ return timeclock.getElapsed(); }
-	
+
 protected:
 
 	/**
@@ -250,28 +256,28 @@ protected:
 	 * sessions having the same SSRC identifier, for instance, to
 	 * implement layered encoding, in which case each layer is
 	 * managed through a different session but all sessions share
-	 * the same SSRC identifier. 
+	 * the same SSRC identifier.
 	 *
 	 * @warning This doesn't seem to be a good solution
 	 *
 	 * @param ssrc Synchronization SouRCe identifier for this session
-	 * @param size an estimation of the number of participants in the 
-	 *        session 
+	 * @param size an estimation of the number of participants in the
+	 *        session
 	 */
 	RTPDataQueue(uint32* ssrc, uint32 size = defaultMembersHashSize);
-	
+
 	/**
 	 * The queue destructor flushes the queue and stops all
 	 * services.
 	 */
-	inline virtual 
+	inline virtual
 	~RTPDataQueue()
 	{ endQueue(); }
 
         /**
          * A plugin point for timer tick driven events.
          */
-        inline virtual void 
+        inline virtual void
 	timerTick()
 	{ return; }
 
@@ -280,7 +286,7 @@ protected:
 
 private:
 	RTPDataQueue(const RTPDataQueue &o);
-	
+
 	RTPDataQueue&
 	operator=(const RTPDataQueue &o);
 

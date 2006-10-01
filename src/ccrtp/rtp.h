@@ -186,7 +186,6 @@ namespace ost {
 		inline virtual
 		~TRTPSessionBase()
 			{
-				dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
 				endSocket();
 			}
 
@@ -493,7 +492,11 @@ SingleThreadRTPSession(uint32 ssrc, const InetMcastAddress& ia,
 
 
 ~SingleThreadRTPSession()
-{ terminate(); }
+{
+    if (isRunning()) {
+        disableStack(); Thread::join();
+    }
+}
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 virtual void startRunning();
@@ -508,6 +511,9 @@ startRunning()
 
 
 protected:
+inline void disableStack(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::disableStack();}
+
 inline void enableStack(void)
 {TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
 
@@ -578,7 +584,7 @@ virtual void run(void)
 		}
 	}
 	dispatchBYE("GNU ccRTP stack finishing.");
-	sleep((timeout_t)~0);
+        Thread::exit();
 }
 
 #endif
@@ -727,7 +733,6 @@ TRTPSessionBaseIPV6(const IPV6Host& ia, tpport_t dataPort,
 	inline virtual
 	~TRTPSessionBaseIPV6()
 		{
-			dispatchBYE("RTP session being destroyed, GNU ccRTP stack finishing.");
 			endSocket();
 		}
 
@@ -1012,7 +1017,11 @@ SingleThreadRTPSessionIPV6(const IPV6Multicast& ia,
 #endif
 
 ~SingleThreadRTPSessionIPV6()
-{ terminate(); }
+{
+    if (isRunning()) {
+        disableStack(); Thread::join();
+    }
+}
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 virtual void startRunning();
@@ -1029,6 +1038,9 @@ startRunning()
 protected:
 inline void enableStack(void)
 {TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+
+inline void disableStack(void)
+{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::disableStack();}
 
 inline microtimeout_t getSchedulingTimeout(void)
 {return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
@@ -1095,7 +1107,7 @@ virtual void run(void)
 		}
 	}
 	dispatchBYE("GNU ccRTP stack finishing.");
-	sleep((timeout_t)~0);
+        Thread::exit();
 }
 
 #endif
