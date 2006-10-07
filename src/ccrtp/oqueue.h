@@ -133,6 +133,85 @@ private:
 	mutable ThreadLock destinationLock;
 };
 
+#ifdef	CCXX_IPV6
+/**
+ * @class DestinationListHandler
+ *
+ * This class handles a list of destination addresses. Stores network
+ * addresses as InetAddress objects.
+ *
+ * @author Federico Montesino Pouzols <fedemp@altern.org>
+ **/
+class __EXPORT DestinationListHandlerIPV6
+{
+protected:
+	struct TransportAddressIPV6;
+	std::list<TransportAddressIPV6*> destListIPV6;
+
+public:
+	DestinationListHandlerIPV6();
+
+	~DestinationListHandlerIPV6();
+
+	/**
+	 * Get whether there is only a destination in the list.
+	 **/
+	inline bool isSingleDestinationIPV6() const
+	{ return (1 == destListIPV6.size()); }
+
+	inline TransportAddressIPV6* getFirstDestinationIPV6() const
+	{ return destListIPV6.front(); }
+
+	inline void lockDestinationListIPV6() const
+	{ destinationLock.readLock(); }
+
+	inline void unlockDestinationListIPV6() const
+	{ destinationLock.unlock(); }
+
+protected:
+	inline void writeLockDestinationListIPV6() const
+	{ destinationLock.writeLock(); }
+
+	/**
+	 * Locks the object before modifying it.
+	 **/
+	bool
+	addDestinationToListIPV6(const IPV6Address& ia, tpport_t data,
+			     tpport_t control);
+
+	/**
+	 * Locks the object before modifying it.
+	 **/
+	bool removeDestinationFromListIPV6(const IPV6Address& ia,
+				       tpport_t dataPort,
+				       tpport_t controlPort);
+
+	struct TransportAddressIPV6
+	{
+		TransportAddressIPV6(IPV6Address na, tpport_t dtp, tpport_t ctp) :
+			networkAddress(na), dataTransportPort(dtp),
+			controlTransportPort(ctp)
+		{  }
+
+		inline const IPV6Address& getNetworkAddress() const
+		{ return networkAddress; }
+
+		inline tpport_t getDataTransportPort() const
+		{ return dataTransportPort; }
+
+		inline tpport_t getControlTransportPort() const
+		{ return controlTransportPort; }
+
+		IPV6Address networkAddress;
+		tpport_t dataTransportPort, controlTransportPort;
+	};
+
+private:
+	mutable ThreadLock destinationLock;
+};
+
+#endif
+
 /**
  * @class OutgoingDataQueue
  *
@@ -142,9 +221,25 @@ private:
  **/
 class __EXPORT OutgoingDataQueue:
 	public OutgoingDataQueueBase,
+#ifdef	CCXX_IPV6
+	protected DestinationListHandlerIPV6,
+#endif
 	protected DestinationListHandler
 {
 public:
+#ifdef	CCXX_IPV6
+	bool
+	addDestination(const IPV6Address& ia,
+		       tpport_t dataPort = DefaultRTPDataPort,
+		       tpport_t controlPort = 0);
+
+	bool
+	forgetDestination(const IPV6Address& ia,
+			  tpport_t dataPort = DefaultRTPDataPort,
+			  tpport_t controlPort = 0);
+
+#endif
+
 	bool
 	addDestination(const InetHostAddress& ia,
 		       tpport_t dataPort = DefaultRTPDataPort,
@@ -445,7 +540,12 @@ protected:
 	void purgeOutgoingQueue();
 
         virtual void
-        setControlPeer(const InetAddress &host, tpport_t port) = 0;
+        setControlPeer(const InetAddress &host, tpport_t port) {};
+
+#ifdef	CCXX_IPV6
+	virtual void
+	setControlPeerIPV6(const IPV6Address &host, tpport_t port) {};
+#endif
 
         // The crypto contexts for outgoing SRTP sessions.
 	mutable Mutex cryptoMutex;
@@ -461,7 +561,12 @@ private:
 	{ }
 
 	virtual void
-        setDataPeer(const InetAddress &host, tpport_t port) = 0;
+        setDataPeer(const InetAddress &host, tpport_t port) {};
+
+#ifdef	CCXX_IPV6
+	virtual void
+	setDataPeerIPV6(const IPV6Address &host, tpport_t port) {};
+#endif
 
 	/**
 	 * This function performs the physical I/O for writing a
@@ -473,7 +578,12 @@ private:
 	 * @return number of bytes sent.
 	 **/
 	virtual size_t
-	sendData(const unsigned char* const buffer, size_t len) = 0;
+	sendData(const unsigned char* const buffer, size_t len) {return 0;};
+
+#ifdef	CCXX_IPV6
+	virtual size_t
+	sendDataIPV6(const unsigned char* const buffer, size_t len) {return 0;};
+#endif
 
 	static const microtimeout_t defaultSchedulingTimeout;
 	static const microtimeout_t defaultExpireTimeout;

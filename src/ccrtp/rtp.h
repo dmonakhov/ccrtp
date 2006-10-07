@@ -226,6 +226,7 @@ namespace ost {
 		setDataPeer(const InetAddress &host, tpport_t port)
 			{ dso->setPeer(host,port); }
 
+
 		/**
 		 * @param buffer memory region to write from
 		 * @param len number of octets to write
@@ -770,7 +771,7 @@ protected:
 		{ na = dso->getSender(tp); return dso->recv(buffer, len); }
 
         inline void
-        setDataPeer(const IPV6Host &host, tpport_t port)
+        setDataPeerIPV6(const IPV6Host &host, tpport_t port)
 		{ dso->setPeer(host,port); }
 
 	/**
@@ -778,7 +779,7 @@ protected:
 	 * @param len number of octets to write
 	 */
 	inline size_t
-	sendData(const unsigned char* const buffer, size_t len)
+	sendDataIPV6(const unsigned char* const buffer, size_t len)
 		{ return dso->send(buffer, len); }
 
 	inline SOCKET getDataRecvSocket() const
@@ -811,7 +812,7 @@ protected:
 		{ na = cso->getSender(tp); return cso->recv(buffer,len); }
 
         inline void
-        setControlPeer(const IPV6Host &host, tpport_t port)
+        setControlPeerIPV6(const IPV6Host &host, tpport_t port)
 		{ cso->setPeer(host,port); }
 
 	/**

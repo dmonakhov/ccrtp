@@ -108,6 +108,69 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 	return result;
 }
 
+#ifdef	CCXX_IPV6
+
+DestinationListHandlerIPV6::DestinationListHandlerIPV6() :
+	destListIPV6(), destinationLock()
+{
+}
+
+DestinationListHandlerIPV6::~DestinationListHandlerIPV6()
+{
+	TransportAddressIPV6* tmp = NULL;
+	writeLockDestinationListIPV6();
+	for (std::list<TransportAddressIPV6*>::iterator i = destListIPV6.begin();
+	     destListIPV6.end() != i; i++) {
+		tmp = *i;
+#ifdef	CCXX_EXCEPTIONS
+		try {
+#endif
+			delete tmp;
+#ifdef	CCXX_EXCEPTIONS
+		} catch (...) {}
+#endif
+	}
+	unlockDestinationListIPV6();
+}
+
+bool
+DestinationListHandlerIPV6::addDestinationToListIPV6(const IPV6Address& ia,
+					     tpport_t data, tpport_t control)
+{
+	TransportAddressIPV6* addr = new TransportAddressIPV6(ia,data,control);
+	writeLockDestinationListIPV6();
+	destListIPV6.push_back(addr);
+	unlockDestinationListIPV6();
+	return true;
+}
+
+bool
+DestinationListHandlerIPV6::removeDestinationFromListIPV6(const IPV6Address& ia,
+						  tpport_t dataPort,
+						  tpport_t controlPort)
+{
+	bool result = false;
+	writeLockDestinationListIPV6();
+	TransportAddressIPV6* tmp;
+	for (std::list<TransportAddressIPV6*>::iterator i = destListIPV6.begin();
+	     destListIPV6.end() != i && !result; i++) {
+		tmp = *i;
+		if ( ia == tmp->getNetworkAddress() &&
+		     dataPort == tmp->getDataTransportPort() &&
+		     controlPort == tmp->getControlTransportPort() ) {
+			// matches. -> remove it.
+			result = true;
+			destListIPV6.erase(i);
+			delete tmp;
+		}
+	}
+	unlockDestinationListIPV6();
+	return result;
+}
+
+
+#endif
+
 /// Schedule at 8 ms.
 const microtimeout_t OutgoingDataQueue::defaultSchedulingTimeout = 8000;
 /// Packets unsent will expire after 40 ms.
@@ -115,6 +178,9 @@ const microtimeout_t OutgoingDataQueue::defaultExpireTimeout = 40000;
 
 OutgoingDataQueue::OutgoingDataQueue():
 	OutgoingDataQueueBase(),
+#ifdef	CCXX_IPV6
+	DestinationListHandlerIPV6(),
+#endif
 	DestinationListHandler(),
 	sendLock(),
         sendFirst(NULL), sendLast(NULL)
@@ -205,6 +271,35 @@ OutgoingDataQueue::forgetDestination(const InetMcastAddress& ia,
 	return DestinationListHandler::
 		removeDestinationFromList(ia,dataPort,controlPort);
 }
+
+#ifdef	CCXX_IPV6
+bool
+OutgoingDataQueue::addDestination(const IPV6Address& ia,
+				  tpport_t dataPort,
+				  tpport_t controlPort)
+{
+	if ( 0 == controlPort )
+		controlPort = dataPort + 1;
+	bool result = addDestinationToListIPV6(ia,dataPort,controlPort);
+	if ( result && isSingleDestinationIPV6() ) {
+		setDataPeerIPV6(ia,dataPort);
+		setControlPeerIPV6(ia,controlPort);
+	}
+	return result;
+}
+
+bool
+OutgoingDataQueue::forgetDestination(const IPV6Address& ia,
+				     tpport_t dataPort,
+				     tpport_t controlPort)
+{
+	if ( 0 == controlPort )
+		controlPort = dataPort + 1;
+	return DestinationListHandlerIPV6::
+		removeDestinationFromListIPV6(ia,dataPort,controlPort);
+}
+
+#endif
 
 bool
 OutgoingDataQueue::isSending(void) const
@@ -437,6 +532,30 @@ void OutgoingDataQueue::dispatchImmediate(OutgoingRTPPkt *packet)
                 }
         }
         unlockDestinationList();
+
+#ifdef	CCXX_IPV6
+	lockDestinationListIPV6();
+        if ( isSingleDestinationIPV6() ) {
+                TransportAddressIPV6* tmp6 = destListIPV6.front();
+                // if going from multi destinations to single destinations.
+                setDataPeerIPV6(tmp6->getNetworkAddress(),
+                            tmp6->getDataTransportPort());
+
+                sendDataIPV6(packet->getRawPacket(),
+                         packet->getRawPacketSizeSrtp());
+        } else {
+                // when no destination has been added, NULL == dest.
+                for (std::list<TransportAddressIPV6*>::iterator i6 =
+                             destListIPV6.begin(); destListIPV6.end() != i6; i6++) {
+                        TransportAddressIPV6* dest6 = *i6;
+                        setDataPeerIPV6(dest6->getNetworkAddress(),
+                                    dest6->getDataTransportPort());
+                        sendDataIPV6(packet->getRawPacket(),
+                                 packet->getRawPacketSizeSrtp());
+                }
+        }
+        unlockDestinationListIPV6();
+#endif
 }
 
 size_t
