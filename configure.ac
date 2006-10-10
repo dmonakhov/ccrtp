@@ -55,6 +55,20 @@ fi
 
 export PKG_CONFIG_PATH
 
+# use "-no-undefined" on Cygwin to force (trigger) libtool to create
+# the shared lib. If this is not set this library
+# is not created. Be sure that the LIBS variable above contains _all_
+# libraries necessary to build ours, Cygwin does not allow undefined
+# symbols.
+case $host in
+#  *-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
+  *-*-cygwin*)
+	LDFLAGS="$LDFLAGS -no-undefined"
+    ;;
+  *)
+    ;;
+esac
+
 # SRTP support
 AC_ARG_ENABLE(srtp,
     AS_HELP_STRING([--enable-srtp],
