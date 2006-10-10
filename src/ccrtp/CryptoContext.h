@@ -156,7 +156,7 @@ namespace ost {
 	 *    The length is bytes of the authentication tag that SRTP appends
 	 *    to the RTP packet. Refer to chapter 4.2. in the RFC 3711.
 	 */
-	    CryptoContext( uint32 ssrc, int roc,
+	    CryptoContext( uint32 ssrc, int32 roc,
 			   int64  keyDerivRate,
 			   const  int32 ealg,
 			   const  int32 aalg,
