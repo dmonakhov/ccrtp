@@ -27,8 +27,14 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef SRTP_SUPPORT
 #include <ccrtp/crypto/AesSrtp.h>
 #include <ccrtp/crypto/hmac.h>
+#endif
 
 #include <ccrtp/CryptoContext.h>
 
@@ -50,6 +56,7 @@ CryptoContext::CryptoContext( uint32 ssrc ):
 	seqNumSet(false)
     {}
 
+#ifdef SRTP_SUPPORT
 CryptoContext::CryptoContext( uint32 ssrc,
                               int32 roc,
                               int64 key_deriv_rate,
@@ -115,6 +122,8 @@ CryptoContext::CryptoContext( uint32 ssrc,
 	}
     }
 
+#endif
+
 CryptoContext::~CryptoContext(){
 
     ealg = SrtpEncryptionNull;
@@ -150,6 +159,7 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	if (ealg == SrtpEncryptionNull) {
 	    return;
 	}
+#ifdef SRTP_SUPPORT
 	if (ealg == SrtpEncryptionAESCM) {
 
 	    /* Compute the CM IV (refer to chapter 4.1.1 in RFC 3711):
@@ -218,16 +228,19 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 			    iv, k_e, n_e, k_s, n_s);
 	    delete aes;
 	}
+#endif
     }
 
 /* Warning: tag must have been initialized */
 void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
-    {
-	int32 tag_length;
+{
 
 	if (aalg == SrtpAuthenticationNull) {
 	    return;
 	}
+#ifdef SRTP_SUPPORT
+    int32 tag_length;
+
 	if (aalg == SrtpAuthenticationSha1Hmac) {
 	    unsigned char temp[20];
 	    const unsigned char* chunks[3];
@@ -248,12 +261,14 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	    /* truncate the result */
 	    memcpy(tag, temp, getTagLength());
 	}
-    }
+#endif
+}
 
+#ifdef SRTP_SUPPORT
 /* used by the key derivation method */
-    static void computeIv( unsigned char* iv, uint64 label, uint64 index,
-			   int64 kdv, unsigned char* master_salt )
-    {
+static void computeIv(unsigned char* iv, uint64 label, uint64 index,
+                      int64 kdv, unsigned char* master_salt)
+{
 
 	uint64 key_id;
 
@@ -284,10 +299,13 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	}
 
 	iv[14] = iv[15] = 0;
-    }
+}
+#endif
 
 /* Derives the srtp session keys from the master key */
-    void CryptoContext::deriveSrtpKeys(uint64 index){
+void CryptoContext::deriveSrtpKeys(uint64 index)
+{
+#ifdef SRTP_SUPPORT
 	AesSrtp* aes;
 	uint8 iv[16];
 
@@ -311,7 +329,8 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	aes = new AesSrtp(master_key, master_key_length);
 	aes->get_ctr_cipher_stream(k_s, n_s, iv);
 	delete aes;
-    }
+#endif
+}
 
 /* Based on the algorithm provided in Appendix A - draft-ietf-srtp-05.txt */
     uint64_t CryptoContext::guessIndex(uint16 new_seq_nb )
@@ -344,8 +363,9 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	return ((uint64)guessed_roc) << 16 | new_seq_nb;
     }
 
-    bool CryptoContext::checkReplay( uint16 new_seq_nb )
-    {
+bool CryptoContext::checkReplay( uint16 new_seq_nb )
+{
+#ifdef SRTP_SUPPORT
 	if ( aalg == SrtpAuthenticationNull && ealg == SrtpEncryptionNull ) {
 	    /* No security policy, don't use the replay protection */
 	    return true;
@@ -384,11 +404,14 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 		}
 	    }
 	}
-    }
+#else
+    return true;
+#endif
+}
 
-    void CryptoContext::update(uint16 new_seq_nb)
-    {
-
+void CryptoContext::update(uint16 new_seq_nb)
+{
+#ifdef SRTP_SUPPORT
 	int64 delta = guessIndex(new_seq_nb) - (((uint64)roc) << 16 | s_l );
 
 	/* update the replay bitmask */
@@ -408,9 +431,12 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	    roc = guessed_roc;
 	    s_l = new_seq_nb;
 	}
-    }
+#endif
+}
 
-    CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate) {
+    CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate)
+{
+#ifdef SRTP_SUPPORT
         CryptoContext* pcc = new CryptoContext(
                 ssrc,
                 roc,                                     // Roll over Counter,
@@ -427,6 +453,9 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
                 this->tagLength);                        // authentication tag len
 
         return pcc;
+#else
+    return NULL;
+#endif
     }
 #ifdef  CCXX_NAMESPACES
 }

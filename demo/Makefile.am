@@ -15,8 +15,20 @@ LT_VERSION=@LT_CCXX_VERSION@
 AM_CXXFLAGS = @WARN_FLAGS@ -I$(top_srcdir)/src
 ccxxincludedir=$(includedir)/cc++
 
+if SRTP_GCRYPT
+srtp_src = ccsrtptest
+ccsrtptest_SOURCES = ccsrtptest.cpp
+ccsrtptest_LDFLAGS = ../src/libccrtp1.la
+endif
+
+if SRTP_OPENSSL
+srtp_src = ccsrtptest
+ccsrtptest_SOURCES = ccsrtptest.cpp
+ccsrtptest_LDFLAGS = ../src/libccrtp1.la
+endif
+
 noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx \
-	ccrtptest ccsrtptest
+	ccrtptest $(srtp_src)
 
 rtpsend_SOURCES = rtpsend.cpp
 rtpsend_LDFLAGS = ../src/libccrtp1.la
@@ -38,6 +50,3 @@ audiotx_LDFLAGS = ../src/libccrtp1.la
 
 ccrtptest_SOURCES = ccrtptest.cpp
 ccrtptest_LDFLAGS = ../src/libccrtp1.la
-
-ccsrtptest_SOURCES = ccsrtptest.cpp
-ccsrtptest_LDFLAGS = ../src/libccrtp1.la

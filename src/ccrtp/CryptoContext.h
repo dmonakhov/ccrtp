@@ -168,7 +168,6 @@ namespace ost {
 			   int32  akeyl,
 			   int32  skeyl,
 			   int32  tagLength );
-
 	/**
 	 * Destructor.
 	 *
