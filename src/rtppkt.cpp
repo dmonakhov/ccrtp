@@ -201,7 +201,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 
 	// add data.
         setbuffer(data,datalen,pointer);
-        zrtpChecksumLength = 0;
 }
 
 OutgoingRTPPkt::OutgoingRTPPkt(
@@ -222,7 +221,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(
 
 	// add data.
 	setbuffer(data,datalen,pointer);
-        zrtpChecksumLength = 0;
 }
 
 OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen,
@@ -235,7 +233,6 @@ OutgoingRTPPkt::OutgoingRTPPkt(const unsigned char* data, size_t datalen,
 	//getHeader()->extension = 0;
 
 	setbuffer(data,datalen,getSizeOfFixedHeader());
-        zrtpChecksumLength = 0;
 }
 
 void
@@ -254,11 +251,6 @@ OutgoingRTPPkt::protect(uint32 ssrc, CryptoContext* pcc)
         /* Encrypt the packet */
         uint64 index = ((uint64)pcc->getRoc() << 16) | (uint64)getSeqNum();
 
-        // if it's a ZRTP packet adjust data to accomodate ZRTP checksum
-        srtpDataOffset -= zrtpChecksumLength;
-        total -= zrtpChecksumLength;
-        payloadSize -= zrtpChecksumLength;
-
         pcc->srtpEncrypt(this, index, ssrc);
 
         // NO MKI support yet - here we assume MKI is zero. To build in MKI
@@ -267,38 +259,10 @@ OutgoingRTPPkt::protect(uint32 ssrc, CryptoContext* pcc)
         /* Compute MAC */
         pcc->srtpAuthenticate(this, pcc->getRoc(),
                                    const_cast<uint8*>(getRawPacket()+srtpDataOffset) );
-        total += zrtpChecksumLength;
-
         /* Update the ROC if necessary */
         if (getSeqNum() == 0xFFFF ) {
                 pcc->setRoc(pcc->getRoc() + 1);
         }
-}
-
-#define CKSUM_CARRY(x) (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))
-void
-OutgoingRTPPkt::computeZrtpChecksum()
-{
-    uint8* cdata = const_cast<uint8*>(getRawPacket());
-    uint16* data =(uint16*)cdata;
-
-    int32 length = total + srtpLength - zrtpChecksumLength;
-
-    uint32_t sum = 0;
-    uint16_t ans = 0;
-
-    while (length > 1) {
-        sum += *data++;
-        length -= 2;
-    }
-    if (length == 1) {
-        *(uint8_t *)(&ans) = *(uint8_t*)data;
-        sum += ans;
-    }
-    uint16 ret = CKSUM_CARRY(sum);
-
-    uint8* tmp = const_cast<uint8*>(getRawPacket());
-    memcpy(tmp+total+srtpLength-zrtpChecksumLength, &ret, 2);
 }
 
 // These masks are valid regardless of endianness.
@@ -327,17 +291,6 @@ IncomingRTPPkt::IncomingRTPPkt(const unsigned char* const block, size_t len) :
 	cachedTimestamp = getRawTimestamp();
 	cachedSeqNum = ntohs(getHeader()->sequence);
 	cachedSSRC = ntohl(getHeader()->sources[0]);
-}
-
-bool
-IncomingRTPPkt::checkZrtpChecksum(bool check)
-{
-    // TODO do a real check, for now adjust length only
-    total -= 2;
-    if (payloadSize >= 2) {
-        payloadSize -= 2;
-    }
-    return true;
 }
 
 int32

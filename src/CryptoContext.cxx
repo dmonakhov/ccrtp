@@ -253,7 +253,6 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 	    chunks[1] = (unsigned char *)&beRoc;
 	    chunkLength[1] = 4;
 	    chunks[2] = NULL;
-
 	    hmac_sha1( k_a, n_a,
 		       chunks,           // data chunks to hash
 		       chunkLength,      // length of the data to hash

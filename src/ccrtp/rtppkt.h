@@ -657,9 +657,6 @@ public:
 	operator!=(const OutgoingRTPPkt &p) const
 	{ return ( this->getSeqNum() != p.getSeqNum() ); }
 
-        void enableZrtpChecksum() { zrtpChecksumLength = 2;}
-        void computeZrtpChecksum();
-
 private:
 	/**
 	 * Copy constructor from objects of its same kind, declared
@@ -679,8 +676,6 @@ private:
 	 * switching host to network order.
 	 */
 	void setCSRCArray(const uint32* const csrcs, uint16 numcsrc);
-
-        int32 zrtpChecksumLength;
 
 };
 
@@ -764,24 +759,6 @@ public:
 	inline bool
 	operator!=(const IncomingRTPPkt &p) const
 	{ return !( *this == p ); }
-
-        /**
-         * Recompute and check ZRTP checksum
-         *
-         * If the <em>check</em> parameter is true then
-         * this method recomputes the ZRTP checksum and compares it
-         * with the checksum conatined in the packet. If the parameter
-         * is set to false the method only adjusts the length of the
-         * data.
-         *
-         * @param check
-         *     if <code>true</code> recompute and check, otherwise
-         *     adjust length of packet data only.
-         * @return <code>true</code> if check is ok or only length was
-         *     adjusted. If check fails returns <code>false</code>
-         */
-         bool
-         checkZrtpChecksum(bool check);
 
 private:
 	/**
