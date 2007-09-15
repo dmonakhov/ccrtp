@@ -38,7 +38,7 @@
 extern void initializeGcrypt();
 
 #include <gcrypt.h>            // the include of gcrypt
-#include <malloc.h>
+#include <stdlib.h>
 #include <ccrtp/crypto/AesSrtp.h>
 
 #include <stdio.h>

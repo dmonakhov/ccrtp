@@ -37,7 +37,7 @@
 
 extern void initializeOpenSSL();
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <openssl/aes.h>                // the include of openSSL
 #include <ccrtp/crypto/AesSrtp.h>
 #include <string.h>
