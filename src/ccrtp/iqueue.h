@@ -943,11 +943,12 @@ public:
 
  	/**
 	 * Retreive data from a specific timestamped packet if such a
-	 * packet is currently available in the receive buffer.
+	 * packet is currently available in the receive buffer. 
 	 *
 	 * @param stamp Data unit timestamp.
 	 * @param src Optional synchronization source selector.
 	 * @return data retrieved from the reception buffer.
+	 * @retval null pointer if no packet with such timestamp is available.
 	 **/
 	const AppDataUnit*
 	getData(uint32 stamp, const SyncSource* src = NULL);
