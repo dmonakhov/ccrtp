@@ -1,3 +1,9 @@
+2007-10-24  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/outqueue.cpp: fixed removeDestinationFromList and
+	removeDestinationFromListIPV6 (ncrement on an undefined iterator
+	bug reported by Martin Mainka).
+
 2006-12-30  David Sugar <dyfet@gnutelephony.org>
 
 	Recent changes known: SRTP support can now be disabled cleanly in

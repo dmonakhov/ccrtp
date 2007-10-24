@@ -93,7 +93,7 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 	writeLockDestinationList();
 	TransportAddress* tmp;
 	for (std::list<TransportAddress*>::iterator i = destList.begin();
-	     destList.end() != i && !result; i++) {
+	     destList.end() != i && !result; ) {
 		tmp = *i;
 		if ( ia == tmp->getNetworkAddress() &&
 		     dataPort == tmp->getDataTransportPort() &&
@@ -102,6 +102,8 @@ DestinationListHandler::removeDestinationFromList(const InetAddress& ia,
 			result = true;
 			destList.erase(i);
 			delete tmp;
+		} else{
+			i++;
 		}
 	}
 	unlockDestinationList();
@@ -153,7 +155,7 @@ DestinationListHandlerIPV6::removeDestinationFromListIPV6(const IPV6Address& ia,
 	writeLockDestinationListIPV6();
 	TransportAddressIPV6* tmp;
 	for (std::list<TransportAddressIPV6*>::iterator i = destListIPV6.begin();
-	     destListIPV6.end() != i && !result; i++) {
+	     destListIPV6.end() != i && !result; ) {
 		tmp = *i;
 		if ( ia == tmp->getNetworkAddress() &&
 		     dataPort == tmp->getDataTransportPort() &&
@@ -162,6 +164,8 @@ DestinationListHandlerIPV6::removeDestinationFromListIPV6(const IPV6Address& ia,
 			result = true;
 			destListIPV6.erase(i);
 			delete tmp;
+		} else {
+			i++;
 		}
 	}
 	unlockDestinationListIPV6();
