@@ -1,4 +1,4 @@
-// Copyright (C) 2001,2002 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2007 Federico Montesino Pouzols <fedemp@altern.org>.
 //  
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ NTP2Timeval(uint32 msw, uint32 lsw)
 {
 	struct timeval t; 
 	t.tv_sec = msw - NTP_EPOCH_OFFSET;
-	t.tv_usec = (uint32)(((double)lsw) * 1000000.0) / ((uint32)(~0));
+	t.tv_usec = (uint32)((((double)lsw) * 1000000.0) / ((uint32)(~0)));
 	return t;
 }
 

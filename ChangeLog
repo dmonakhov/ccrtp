@@ -1,3 +1,8 @@
+2007-10-29  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/rtcppkt.cpp: (NTP2Timeval(uint32, uint32): fixed bug in
+	tf_usec field computation (reported by Martin Runge).
+
 2007-10-24  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/outqueue.cpp: fixed removeDestinationFromList and
