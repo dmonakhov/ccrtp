@@ -1,3 +1,10 @@
+2007-11-16  Federico Montesino Pouzols  <fedemp@altern.org>
+
+	* src/ccrtp/rtcppkt.cpp: fixed switched member in
+	RTCPSenderInfo::getPacketCount and RTCPSenderInfo::getOctetCount
+	(patch from Mattias Seeman). Added better constructor to
+	RTCPReceiverInfo and RTCPSenderInfo.
+
 2007-10-29  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/rtcppkt.cpp: (NTP2Timeval(uint32, uint32): fixed bug in

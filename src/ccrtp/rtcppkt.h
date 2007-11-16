@@ -1,4 +1,4 @@
-// Copyright (C) 2001, 2002, 2004 Federico Montesino Pouzols <fedemp@altern.org>.
+// Copyright (C) 2001,2002,2004,2007 Federico Montesino Pouzols <fedemp@altern.org>.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -380,6 +380,11 @@ public:
 	{ memcpy(&receiverInfo,&ri,
 		 sizeof(RTCPCompoundHandler::ReceiverInfo));}
 
+        RTCPReceiverInfo(RTCPCompoundHandler::ReceiverInfo& si)
+		: receiverInfo( si )
+        {
+        }
+
 	~RTCPReceiverInfo()
 	{ }
 
@@ -455,6 +460,11 @@ public:
 	{ memcpy(&senderInfo,&si,
 		 sizeof(RTCPCompoundHandler::SenderInfo));}
 
+        RTCPSenderInfo(RTCPCompoundHandler::SenderInfo& si)
+		: senderInfo( si )
+        {
+        }
+
 	~RTCPSenderInfo()
 	{ }
 
@@ -483,11 +493,11 @@ public:
 	 **/
 	inline uint32
 	getPacketCount() const
-	{ return ntohl(senderInfo.octetCount); }
+	{ return ntohl(senderInfo.packetCount); }
 	
 	inline uint32
 	getOctetCount() const
-	{ return ntohl(senderInfo.packetCount); }
+	{ return ntohl(senderInfo.octetCount); }
 
 private:
 	RTCPCompoundHandler::SenderInfo senderInfo;
