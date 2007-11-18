@@ -81,19 +81,29 @@ fi
 # availability of gcrypt or openSSL crypto library if SRTP support is enabled
 if test "${enable_srtp}" = "yes"
 then
-    AC_CHECK_LIB([gcrypt],
-                 [gcry_cipher_open],
-                 [],
-                 [AC_CHECK_LIB([crypto],
-                               [EVP_CipherInit_ex],
-                               [],
-                               [AC_MSG_ERROR([Cannot find libgcrypt or OpenSSL crypto library.])]
-                              )
-                 ]
-                )
+    openssl="false"
+    gcrypt="false"
+    AM_PATH_LIBGCRYPT_CCRTP([1:1.2.3],
+                  [AC_CHECK_HEADERS([gcrypt.h],
+                                    [], AC_MSG_ERROR([libgcrypt headers not found.]))
+                   LIBS="$LIBGCRYPT_LIBS $LIBS"
+                   gcrypt="true"
+                  ],
+                  [AC_CHECK_LIB([crypto],
+                      [EVP_CipherInit_ex],
+                      [AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
+                                        [], AC_MSG_ERROR([OpenSSL headers not found.]))
+                       LIBS="-lcrypto $LIBS"
+                       openssl="true"
+                      ],
+                      [AC_MSG_ERROR([Cannot find libgcrypt or OpenSSL crypto library.])]
+                     )
+                  ]
+                 )
+    AM_CONDITIONAL(SRTP_OPENSSL, test "$openssl" = "true")
+    AM_CONDITIONAL(SRTP_GCRYPT, test "$gcrypt" = "true")
+
 fi
-AM_CONDITIONAL(SRTP_GCRYPT, test "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes")
-AM_CONDITIONAL(SRTP_OPENSSL, test "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes")
 
 OST_PROG_COMMON
 OST_PROG_LIBVER
@@ -124,18 +134,6 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 			])
 	])
 ])
-
-if test "${enable_srtp}" = "yes" -a "${ac_cv_lib_gcrypt_gcry_cipher_open}" = "yes"
-then
-     AC_CHECK_HEADERS([gcrypt.h],
-                      [], AC_MSG_ERROR([libgcrypt headers not found.]))
-fi
-
-if test "${enable_srtp}" = "yes" -a "${ac_cv_lib_crypto_EVP_CipherInit_ex}" = "yes"
-then
-     AC_CHECK_HEADERS([openssl/bn.h openssl/aes.h openssl/sha.h],
-                      [], AC_MSG_ERROR([OpenSSL headers not found.]))
-fi
 
 KDOC_DIR="\$(top_srcdir)/doc"
 AC_SUBST(LT_RELEASE)
