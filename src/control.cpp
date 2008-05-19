@@ -798,10 +798,10 @@ QueueRTCPManager::dispatchBYE(const std::string& reason)
 		if ( padlen ) {
 			memset(buffer + len,0,padlen);
 			len += padlen;
+                        pkt->info.BYE.length += padlen;
 		}
 	}
 	pkt->fh.length = htons(((len - len1) >> 2) - 1);
-	pkt->fh.padding = (padlen > 0);
 
 	return sendControlToDestinations(buffer,len);
 }
