@@ -77,8 +77,8 @@ AesSrtp::~AesSrtp() {
 
 void AesSrtp::encrypt( const uint8* input, uint8* output ) {
     if (key != NULL) {
-	int32_t err = gcry_cipher_encrypt (static_cast<gcry_cipher_hd_t>(key),
-					   output, AES_BLOCK_SIZE, input, AES_BLOCK_SIZE);
+        gcry_cipher_encrypt (static_cast<gcry_cipher_hd_t>(key),
+                             output, AES_BLOCK_SIZE, input, AES_BLOCK_SIZE);
     }
 }
 
@@ -87,8 +87,8 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
     uint16 ctr;
     uint16 input;
 
-    unsigned char* aes_input = new unsigned char[AES_BLOCK_SIZE];
-    unsigned char* temp = new unsigned char[AES_BLOCK_SIZE];
+    unsigned char aes_input[AES_BLOCK_SIZE];
+    unsigned char temp[AES_BLOCK_SIZE];
 
     memcpy(aes_input, iv, 14 );
     iv += 14;
@@ -102,16 +102,15 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
         gcry_cipher_encrypt(static_cast<gcry_cipher_hd_t>(key), &output[ctr*AES_BLOCK_SIZE], AES_BLOCK_SIZE,
                             aes_input, AES_BLOCK_SIZE);
     }
-    // Treat the last bytes:
-    input = ctr;
-    aes_input[14] = (uint8)((input & 0xFF00) >>  8);
-    aes_input[15] = (uint8)((input & 0x00FF));
+    if ((length % AES_BLOCK_SIZE) > 0) {
+        // Treat the last bytes:
+        input = ctr;
+        aes_input[14] = (uint8)((input & 0xFF00) >>  8);
+        aes_input[15] = (uint8)((input & 0x00FF));
 
-    gcry_cipher_encrypt(static_cast<gcry_cipher_hd_t>(key), temp, AES_BLOCK_SIZE, aes_input, AES_BLOCK_SIZE);
-    memcpy(&output[ctr*AES_BLOCK_SIZE], temp, length % AES_BLOCK_SIZE);
-
-    delete[] temp;
-    delete[] aes_input;
+        gcry_cipher_encrypt(static_cast<gcry_cipher_hd_t>(key), temp, AES_BLOCK_SIZE, aes_input, AES_BLOCK_SIZE);
+        memcpy(&output[ctr*AES_BLOCK_SIZE], temp, length % AES_BLOCK_SIZE);
+    }
 }
 
 
