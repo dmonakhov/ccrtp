@@ -432,7 +432,16 @@ OutgoingDataQueue::putData(uint32 stamp, const unsigned char *data,
 			getMaxSendSegmentSize() : remainder;
 
                 CryptoContext* pcc = getOutQueueCryptoContext(getLocalSSRC());
-
+                if (pcc == NULL) {
+                    pcc = getOutQueueCryptoContext(0);
+                    if (pcc != NULL) {
+                        pcc = pcc->newCryptoContextForSSRC(getLocalSSRC(), 0, 0L);
+                        if (pcc != NULL) {
+                            pcc->deriveSrtpKeys(0);
+                            setOutQueueCryptoContext(pcc);
+                        }
+                    }
+                }
                 OutgoingRTPPkt* packet;
 		if ( sendInfo.sendCC )
                     packet = new OutgoingRTPPkt(sendInfo.sendSources,15,data + offset,step,

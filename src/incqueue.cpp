@@ -210,6 +210,16 @@ IncomingDataQueue::takeInDataPacket(void)
 	}
 
         CryptoContext* pcc = getInQueueCryptoContext( packet->getSSRC());
+        if (pcc == NULL) {
+            pcc = getInQueueCryptoContext(0);
+            if (pcc != NULL) {
+                pcc = pcc->newCryptoContextForSSRC(packet->getSSRC(), 0, 0L);
+                if (pcc != NULL) {
+                    pcc->deriveSrtpKeys(0);
+                    setInQueueCryptoContext(pcc);
+                }
+            }
+        }
         if (pcc != NULL) {
             int32 ret = packet->unprotect(pcc);
             if (ret < 0) {
