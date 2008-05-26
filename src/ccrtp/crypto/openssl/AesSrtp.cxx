@@ -44,24 +44,34 @@ extern void initializeOpenSSL();
 #include <stdio.h>
 
 AesSrtp::AesSrtp():key(NULL){
+    void initializeOpenSSL();
 }
 
-AesSrtp::AesSrtp( uint8* key, int32 key_length ) {
+AesSrtp::AesSrtp( uint8* k, int32 keyLength ):key(NULL) {
 
-    if (!(key_length == 16 || key_length == 32)) {
-	return;
-    }
     void initializeOpenSSL();
-
-    this->key = malloc( sizeof( AES_KEY ) );
-    memset( this->key, 0, sizeof( AES_KEY ) );;
-    AES_set_encrypt_key( key, key_length*8, (AES_KEY *) this->key );
+    setNewKey(k, keyLength);
 }
 
 AesSrtp::~AesSrtp() {
-    if (key)
-	free(key);
+    if (key != NULL)
+	delete[] (uint8*)key;
 }
+
+bool AesSrtp::setNewKey(const uint8* k, int32 keyLength) {
+    // release an existing key before setting a new one
+    if (key != NULL)
+	delete[] (uint8*)key;
+
+    if (!(keyLength == 16 || keyLength == 32)) {
+	return false;
+    }
+    key = new uint8[sizeof( AES_KEY )];
+    memset(key, 0, sizeof(AES_KEY) );
+    AES_set_encrypt_key(k, keyLength*8, (AES_KEY *)key );
+    return true;
+}
+
 
 void AesSrtp::encrypt( const uint8* input, uint8* output ){
     AES_encrypt(input, output, (AES_KEY *)key);
@@ -73,7 +83,7 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
     uint16 input;
 
     unsigned char aes_input[AES_BLOCK_SIZE];
-    unsigned char temp = [AES_BLOCK_SIZE];
+    unsigned char temp[AES_BLOCK_SIZE];
 
     memcpy(aes_input, iv, 14 );
     iv += 14;
@@ -132,14 +142,14 @@ void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
 
 void AesSrtp::f8_encrypt(const uint8* data, uint32 data_length,
 			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen ) {
+			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
 
-    f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, origKey, keyLen, salt, saltLen);
+    f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, origKey, keyLen, salt, saltLen, f8Cipher);
 }
 
 void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
 			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen ) {
+			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher) {
 
 
     unsigned char *saltMask;
@@ -185,15 +195,15 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
     /*
      * Prepare the a new AES cipher with the special key to compute IV'
      */
-    AesSrtp *aes = new AesSrtp(maskedKey, keyLen);
+    f8Cipher->setNewKey(maskedKey, keyLen);
 
     /*
      * Use the masked key to encrypt the original IV to produce IV'.
      *
      * After computing the IV' we don't need this cipher context anymore, free it.
      */
-    aes->encrypt(iv, f8ctx.ivAccent);
-    delete aes;
+    f8Cipher->encrypt(iv, f8ctx.ivAccent);
+//    delete aes;
 
     memset(maskedKey, 0, keyLen);
     free(saltMask);

@@ -87,6 +87,20 @@ public:
     void encrypt( const uint8* input, uint8* output );
 
     /**
+     * Set new key
+     *
+     * @param key
+     *   Pointer to key data, must have at least a size of keyLength 
+     *
+     * @param keyLength
+     *   Length of the key in bytes, must be 16, 24, or 32
+     *
+     * @return
+     *   false if key could not set.
+     */
+    bool setNewKey(const uint8* key, int32 keyLength);
+
+    /**
      * Computes the cipher stream for AES CM mode.
      *
      * @param output
@@ -101,7 +115,6 @@ public:
      *    The initialization vector as input to create the cipher stream.
      *    Refer to chapter 4.1.1 in RFC 3711.
      */
-
     void get_ctr_cipher_stream(uint8* output, uint32 length, uint8* iv);
 
     /**
@@ -174,6 +187,9 @@ public:
      *
      * @param saltLen
      *    The length in bytes of the computed SRTP session salt.
+     *
+     * @param f8Cipher
+     *   An AES cipher context used for intermediate f8 AES encryption.
      */
     void f8_encrypt( const uint8* data,
 		     uint32 dataLen,
@@ -181,7 +197,8 @@ public:
 		     uint8* key,
 		     int32  keyLen,
 		     uint8* salt,
-		     int32  saltLen);
+		     int32  saltLen,
+	AesSrtp* f8Cipher);
 
     /**
      * AES F8 mode encryption.
@@ -222,7 +239,8 @@ public:
 		    uint8* key,
 		    int32  keyLen,
 		    uint8* salt,
-		    int32  saltLen);
+		    int32  saltLen,
+	AesSrtp* f8Cipher);
 
 
 private:
