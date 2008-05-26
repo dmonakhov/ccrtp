@@ -32,7 +32,6 @@
 #endif
 
 #ifdef SRTP_SUPPORT
-#include <ccrtp/crypto/AesSrtp.h>
 #include <ccrtp/crypto/hmac.h>
 #endif
 
@@ -53,7 +52,7 @@ CryptoContext::CryptoContext( uint32 ssrc ):
 	n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
 	ealg(SrtpEncryptionNull), aalg(SrtpAuthenticationNull),
 	ekeyl(0), akeyl(0), skeyl(0),
-	seqNumSet(false)
+	seqNumSet(false), aesCipher(NULL), f8AesCipher(NULL)
     {}
 
 #ifdef SRTP_SUPPORT
@@ -74,7 +73,8 @@ CryptoContext::CryptoContext( uint32 ssrc,
 	ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
 	roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
 	replay_window(0),
-	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false)
+	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false),
+	aesCipher(NULL), f8AesCipher(NULL)
     {
 	this->ealg = ealg;
 	this->aalg = aalg;
@@ -98,12 +98,15 @@ CryptoContext::CryptoContext( uint32 ssrc,
 		k_s = NULL;
 		break;
 
-	    case SrtpEncryptionAESCM:
 	    case SrtpEncryptionAESF8:
+		f8AesCipher = new AesSrtp();
+
+	    case SrtpEncryptionAESCM:
 		n_e = ekeyl;
 		k_e = new uint8[n_e];
 		n_s = skeyl;
 		k_s = new uint8[n_s];
+		aesCipher = new AesSrtp();
 		break;
 	}
 
@@ -152,6 +155,14 @@ CryptoContext::~CryptoContext(){
 	n_a = 0;
 	delete [] k_a;
     }
+    if (aesCipher != NULL) {
+	delete aesCipher;
+	aesCipher = NULL;
+    }
+    if (f8AesCipher != NULL) {
+	delete f8AesCipher;
+	f8AesCipher = NULL;
+    }
 }
 
 void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
@@ -183,11 +194,9 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	    }
 	    iv[14] = iv[15] = 0;
 
-	    AesSrtp* aes = new AesSrtp( k_e, n_e );
             int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-	    aes->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
+	    aesCipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
 			      rtp->getPayloadSize()+pad, iv);
-	    delete aes;
 	}
 
 	if (ealg == SrtpEncryptionAESF8) {
@@ -221,12 +230,10 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	    // set ROC in network order into IV
 	    ui32p[3] = htonl(roc);
 
-	    AesSrtp *aes = new AesSrtp(k_e, n_e);
             int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-	    aes->f8_encrypt(rtp->getPayload(),
+	    aesCipher->f8_encrypt(rtp->getPayload(),
 			    rtp->getPayloadSize()+pad,
-			    iv, k_e, n_e, k_s, n_s);
-	    delete aes;
+				  iv, k_e, n_e, k_s, n_s, f8AesCipher);
 	}
 #endif
     }
@@ -305,29 +312,28 @@ static void computeIv(unsigned char* iv, uint64 label, uint64 index,
 void CryptoContext::deriveSrtpKeys(uint64 index)
 {
 #ifdef SRTP_SUPPORT
-	AesSrtp* aes;
 	uint8 iv[16];
+
+	// prepare AES cipher to compute derived keys.
+	aesCipher->setNewKey(master_key, master_key_length);
 
 	// compute the session encryption key
 	uint64 label = 0;
 	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aes = new AesSrtp(master_key, master_key_length );
-	aes->get_ctr_cipher_stream(k_e, n_e, iv);
-	delete aes;
+	aesCipher->get_ctr_cipher_stream(k_e, n_e, iv);
 
 	// compute the session authentication key
 	label = 0x01;
 	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aes = new AesSrtp(master_key, master_key_length );
-	aes->get_ctr_cipher_stream(k_a, n_a, iv);
-	delete aes;
+	aesCipher->get_ctr_cipher_stream(k_a, n_a, iv);
 
 	// compute the session salt
 	label = 0x02;
 	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aes = new AesSrtp(master_key, master_key_length);
-	aes->get_ctr_cipher_stream(k_s, n_s, iv);
-	delete aes;
+	aesCipher->get_ctr_cipher_stream(k_s, n_s, iv);
+
+	// as last step prepare AES cipher with derived key.
+	aesCipher->setNewKey(k_e, n_e);
 #endif
 }
 
