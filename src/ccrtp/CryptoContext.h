@@ -25,6 +25,10 @@
 
 #include <ccrtp/rtppkt.h>
 
+#ifdef SRTP_SUPPORT
+#include <ccrtp/crypto/AesSrtp.h>
+#endif
+
 #define REPLAY_WINDOW_SIZE 64
 
 
@@ -380,6 +384,15 @@ namespace ost {
 	    uint8 skeyl;
 	    uint8 tagLength;
 	    bool  seqNumSet;
+	    
+#ifdef SRTP_SUPPORT
+	    AesSrtp* aesCipher;
+	    AesSrtp* f8AesCipher;
+#else
+	    void* aesCipher;
+	    void* f8AesCipher;
+#endif
+
     };
 #ifdef  CCXX_NAMESPACES
 }
