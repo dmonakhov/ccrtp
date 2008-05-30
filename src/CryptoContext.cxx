@@ -210,29 +210,17 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	     */
 
 	    unsigned char iv[16];
-	    uint16 seq_no = rtp->getSeqNum();
-	    uint32 ui32;
 	    uint32 *ui32p = (uint32 *)iv;
-	    uint16 *ui16p = (uint16 *)iv;
 
 	    iv[0] = 0;
-	    iv[1] = rtp->isMarked() ? 0x80 : 0x00;
-	    iv[1] |= rtp->getPayloadType() & 0x7f;
-	    ui16p[1] = htons(seq_no);
-
-	    // Set the timestamp in network order into IV
-	    ui32 = rtp->getTimestamp();
-	    ui32p[1] = htonl(ui32);
-
-	    // set the SSRC in network order into IV
-	    ui32p[2] = htonl(ssrc);
+	    memcpy(&iv[1], rtp->getRawPacket()+1, 11);
 
 	    // set ROC in network order into IV
 	    ui32p[3] = htonl(roc);
 
             int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
 	    aesCipher->f8_encrypt(rtp->getPayload(),
-			    rtp->getPayloadSize()+pad,
+				  rtp->getPayloadSize()+pad,
 				  iv, k_e, n_e, k_s, n_s, f8AesCipher);
 	}
 #endif
@@ -473,3 +461,4 @@ void CryptoContext::update(uint16 new_seq_nb)
  * c-basic-offset: 4
  * End:
  */
+

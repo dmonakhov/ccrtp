@@ -15,19 +15,19 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- * In addition, as a special exception, the copyright holders give
- * permission to link the code of portions of this program with the
- * OpenSSL library under certain conditions as described in each
- * individual source file, and distribute linked combinations
- * including the two.
- * You must obey the GNU General Public License in all respects
- * for all of the code used other than OpenSSL.  If you modify
- * file(s) with this exception, you may extend this exception to your
- * version of the file(s), but you are not obligated to do so.  If you
- * do not wish to do so, delete this exception statement from your
- * version.  If you delete this exception statement from all source
- * files in the program, then also delete it here.
-*/
+  * In addition, as a special exception, the copyright holders give
+  * permission to link the code of portions of this program with the
+  * OpenSSL library under certain conditions as described in each
+  * individual source file, and distribute linked combinations
+  * including the two.
+  * You must obey the GNU General Public License in all respects
+  * for all of the code used other than OpenSSL.  If you modify
+  * file(s) with this exception, you may extend this exception to your
+  * version of the file(s), but you are not obligated to do so.  If you
+  * do not wish to do so, delete this exception statement from your
+  * version.  If you delete this exception statement from all source
+  * files in the program, then also delete it here.
+  */
 
 /**
  * @author Erik Eliasson <eliasson@it.kth.se>
@@ -147,33 +147,37 @@ void AesSrtp::f8_encrypt(const uint8* data, uint32 data_length,
     f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, origKey, keyLen, salt, saltLen, f8Cipher);
 }
 
+#define MAX_AES_KEYLEN 32
+
 void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
 			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher) {
+			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
 
 
-    unsigned char *saltMask;
-    unsigned char *maskedKey;
     unsigned char *cp_in, *cp_in1, *cp_out;
     int i;
     int offset = 0;
+
+    unsigned char ivAccent[AES_BLOCK_SIZE];
+    unsigned char maskedKey[MAX_AES_KEYLEN];
+    unsigned char saltMask[MAX_AES_KEYLEN];
+    unsigned char S[AES_BLOCK_SIZE];
 
     F8_CIPHER_CTX f8ctx;
 
     if (key == NULL)
 	return;
 
+    if (keyLen > MAX_AES_KEYLEN)
+	return;
+
+    if (saltLen > keyLen)
+	return;
+
     /*
      * Get memory for the derived IV (IV')
      */
-    f8ctx.ivAccent = (unsigned char *)malloc(AES_BLOCK_SIZE);
-
-    /*
-     * Get memory for the special key. This is the key to compute the
-     * derived IV (IV').
-     */
-    saltMask = (unsigned char *)malloc(keyLen);
-    maskedKey = (unsigned char *)malloc(keyLen);
+    f8ctx.ivAccent = ivAccent;
 
     /*
      * First copy the salt into the mask field, then fill with 0x55 to
@@ -203,14 +207,9 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
      * After computing the IV' we don't need this cipher context anymore, free it.
      */
     f8Cipher->encrypt(iv, f8ctx.ivAccent);
-//    delete aes;
-
-    memset(maskedKey, 0, keyLen);
-    free(saltMask);
-    free(maskedKey);                   // both values are no longer needed
 
     f8ctx.J = 0;                       // initialize the counter
-    f8ctx.S = (unsigned char *)malloc(AES_BLOCK_SIZE);  // get the key stream buffer
+    f8ctx.S = S;		       // get the key stream buffer
 
     memset(f8ctx.S, 0, AES_BLOCK_SIZE); // initial value for key stream
 
@@ -222,10 +221,6 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
     if (in_length > 0) {
         processBlock(&f8ctx, in+offset, in_length, out+offset);
     }
-    memset(f8ctx.ivAccent, 0, AES_BLOCK_SIZE);
-    memset(f8ctx.S, 0, AES_BLOCK_SIZE);
-    free(f8ctx.ivAccent);
-    free(f8ctx.S);
 }
 
 int AesSrtp::processBlock(F8_CIPHER_CTX *f8ctx, const uint8* in, int32 length, uint8* out) {
@@ -275,3 +270,4 @@ int AesSrtp::processBlock(F8_CIPHER_CTX *f8ctx, const uint8* in, int32 length, u
  * c-basic-offset: 4
  * End:
  */
+

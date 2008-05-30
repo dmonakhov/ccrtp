@@ -585,7 +585,7 @@ virtual void run(void)
 		}
 	}
 	dispatchBYE("GNU ccRTP stack finishing.");
-        Thread::exit();
+//        Thread::exit();
 }
 
 #endif
