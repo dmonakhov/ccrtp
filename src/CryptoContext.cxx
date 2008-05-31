@@ -212,8 +212,8 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
 	    unsigned char iv[16];
 	    uint32 *ui32p = (uint32 *)iv;
 
+	    memcpy(iv, rtp->getRawPacket(), 12);
 	    iv[0] = 0;
-	    memcpy(&iv[1], rtp->getRawPacket()+1, 11);
 
 	    // set ROC in network order into IV
 	    ui32p[3] = htonl(roc);
