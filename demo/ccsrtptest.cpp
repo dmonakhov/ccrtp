@@ -143,7 +143,7 @@ unsigned char PacketsPattern::data[] = {
 
 PacketsPattern pattern;
 
-static char* fixKey = "c2479f224b21c2008deea6ef0e5dbd4a761aef98e7ebf8eed405986c4687";
+static char* fixKey = (char *)"c2479f224b21c2008deea6ef0e5dbd4a761aef98e7ebf8eed405986c4687";
 
 // static uint8* masterKey =  (uint8*)"masterKeymasterKeymasterKeymaster";
 // static uint8* masterSalt = (uint8*)"NaClNaClNaClNa";
@@ -356,6 +356,7 @@ static int testF8()
 	hexdump("Test vector payload data", payload, sizeof(payload));
 	return -1;
     }
+	return 0;
 }
 
 
