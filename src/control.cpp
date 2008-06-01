@@ -886,7 +886,7 @@ QueueRTCPManager::dispatchControlPacket(void)
 		pkt->info.SR.sinfo.NTPMSW = htonl(now.tv_sec + NTP_EPOCH_OFFSET);
 		pkt->info.SR.sinfo.NTPLSW = htonl((uint32)(((double)(now.tv_usec)*(uint32)(~0))/1000000.0));
 		// RTP timestamp
-		uint32 tstamp = now.tv_usec - getInitialTime().tv_usec;
+		int32 tstamp = now.tv_usec - getInitialTime().tv_usec;
 		tstamp *= (getCurrentRTPClockRate()/1000);
 		tstamp /= 1000;
 		tstamp += (now.tv_sec - getInitialTime().tv_sec) *

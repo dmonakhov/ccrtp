@@ -1,3 +1,9 @@
+2008-06-01  David Sugar <dyfet@gnutelephony.org>
+
+	For release 1.6.1: Crypto context fixes and updates from Werner
+	Dittmann, timestamp calculation issues as reported on list, and a gcc 
+	4.3 issue I found.
+
 2007-11-16  Federico Montesino Pouzols  <fedemp@altern.org>
 
 	* src/ccrtp/rtcppkt.cpp: fixed switched member in
