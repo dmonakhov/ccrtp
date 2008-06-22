@@ -1,11 +1,10 @@
 #!/bin/sh
+# Copyright (C) 2006-2007 David Sugar, Tycho Softworks.
 #
-# Copyright (C) 1999-2001 Open Source Telecom Corporation.
-#  
 # This file is free software; as a special exception the author gives
-# unlimited permission to copy and/or distribute it, with or without 
+# unlimited permission to copy and/or distribute it, with or without
 # modifications, as long as this notice is preserved.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -13,7 +12,7 @@
 WANT_AUTOCONF_2_5=1
 export WANT_AUTOCONF_2_5
 
-rm -rf auto* libtool
+rm -rf autoconf auto*.cache libtool
 if test ! -d autoconf ; then mkdir autoconf ; fi
 
 libtoolize="libtoolize"
@@ -27,8 +26,16 @@ for lt in glibtoolize libtoolize15 libtoolize14 libtoolize13 ; do
 done
 $libtoolize --copy --force
 
+AUTOMAKE_FLAGS=""
+case $libtoolize in
+*glibtoolize)
+	AUTOMAKE_FLAGS="-i"
+	;;
+esac
 
-ACLOCALDIRS="-I m4"
+ACLOCALDIRS=""
+if test -d m4 ; then
+	ACLOCALDIRS="-I m4" ; fi
 
 if test ! -z "$ACLOCAL" ; then
         ACLOCALDIRS="$ACLOCALDIRS -I"${ACLOCAL}
@@ -72,7 +79,7 @@ else
         autoheader${AUTOCONF_SUFFIX}
 fi
 
-automake${AUTOMAKE_SUFFIX} --add-missing --copy
+automake${AUTOMAKE_SUFFIX} --add-missing --copy ${AUTOMAKE_FLAGS}
 
 if test -f /usr/bin/autoconf-$ver ; then
 	/usr/bin/autoconf-$ver
