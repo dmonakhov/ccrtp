@@ -190,7 +190,7 @@ namespace ost {
 			}
 
 		inline RTPDataChannel *getDSO(void)
-			{return dso;};
+			{return dso;}
 
 	protected:
 		/**
@@ -528,10 +528,10 @@ inline void controlTransmissionService(void)
 {TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
 
 inline timeval getRTCPCheckInterval(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();}
 
 inline size_t dispatchDataPacket(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();}
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 virtual void run(void);
@@ -738,7 +738,7 @@ TRTPSessionBaseIPV6(const IPV6Host& ia, tpport_t dataPort,
 		}
 
 	inline RTPDataChannel *getDSO(void)
-		{return dso;};
+		{return dso;}
 
 protected:
 	/**
@@ -1053,10 +1053,10 @@ inline void controlTransmissionService(void)
 {TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
 
 inline timeval getRTCPCheckInterval(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();};
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();}
 
 inline size_t dispatchDataPacket(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();};
+{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();}
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 virtual void run(void);

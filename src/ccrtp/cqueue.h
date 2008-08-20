@@ -131,7 +131,7 @@ public:
 	 */
 	inline void
 	setEnd2EndDelay(microtimeout_t t)
-		{ end2EndDelay = t; };
+		{ end2EndDelay = t; }
 
 	inline microtimeout_t
 	getDefaultEnd2EndDelay() const
@@ -156,7 +156,7 @@ public:
 	 */
 	inline void
 	setSendersControlFraction(float fraction)
-	{ sendControlBwFract = fraction; recvControlBwFract = 1 - fraction;};
+	{ sendControlBwFract = fraction; recvControlBwFract = 1 - fraction;}
 
 	/**
 	 * Manually set the minimum interval for sending RTP compound
@@ -309,11 +309,11 @@ protected:
 	 **/
 	inline void
 	setPrevMembersNum(uint32 n)
-	{ reconsInfo.rtcpPMembers = n; };
+	{ reconsInfo.rtcpPMembers = n; }
 
 	inline uint32
 	getPrevMembersCount() const
-	{ return reconsInfo.rtcpPMembers; };
+	{ return reconsInfo.rtcpPMembers; }
 
 	/**
 	 * This method is used to send an RTCP BYE packet.  An RTCP

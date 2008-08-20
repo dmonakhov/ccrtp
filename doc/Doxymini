@@ -168,6 +168,18 @@ INLINE_INFO          = YES
 
 TAB_SIZE             = 8
 
+# The GENERATE_TODOLIST tag can be used to enable (YES) or
+# disable (NO) the todo list. This list is created by putting \todo
+# commands in the documentation.
+
+GENERATE_TODOLIST      = NO
+
+# If the sources in your project are distributed over multiple directories
+# then setting the SHOW_DIRECTORIES tag to YES will show the directory
+# hierarchy in the documentation.
+
+SHOW_DIRECTORIES 	= NO
+
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
@@ -298,7 +310,7 @@ COLS_IN_ALPHA_INDEX  = 5
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
 # generate Latex output.
 
-GENERATE_LATEX       = YES
+GENERATE_LATEX       = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -344,7 +356,7 @@ PDF_HYPERLINKS       = NO
 # If the GENERATE_MAN tag is set to YES (the default) Doxygen will
 # generate man pages
 
-GENERATE_MAN         = NO
+GENERATE_MAN         = YES
 
 # The MAN_OUTPUT tag is used to specify where the man pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be

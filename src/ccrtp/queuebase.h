@@ -95,7 +95,7 @@ public:
 	 */
 	inline PayloadType
 	getType() const
-	{ return datablock->getPayloadType(); };
+	{ return datablock->getPayloadType(); }
 
 	/**
 	 *  Get data as it is received in RTP packets (i.e. for
@@ -106,14 +106,14 @@ public:
 	 **/
 	inline const uint8* const
 	getData() const
-	{ return datablock->getPayload(); };
+	{ return datablock->getPayload(); }
 		
 	/**
 	 * @return length of data in octets
 	 **/
 	size_t
 	getSize() const
-	{ return datablock->getPayloadSize(); };
+	{ return datablock->getPayloadSize(); }
 
 	/**
 	 * @return Source that sent this data

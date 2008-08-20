@@ -44,6 +44,7 @@
 #include "private.h"
 #include <ccrtp/cqueue.h>
 #include <cstdlib>
+#include <climits>
 
 #ifdef  CCXX_NAMESPACES
 namespace ost {

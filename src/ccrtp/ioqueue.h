@@ -282,7 +282,7 @@ protected:
 	{ return; }
 
 	void renewLocalSSRC()
-		{IncomingDataQueue::renewLocalSSRC();};
+		{IncomingDataQueue::renewLocalSSRC();}
 
 private:
 	RTPDataQueue(const RTPDataQueue &o);

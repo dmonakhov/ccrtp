@@ -38,6 +38,6 @@ public:
 void	server(void);
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 

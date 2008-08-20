@@ -21,6 +21,8 @@
 #include <fstream>
 
 
+using namespace std;
+
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 using namespace std;
@@ -167,5 +169,5 @@ int main(int argc, char **argv)
 }
 
 #ifdef	CCXX_NAMESPACES
-}; };
+} }
 #endif

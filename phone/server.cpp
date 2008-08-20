@@ -20,6 +20,8 @@
 #include <iostream>
 #include <fstream>
 
+using namespace std;
+
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 using namespace std;
@@ -96,5 +98,5 @@ void server(void)
 }
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif

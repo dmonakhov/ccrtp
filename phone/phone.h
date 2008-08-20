@@ -211,7 +211,7 @@ extern RTPAudio *rtp;
 extern DevAudio *audio;
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif
 
 #endif

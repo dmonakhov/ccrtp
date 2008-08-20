@@ -540,11 +540,11 @@ protected:
 	void purgeOutgoingQueue();
 
         virtual void
-        setControlPeer(const InetAddress &host, tpport_t port) {};
+        setControlPeer(const InetAddress &host, tpport_t port) {}
 
 #ifdef	CCXX_IPV6
 	virtual void
-	setControlPeerIPV6(const IPV6Address &host, tpport_t port) {};
+	setControlPeerIPV6(const IPV6Address &host, tpport_t port) {}
 #endif
 
         // The crypto contexts for outgoing SRTP sessions.
@@ -561,11 +561,11 @@ private:
 	{ }
 
 	virtual void
-        setDataPeer(const InetAddress &host, tpport_t port) {};
+        setDataPeer(const InetAddress &host, tpport_t port) {}
 
 #ifdef	CCXX_IPV6
 	virtual void
-	setDataPeerIPV6(const IPV6Address &host, tpport_t port) {};
+	setDataPeerIPV6(const IPV6Address &host, tpport_t port) {}
 #endif
 
 	/**
@@ -578,11 +578,11 @@ private:
 	 * @return number of bytes sent.
 	 **/
 	virtual size_t
-	sendData(const unsigned char* const buffer, size_t len) {return 0;};
+	sendData(const unsigned char* const buffer, size_t len) {return 0;}
 
 #ifdef	CCXX_IPV6
 	virtual size_t
-	sendDataIPV6(const unsigned char* const buffer, size_t len) {return 0;};
+	sendDataIPV6(const unsigned char* const buffer, size_t len) {return 0;}
 #endif
 
 	static const microtimeout_t defaultSchedulingTimeout;

@@ -279,11 +279,11 @@ public:
 	 **/
 	inline uint32
 	getRawPacketSize() const
-	{ return total; };
+	{ return total; }
 
         inline uint32
         getRawPacketSizeSrtp() const
-        { return total + srtpLength; };
+        { return total + srtpLength; }
 
         inline size_t
 	getSizeOfFixedHeader() const
@@ -294,7 +294,7 @@ protected:
 	 * Destructor, free the buffer provided in the constructor.
 	 **/
 	inline virtual ~RTPPacket()
-	{ endPacket(); };
+	{ endPacket(); }
 
 	/**
 	 * Free memory allocated for the packet.
@@ -336,7 +336,7 @@ protected:
 	 **/
 	inline uint32
 	getRawTimestamp() const
-	{ return ntohl(getHeader()->timestamp); };
+	{ return ntohl(getHeader()->timestamp); }
 
 	inline void
 	setbuffer(const void* src, size_t len, size_t pos)
@@ -465,7 +465,7 @@ public:
 	 * @return low level 2833 data structure.
 	 */
 	inline struct RFC2833Payload *getRaw2833Payload(void)
-		{return (struct RFC2833Payload *)getPayload();};
+		{return (struct RFC2833Payload *)getPayload();}
 
 	/**
 	 * Fetch 2833 duration field.
@@ -473,7 +473,7 @@ public:
 	 * @return 2833 duration in native host machine byte order.
 	 */
 	inline uint16 get2833Duration(void)
-		{return ntohs(getRaw2833Payload()->duration);};
+		{return ntohs(getRaw2833Payload()->duration);}
 
 	/**
 	 * Set 2833 duration field.
@@ -481,7 +481,7 @@ public:
 	 * @param timestamp to use, native host machine byte order.
 	 */
 	inline void set2833Duration(uint16 timestamp)
-		{getRaw2833Payload()->duration = htons(timestamp);};
+		{getRaw2833Payload()->duration = htons(timestamp);}
 };
 
 /**
@@ -579,7 +579,7 @@ public:
 	 **/
 	inline void
 	setPayloadType(PayloadType pt)
-	{ getHeader()->payload = pt; };
+	{ getHeader()->payload = pt; }
 
 	/**
          * Sets the sequence number in the header.

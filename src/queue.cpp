@@ -96,7 +96,7 @@ protected:
 	virtual std::ostream &strDigest(std::ostream &os) = 0;
 
 	friend std::ostream &operator<<(std::ostream &os, Digest &ia)
-		{return ia.strDigest(os);};
+		{return ia.strDigest(os);}
 
 public:
 	/**
@@ -149,7 +149,7 @@ public:
 	void initDigest(void);
 
 	inline unsigned getSize(void)
-		{return 16;};
+		{return 16;}
 
 	unsigned getDigest(unsigned char *buffer);
 

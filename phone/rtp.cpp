@@ -17,6 +17,8 @@
 #include <cc++/slog.h>
 #include "server.h"
 
+using namespace std;
+
 #ifdef	CCXX_NAMESPACES
 namespace ost {
 using namespace std;
@@ -84,5 +86,5 @@ void RTPAudio::onGotGoodbye(const SyncSource &src, const string& reason)
 RTPAudio *rtp;
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif

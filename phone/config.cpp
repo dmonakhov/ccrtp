@@ -73,5 +73,5 @@ KeyAudio keyaudio;
 KeyRTP keyrtp;
 
 #ifdef	CCXX_NAMESPACES
-};
+}
 #endif

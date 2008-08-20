@@ -432,7 +432,7 @@ protected:
 		 * @return 32 bit timestamp starting from 0 for each source.
 		 */
 		inline uint32 getTimestamp() const
-		{ return shiftedTimestamp; };
+		{ return shiftedTimestamp; }
 
 		inline void setTimestamp(uint32 ts)
 		{ shiftedTimestamp = ts;}
