@@ -59,10 +59,10 @@ public:
 	// Constructor. If it is given a file name, this thread will
 	// transmit that file. If it is not, /dev/audio input is
 	// transmitted
-	ccRTP_AudioTransmitter(char *filename=""){
+	ccRTP_AudioTransmitter(char *filename=(char *)""){
 		
 		if( !strcmp(filename,"") ){
-			filename="/dev/audio";
+			filename=(char *)"/dev/audio";
 			sendingfile = false;
 		}else{
 			sendingfile = true;
