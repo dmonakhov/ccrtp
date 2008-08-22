@@ -5,13 +5,11 @@ Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
 Name: ccrtp
 Version: @VERSION@
 Release: 1
-Epoch: 0
 License: LGPL
 Group: Development/Libraries
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
 Source0: ftp://ftp.gnu.org/gnu/cccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
-Requires: libgcrypt
 BuildRequires: libcommoncpp2-devel >= 1.4.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
