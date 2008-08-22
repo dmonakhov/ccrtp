@@ -143,6 +143,12 @@ AC_PATH_PROG(DOXYGEN, doxygen, no)
 AC_SUBST(DOXYGEN)
 AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
+LIB_VERSION=`echo $LT_RELEASE | sed -e 's/[\.]/_/'` 
+LIB_MAJOR=`echo $LT_VERSION | sed -e 's/[:].*$//'`
+
+AC_SUBST(LIB_VERSION)
+AC_SUBST(LIB_MAJOR)
+
 AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
 ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile)
