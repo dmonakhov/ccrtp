@@ -59,13 +59,11 @@ AC_DEFUN([OST_CXX_EXCEPTIONS],[
   dnl Enable C++ exception handling whenever possible.
   dnl 
 
-  ac_save_CXXFLAGS="$CXXFLAGS"
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
-  CXXFLAGS=""
 
   dnl strip -fno-exceptions flag if used
-  optflags=$CXXFLAGS
+  optflags="$CXXFLAGS"
   if test ! -z "$optflags" ; then
 	CXXFLAGS=""
 	for opt in $optflags ; do
@@ -78,6 +76,8 @@ AC_DEFUN([OST_CXX_EXCEPTIONS],[
 		esac
 	done
   fi
+  ac_save_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS=""
 
   dnl Check for exception handling
   AC_CACHE_CHECK(whether ${CXX} supports -fhandle-exceptions,
