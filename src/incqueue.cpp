@@ -511,8 +511,8 @@ IncomingDataQueue::getWaiting(uint32 timestamp, const SyncSource* src)
 			recvLock.unlock();
 			return result;
 		}
-		while ( l && (l->getTimestamp() < timestamp) ||
-			end2EndDelayed(*l) ) {
+		while ( l && ((l->getTimestamp() < timestamp) ||
+			end2EndDelayed(*l))) {
 			nold++;
 			l = l->getSrcNext();
 		}

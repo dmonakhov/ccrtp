@@ -141,7 +141,8 @@ public:
 			if (i==0)
 				Thread::sleep(20);
 			
-			::write(audiooutput,adu->getData(),adu->getSize());
+			if(::write(audiooutput,adu->getData(),adu->getSize()) < (ssize_t)adu->getSize())
+				break;
 
 			cout << "." << flush;
 

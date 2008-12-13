@@ -1,3 +1,7 @@
+2008-12-12  David Sugar <dyfet@gnutelephony.org>
+
+	General code cleanup and pedantic check for what will be release 1.7.0.
+
 2008-08-20  David Sugar <dyfet@gnutelephony.org>
 
     Taking in debian gcc-4.3 cleanness patch and upstream patches...
