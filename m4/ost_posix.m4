@@ -21,6 +21,8 @@ dnl distribution terms that you use for the rest of that program.
 
 AC_DEFUN([OST_SYS_POSIX],[
  AC_REQUIRE([OST_PROG_CC_POSIX])
+ ac_save_CFLAGS="$CFLAGS"
+ CFLAGS=""
  AC_CACHE_CHECK(whether system meets Posix.1,
 	ost_cv_sys_posix1,
 	AC_TRY_COMPILE(,[
@@ -34,6 +36,7 @@ AC_DEFUN([OST_SYS_POSIX],[
 	     ost_cv_sys_posix1=no
         )
   )
+  CFLAGS="$ac_save_CFLAGS"
   if test $ost_cv_sys_posix1 = no ; then
 	AC_CHECK_HEADERS(unistd.h)
   else
