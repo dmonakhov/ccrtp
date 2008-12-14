@@ -45,6 +45,10 @@ AM_PROG_LIBTOOL
 AM_INIT_AUTOMAKE(ccrtp,[$VERSION])
 AM_CONFIG_HEADER(src/config.h)
 
+AC_C_RESTRICT
+AC_C_VOLATILE
+AC_C_INLINE
+
 if test -z "$PKG_CONFIG_PATH" ; then
         PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
 fi
