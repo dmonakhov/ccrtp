@@ -1,4 +1,5 @@
-dnl Copyright (C) 1999-2001 Open Source Telecom Corporation.
+dnl Copyright (C) 1999-2005 Open Source Telecom Corporation.
+dnl Copyright (C) 2006-2008 David Sugar, Tycho Softworks.
 dnl  
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
