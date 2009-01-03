@@ -1,11 +1,14 @@
+%{!?release: %define release 0}
+%{!?version: %define version @VERSION@}
+
 %define _libname libccrtp1-@LIB_VERSION@-@LIB_MAJOR@
 %define _devname libccrtp-devel
 
 Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
 Name: ccrtp
-Version: @VERSION@
-Release: 1
-License: LGPL
+Version: %{version}
+Release: %{release}%{?dist}
+License: LGPL v2 or later
 Group: Development/Libraries
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
 Source0: ftp://ftp.gnu.org/gnu/cccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
