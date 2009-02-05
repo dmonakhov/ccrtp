@@ -373,8 +373,7 @@ bool CryptoContext::checkReplay( uint16 new_seq_nb )
 	    s_l = new_seq_nb;
 	}
 	uint64 guessed_index = guessIndex( new_seq_nb );
-	uint64 local_index =
-	    (((uint64_t)roc) << 16 & 0xFFFF) | s_l;
+	uint64 local_index = (((uint64_t)roc) << 16) | s_l;
 
 	int64 delta = guessed_index - local_index;
 	if (delta > 0) {
