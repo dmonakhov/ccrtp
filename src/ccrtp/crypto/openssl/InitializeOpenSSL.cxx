@@ -57,6 +57,16 @@ int initializeOpenSSL ()
     return 1;
 }
 
+int finalizeOpenSSL ()
+{
+	if(!initialized)
+		return 1;
+
+	initialized = 0;
+	threadLockCleanup();
+	return 1;
+}
+
 #ifdef OPENSSL_SYS_WIN32
 
 static HANDLE *lock_cs;
@@ -213,6 +223,7 @@ static void myLockingCallback(int mode, int type, const char *file,
     }
 }
 
+/*
 static unsigned long pthreads_thread_id(void)
 {
     unsigned long ret;
@@ -220,5 +231,6 @@ static unsigned long pthreads_thread_id(void)
     ret = (unsigned long)pthread_self();
     return(ret);
 }
+*/
 
 #endif /* LIBPTHREAD && !SOLARIS */
