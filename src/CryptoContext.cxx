@@ -27,9 +27,7 @@
 
 #include <iostream>
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #ifdef SRTP_SUPPORT
 #include <ccrtp/crypto/hmac.h>
@@ -128,41 +126,43 @@ CryptoContext::CryptoContext( uint32 ssrc,
 #endif
 
 CryptoContext::~CryptoContext(){
-
+    
     ealg = SrtpEncryptionNull;
     aalg = SrtpAuthenticationNull;
 
+#ifdef SRTP_SUPPORT    
     if (mki)
-	delete [] mki;
-
+        delete [] mki;
+    
     if (master_key_length > 0) {
-	master_key_length = 0;
-	delete [] master_key;
+        master_key_length = 0;
+        delete [] master_key;
     }
     if (master_salt_length > 0) {
-	master_salt_length = 0;
-	delete [] master_salt;
+        master_salt_length = 0;
+        delete [] master_salt;
     }
     if (n_e > 0) {
-	n_e = 0;
-	delete [] k_e;
+        n_e = 0;
+        delete [] k_e;
     }
     if (n_s > 0) {
-	n_s = 0;
-	delete [] k_s;
+        n_s = 0;
+        delete [] k_s;
     }
     if (n_a > 0) {
-	n_a = 0;
-	delete [] k_a;
+        n_a = 0;
+        delete [] k_a;
     }
     if (aesCipher != NULL) {
-	delete aesCipher;
-	aesCipher = NULL;
+        delete aesCipher;
+        aesCipher = NULL;
     }
     if (f8AesCipher != NULL) {
-	delete f8AesCipher;
-	f8AesCipher = NULL;
+        delete f8AesCipher;
+        f8AesCipher = NULL;
     }
+#endif
 }
 
 void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {

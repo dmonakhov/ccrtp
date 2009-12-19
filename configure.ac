@@ -154,6 +154,6 @@ LIB_MAJOR=`echo $LT_VERSION | sed -e 's/[:].*$//'`
 AC_SUBST(LIB_VERSION)
 AC_SUBST(LIB_MAJOR)
 
-AC_OUTPUT(Makefile src/Makefile src/ccrtp/Makefile m4/Makefile
+AC_OUTPUT(Makefile m4/Makefile src/Makefile src/ccrtp/Makefile zrtp/Makefile)
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
 ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile)
