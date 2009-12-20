@@ -1,24 +1,30 @@
 %{!?release: %define release 0}
-%{!?version: %define version @VERSION@}
+#%{!?version: %define version @VERSION@}
 
-%define _libname libccrtp1-@LIB_VERSION@-@LIB_MAJOR@
-%define _devname libccrtp-devel
+#%define _libname libccrtp1-@VERSION@
+#%define _devname libccrtp-devel
 
 Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
-Name: ccrtp
+Name: libccrtp1
 Version: %{version}
 Release: %{release}%{?dist}
 License: LGPL v2 or later
-Group: Development/Libraries
+Group: System/Libraries
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
-Source0: ftp://ftp.gnu.org/gnu/cccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
+Source0: ftp://ftp.gnu.org/gnu/cccrtp/libccrtp1-%{PACKAGE_VERSION}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
-BuildRequires: libcommoncpp2-devel >= 1.4.0
+Provides: %{name} = %{version}-%{release}
+BuildRequires: commoncpp2-devel >= 1.4.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
 BuildRequires: libgcrypt-devel
 
+%define srcdirname %{name}-%{version}
+
 %description
+This package contains the runtime library needed by applications that use 
+the GNU RTP stack.
+
 ccRTP is a generic, extensible and efficient C++ framework for
 developing applications based on the Real-Time Transport Protocol
 (RTP) from the IETF. It is based on Common C++ and provides a full
@@ -28,56 +34,54 @@ multi-unicast and multicast, manages multiple sources, handles RTCP
 automatically, supports different threading models and is generic as
 for underlying network and transport protocols.
 
-%package -n %{_libname}
-Group: System/Libraries
-Summary: Runtime library for GNU RTP Stack
-Provides: %{name} = %{version}-%{release}
-
-%package -n %{_devname}
+%package devel
 Group: Development/Libraries
 Summary: Headers and static link library for ccrtp.
 Requires: %{_libname} = %{version} 
-Requires: libcommoncpp2-devel >= 1.4.0
+Requires: commoncpp2-devel >= 1.4.0
 Requires: libgcrypt-devel
 Provides: %{name}-devel = %{version}-%{release}
 
-%description -n %{_libname}
-This package contains the runtime library needed by applications that use 
-the GNU RTP stack.
-
-%description -n %{_devname}
+%description devel
 This package provides the header files, link libraries, and 
 documentation for building applications that use GNU ccrtp. 
 
 %prep
-%setup
+%setup -q
+
 %build
-%configure
+cd ..
+%{__rm} -rf build_tree
+%{__mkdir} build_tree
+cd build_tree
+cmake -DCMAKE_INSTALL_PREFIX=%{buildroot}%{_prefix} ../%{srcdirname}
+%{__make}
 
-make %{?_smp_mflags} LDFLAGS="-s" CXXFLAGS="$RPM_OPT_FLAGS"
+%install 
+cd ../build_tree
+%{__make} install
 
-%install
-
-%makeinstall
-rm -rf %{buildroot}/%{_infodir} 
+#%makeinstall
+#rm -rf %{buildroot}/%{_infodir} 
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
+%{__rm} -rf build_tree
 
-%files -n %{_libname}
+%files
 %defattr(-,root,root,0755)
 %doc AUTHORS COPYING ChangeLog README COPYING.addendum
 %{_libdir}/*.so.*
 
-%files -n %{_devname}
+%files devel
 %defattr(-,root,root,0755)
-%{_libdir}/*.a
+#%{_libdir}/*.a
 %{_libdir}/*.so
-%{_libdir}/*.la   
+#%{_libdir}/*.la   
 %{_libdir}/pkgconfig/*.pc
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 
-%post -n %{_libname} -p /sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun -n %{_libname} -p /sbin/ldconfig  
+%postun -p /sbin/ldconfig  

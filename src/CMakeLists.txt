@@ -62,4 +62,4 @@ target_link_libraries(ccrtp1 ${LIBS})
 
 ########### install files ###############
 
-install(TARGETS ccrtp1 DESTINATION lib)
+install(TARGETS ccrtp1 DESTINATION lib${LIB64})

@@ -63,6 +63,7 @@ add_src_dist_files(${rtpsend_SRCS}
                    ${rtphello_SRCS}
                    ${rtpduphello_SRCS} 
                    ${audiorx_SRCS} 
+                   ${audiotx_SRCS} 
                    ${ccrtptest_SRCS} 
                    ${ccsrtptest_SRCS})
 
