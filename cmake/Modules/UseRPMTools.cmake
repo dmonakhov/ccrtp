@@ -1,4 +1,3 @@
-#
 # - Find tools needed for building RPM Packages
 #   on Linux systems and defines macro that helps to
 #   build source or binary RPM, the MACRO assumes

@@ -1,4 +1,10 @@
-macro(enable_arg _enable_name _enable_default)
+macro (enable_arg _enable_name _enable_default)
+if (${ARGC} GREATER 2)
+  set(_auto_arg_help
+      ${_AUTO_ARG_HELP}
+      "-Denable-${_enable_name}=[true|false] -- ${ARGV2} (default: ${_enable_default})"
+     )
+endif()
 
 if(NOT DEFINED enable-${_enable_name} AND NOT DEFINED disable-${_enable_name})
   set(enable_${_enable_name} ${_enable_default})
@@ -18,5 +24,16 @@ elseif(DEFINED disable-${_enable_name})
   endif()
   unset(disable-${_enable_name})
   unset(disable-${_enable_name} CACHE)
+endif()
+endmacro()
+
+macro(args_help)
+if(DEFINED help-args)
+  message("Control arguments:")
+  foreach(_args_help ${_AUTO_ARG_HELP})
+    message(${_args_help})
+  endforeach()
+  unset(help-args)
+  unset(help-args CACHE)
 endif()
 endmacro()
