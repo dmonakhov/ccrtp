@@ -14,7 +14,7 @@ ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = autogen.sh ccrtp.spec ccrtp.spec.in COPYING.addendum \
 	ccrtp.list ccrtp.list.in libccrtp1.pc libccrtp1.pc.in autoconf/*
 
-SUBDIRS = demo doc src 
+SUBDIRS = src demo doc 
 DIST_SUBDIRS = m4 src phone doc demo w32
 
 pkgconfigdir = $(libdir)/pkgconfig
