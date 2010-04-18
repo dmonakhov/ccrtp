@@ -147,10 +147,26 @@ public class FortunaGenerator implements RandomGenerator {
         generator.nextBytes(buffer, 0, buffer.length);
     }
 
+    /**
+     * Get new random data.
+     * 
+     * This functions fills a byte buffer with new random data. 
+     * 
+     * @param out the buffer that receives the random data
+     */
     public void nextBytes(byte[] out) {
         nextBytes(out, 0, out.length);
     }
 
+    /**
+     * Get new random data.
+     * 
+     * This functions returns new random data. 
+     * 
+     * @param out the buffer that receives the random data
+     * @param offset offset into the buffer
+     * @param length number of random bytes
+     */
     public void nextBytes(byte[] out, int offset, int length) {
         if (length == 0)
             return;
@@ -177,20 +193,72 @@ public class FortunaGenerator implements RandomGenerator {
         }
     }
 
+    /**
+     * Adds new seed (entropy) to a entropy pool.
+     * 
+     * This functions adds entropy data to the current pool. Fortuna uses
+     * 32 pools to gather entropy. After the function added the entropy to
+     * the pool it increments the current pool number modulo 32.
+     * 
+     * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
+     * uses the pools to perform a real reseed. If an application uses this
+     * function to add entropy it shall take this behaviour into consideration.
+     * 
+     * @param b  a long with new entropy data. If the current pool is 0 then
+     *            the function adds the length of a long to the overall
+     *            entropy count that controls reseed.
+     */
     public void addSeedMaterial(long b) {
         pools[pool].update((byte)(b & 0xff));
-        pools[pool].update((byte)((b >> 8) & 0xff));
+        pools[pool].update((byte)((b >>  8) & 0xff));
         pools[pool].update((byte)((b >> 16) & 0xff));
         pools[pool].update((byte)((b >> 24) & 0xff));
+        pools[pool].update((byte)((b >> 32) & 0xff));
+        pools[pool].update((byte)((b >> 40) & 0xff));
+        pools[pool].update((byte)((b >> 48) & 0xff));
+        pools[pool].update((byte)((b >> 56) & 0xff));
         if (pool == 0)
-            pool0Count += 4;;
+            pool0Count += 8;
         pool = (pool + 1) % NUM_POOLS;
     }
 
+    /**
+     * Adds new seed (entropy) to a entropy pool.
+     * 
+     * This functions adds entropy data to the current pool. Fortuna uses
+     * 32 pools to gather entropy. After the function added the entropy to
+     * the pool it increments the current pool number modulo 32.
+     * 
+     * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
+     * uses the pools to perform a real reseed. If an application uses this
+     * function to add entropy it shall take this behaviour into consideration.
+     * 
+     * @param buf buffer with new entropy data. If the current pool is 0 then
+     *            the function adds the length of the buffer to the overall
+     *            entropy count that controls reseed.
+     */
     public void addSeedMaterial(byte[] buf) {
         addSeedMaterial(buf, 0, buf.length);
     }
 
+    /**
+     * Adds new seed (entropy) to a entropy pool.
+     * 
+     * This functions adds entropy data to the current pool. Fortuna uses
+     * 32 pools to gather entropy. After the function added the entropy to
+     * the pool it increments the current pool number modulo 32.
+     * 
+     * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
+     * uses the pools to perform a real reseed. If an application uses this
+     * function to add entropy it shall take this behaviour into consideration.
+     * 
+     * @param buf buffer with new entropy data. 
+     * @param offset offset into the buffer
+     * @param length number of bytes to add to the current pool's entropy.
+     *            If the current pool is 0 then the function adds the length 
+     *            of the buffer to the overall entropy count that controls 
+     *            reseed.
+     */
     public void addSeedMaterial(byte[] buf, int offset, int length) {
         pools[pool].update(buf, offset, length);
         if (pool == 0)
@@ -198,6 +266,35 @@ public class FortunaGenerator implements RandomGenerator {
         pool = (pool + 1) % NUM_POOLS;
     }
 
+    /**
+     * Adds new seed (entropy) to the specified entropy pool.
+     * 
+     * This functions adds entropy data to the the specified pool. Fortuna 
+     * uses32 pools to gather entropy.
+     * 
+     * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
+     * uses the pools to perform a real reseed. If an application uses this
+     * function to add entropy it shall take this behaviour into consideration.
+     * 
+     * @param poolNumber speficies which pool receives the entropy data
+     * @param buf buffer with new entropy data. 
+     * @param offset offset into the buffer
+     * @param length number of bytes to add to the specified pool's entropy.
+     *            If the specified pool is 0 then the function adds the length 
+     *            of the buffer to the overall entropy count that controls 
+     *            reseed.
+     */
+    public void addSeedMaterial(int poolNumber, byte[] data, int offset, int length) {
+      if (poolNumber < 0 || poolNumber >= pools.length)
+        throw new IllegalArgumentException("pool number out of range: "
+                                           + poolNumber);
+      pools[poolNumber].update((byte)length);
+      pools[poolNumber].update(data, offset, length);
+      if (poolNumber == 0)
+        pool0Count += length;
+    }
+
+    
     public byte[] getSeedStatus() {
         byte[] seed = new byte[SEED_FILE_SIZE];
         generator.nextBytes(seed, 0, seed.length);
