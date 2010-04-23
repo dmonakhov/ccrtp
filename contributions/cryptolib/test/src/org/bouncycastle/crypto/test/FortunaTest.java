@@ -31,7 +31,7 @@ public class FortunaTest {
 
     public static void writeFortuna() {
         try {
-            OutputStream out = new GZIPOutputStream(new FileOutputStream("/tmp/testfortuna"));
+            OutputStream out = new GZIPOutputStream(new FileOutputStream("testfortuna"));
             FortunaGenerator f = getFortuna();
             byte buf[] = new byte[1024];
             for (int i = 0; i < 64*1024; i++) {

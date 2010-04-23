@@ -9,39 +9,70 @@ import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
- * This class implements the Fortuna random number generator.
- * 
- * This class is a modified variant of the original Fortuna generator
- * in GNU Classpath (see note below). The class now uses the Bouncycastle
- * hash and cipher classes and provides a Buncycastle compliant interface.
- *
- * I did some small enhancements of the reseed loop that, otherwise the
- * algorithms were not touched.
- * 
- * License: the Bouncycastle license applies to this file. Also notice
- * the GNU Classpath license exception (see below). 
- * 
- * The Fortuna continuously-seeded pseudo-random number generator. This
- * generator is composed of two major pieces: the entropy accumulator and the
+ * The Fortuna random number generator.
+ * <p>
+ * This class is a modified variant of the original Fortuna generator in GNU
+ * Classpath (see note below). The class now uses the Bouncycastle hash and
+ * cipher classes and provides a Bouncycastle compliant interface.
+ * <p>
+ * Fortuna is a continuously-seeded pseudo-random number generator (PRNG)
+ * and is composed of two major pieces: the entropy accumulator and the
  * generator function. The former takes in random bits and incorporates them
  * into the generator's state. The latter takes this base entropy and generates
  * pseudo-random bits from it.
  * <p>
+ * Here an example how to use the FortunaGenerator (pseudo code):
+ * 
+ * <pre>
+ * ...
+ *     new Random().nextBytes(firstSeed)  // get some random data
+ *     FortunaGenerator fg = new FortunaGenerator(firstSeed);
+ *     ...
+ *     
+ *     fg.nextBytes(randomData)
+ *     ...
+ *     fg.addSeedMaterial(entropyData)
+ * 
+ * </pre>
+ * 
+ * After some time the application has done its work and exits. To enable 
+ * a fast restart of the FortunaGenerator you may store the seed status 
+ * and initialize the FortunaGenerator with this seed the next time. For
+ * example:
+ * 
+ * <pre>
+ * ... // use FortunaGenerator
+ *     seedStatus = fg.getSeedStatus()
+ *     
+ *     // save seed status somewhere
+ *     // exit application
+ * ...
+ *     // restart application
+ *     if (saved seed status available) 
+ *         read seed status data
+ *         FortunaGenerator fg = new FortunaGenerator()
+ *         fg.setSeedStatus(seed status data)
+ *     // alternatively you can do 
+ *         FortunaGenerator = new FortunaGenerator(seed status data)
+ *     // use FortunaGenerator
+ * 
+ * </pre>
+ * 
  * There are some things users of this class <em>must</em> be aware of:
  * <dl>
  * <dt>Adding Random Data</dt>
- * <dd>This class does not do any polling of random sources, but rather
- * provides an interface for adding entropy data (additional seed). Applications
- * that use this code <em>must</em> provide this mechanism. We use this design 
- * because an application writer who knows the system he is targeting is in a 
- * better position to judge what random data is available.</dd>
+ * <dd>This class does not do any polling of random sources, but rather provides
+ * an interface for adding entropy data (additional seed). Applications that use
+ * this code <em>must</em> provide this mechanism. We use this design because an
+ * application writer who knows the system he is targeting is in a better
+ * position to judge what random data is available.</dd>
  * <dt>Storing the Seed</dt>
- * <dd>This class implements functions to read and restore the seed in such a 
- * way that it returns a 64 byte seed byte array to the application, and sets 
- * it back again when the application sets the seed status again. 
- * This is the extent of seed file management, however, and those
- * using this class are encouraged to think deeply about when, how often, and
- * where to store the seed.</dd>
+ * <dd>This class implements functions to read and restore the seed in such a
+ * way that it returns a 64 byte seed byte array to the application, and sets it
+ * back again when the application sets the seed status again. This is the
+ * extent of seed file management, however, and those using this class are
+ * encouraged to think deeply about when, how often, and where to store the
+ * seed.</dd>
  * </dl>
  * <p>
  * <b>References:</b>
@@ -51,7 +82,15 @@ import org.bouncycastle.crypto.params.KeyParameter;
  * Schneier). ISBN 0-471-22357-3.</li>
  * </ul>
  * 
- * Copyright (C) 2010 Werner Dittmann <Werner.Dittmann@t-online.de>
+ * I did some small enhancements of the re-seed loop that, otherwise the
+ * algorithms were not touched.
+ * <p>
+ * License: the Bouncycastle license applies to this file. Also notice the GNU
+ * Classpath license exception (see below).
+ * <p>
+ * Copyright (C) 2010 Werner Dittmann <Werner.Dittmann@t-online.de> <br>
+ * Copyright (C) 2004, 2006 Free Software Foundation, Inc.
+ * 
  */
 
 /* 
@@ -106,22 +145,29 @@ public class FortunaGenerator implements RandomGenerator {
     private int pool = 0;
     private int pool0Count = 0;
     private int reseedCount = 0;
-
+    private boolean initialized = false;
+    
     /** A temporary buffer to serve random bytes. */
     private byte[] buffer;
 
     /** The index into buffer of where the next byte will come from. */
-    protected int ndx;
+    protected int ndx = 0;
 
+    public FortunaGenerator() {
+    	this(null);
+    }
+    
     public FortunaGenerator(byte[] seed) {
         generator = new Generator(new AESFastEngine(), new SHA256Digest());
         pools = new Digest[NUM_POOLS];
         for (int i = 0; i < NUM_POOLS; i++)
             pools[i] = new SHA256Digest();
-
-        buffer = new byte[256];
-        generator.init(seed);
-        fillBlock();
+        buffer = new byte[256];	
+    	if (seed != null) {
+    		generator.init(seed);
+    		fillBlock();
+    		initialized = true;
+    	}
     }
 
     private void fillBlock()  {
@@ -149,7 +195,7 @@ public class FortunaGenerator implements RandomGenerator {
 
     /**
      * Get new random data.
-     * 
+     * <p>
      * This functions fills a byte buffer with new random data. 
      * 
      * @param out the buffer that receives the random data
@@ -160,7 +206,7 @@ public class FortunaGenerator implements RandomGenerator {
 
     /**
      * Get new random data.
-     * 
+     * <p>
      * This functions returns new random data. 
      * 
      * @param out the buffer that receives the random data
@@ -168,6 +214,9 @@ public class FortunaGenerator implements RandomGenerator {
      * @param length number of random bytes
      */
     public void nextBytes(byte[] out, int offset, int length) {
+        if (! initialized)
+            throw new IllegalStateException(" Gortuna generator not initialized/seeded");
+
         if (length == 0)
             return;
 
@@ -194,19 +243,19 @@ public class FortunaGenerator implements RandomGenerator {
     }
 
     /**
-     * Adds new seed (entropy) to a entropy pool.
-     * 
+     * Adds new random data (entropy) to an entropy pool.
+     * <p>
      * This functions adds entropy data to the current pool. Fortuna uses
      * 32 pools to gather entropy. After the function added the entropy to
      * the pool it increments the current pool number modulo 32.
-     * 
+     * <p>
      * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
-     * uses the pools to perform a real reseed. If an application uses this
+     * uses the pools to perform a real re-seed. If an application uses this
      * function to add entropy it shall take this behaviour into consideration.
      * 
      * @param b  a long with new entropy data. If the current pool is 0 then
      *            the function adds the length of a long to the overall
-     *            entropy count that controls reseed.
+     *            entropy count that controls re-seed.
      */
     public void addSeedMaterial(long b) {
         pools[pool].update((byte)(b & 0xff));
@@ -223,33 +272,33 @@ public class FortunaGenerator implements RandomGenerator {
     }
 
     /**
-     * Adds new seed (entropy) to a entropy pool.
-     * 
+     * Adds new random data (entropy) to an entropy pool.
+     * <p>
      * This functions adds entropy data to the current pool. Fortuna uses
      * 32 pools to gather entropy. After the function added the entropy to
      * the pool it increments the current pool number modulo 32.
-     * 
+     * <p>
      * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
-     * uses the pools to perform a real reseed. If an application uses this
+     * uses the pools to perform a real re-seed. If an application uses this
      * function to add entropy it shall take this behaviour into consideration.
      * 
      * @param buf buffer with new entropy data. If the current pool is 0 then
      *            the function adds the length of the buffer to the overall
-     *            entropy count that controls reseed.
+     *            entropy count that controls re-seed.
      */
     public void addSeedMaterial(byte[] buf) {
         addSeedMaterial(buf, 0, buf.length);
     }
 
     /**
-     * Adds new seed (entropy) to a entropy pool.
-     * 
+     * Adds new random data (entropy) to an entropy pool.
+     * <p>
      * This functions adds entropy data to the current pool. Fortuna uses
      * 32 pools to gather entropy. After the function added the entropy to
      * the pool it increments the current pool number modulo 32.
-     * 
+     * <p>
      * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
-     * uses the pools to perform a real reseed. If an application uses this
+     * uses the pools to perform a real re-seed. If an application uses this
      * function to add entropy it shall take this behaviour into consideration.
      * 
      * @param buf buffer with new entropy data. 
@@ -257,7 +306,7 @@ public class FortunaGenerator implements RandomGenerator {
      * @param length number of bytes to add to the current pool's entropy.
      *            If the current pool is 0 then the function adds the length 
      *            of the buffer to the overall entropy count that controls 
-     *            reseed.
+     *            re-seed.
      */
     public void addSeedMaterial(byte[] buf, int offset, int length) {
         pools[pool].update(buf, offset, length);
@@ -267,22 +316,22 @@ public class FortunaGenerator implements RandomGenerator {
     }
 
     /**
-     * Adds new seed (entropy) to the specified entropy pool.
-     * 
+     * Adds new random data (entropy) to the specified entropy pool.
+     * <p>
      * This functions adds entropy data to the the specified pool. Fortuna 
      * uses32 pools to gather entropy.
-     * 
+     * <p>
      * Only if pool 0 (zero) got enough entropy (min. 64 bytes) then Fortuna
-     * uses the pools to perform a real reseed. If an application uses this
+     * uses the pools to perform a real re-seed. If an application uses this
      * function to add entropy it shall take this behaviour into consideration.
      * 
-     * @param poolNumber speficies which pool receives the entropy data
-     * @param buf buffer with new entropy data. 
+     * @param poolNumber specifies which pool receives the entropy data
+     * @param data buffer with new entropy data. 
      * @param offset offset into the buffer
      * @param length number of bytes to add to the specified pool's entropy.
      *            If the specified pool is 0 then the function adds the length 
-     *            of the buffer to the overall entropy count that controls 
-     *            reseed.
+     *            of the data to the overall entropy count that controls 
+     *            re-seed.
      */
     public void addSeedMaterial(int poolNumber, byte[] data, int offset, int length) {
       if (poolNumber < 0 || poolNumber >= pools.length)
@@ -295,20 +344,35 @@ public class FortunaGenerator implements RandomGenerator {
     }
 
     
+    /**
+     * Return the generator's seed status.
+     * <p>
+     * An application may get the seed status, store it in a safe place
+     * and retrieve it to seed a new Fortuna PRNG instance.
+     * 
+     * @return The seed status.
+     */
     public byte[] getSeedStatus() {
         byte[] seed = new byte[SEED_FILE_SIZE];
         generator.nextBytes(seed, 0, seed.length);
         return seed;
     }
 
+    /**
+     * Seed the generator with a previously saved seed.
+     * 
+     * @param seedStatus the generator's seed.
+     */
     public void setSeedStatus(byte[] seedStatus) {
-        generator.addRandomBytes(seedStatus, 0, seedStatus.length);
+        generator.init(seedStatus);
+        fillBlock();
+        initialized = true;
     }
 
     /**
      * The Fortuna generator function. The generator is a PRNG in its own right;
      * Fortuna itself is basically a wrapper around this generator that manages
-     * reseeding in a secure way.
+     * re-seeding in a secure way.
      */
     private static class Generator  {
         private static final int LIMIT = 1 << 20;
@@ -333,7 +397,8 @@ public class FortunaGenerator implements RandomGenerator {
         }
 
         private void nextBytes(byte[] out, int offset, int length) {
-            int count = 0;
+
+        	int count = 0;
             do {
                 int amount = Math.min(LIMIT, length - count);
                 nextBytesInternal(out, offset + count, amount);
