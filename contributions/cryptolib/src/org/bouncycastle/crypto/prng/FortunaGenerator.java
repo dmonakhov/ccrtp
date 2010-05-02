@@ -214,8 +214,8 @@ public class FortunaGenerator implements RandomGenerator {
      * @param length number of random bytes
      */
     public void nextBytes(byte[] out, int offset, int length) {
-        if (! initialized)
-            throw new IllegalStateException(" Gortuna generator not initialized/seeded");
+        if (!initialized)
+            throw new IllegalStateException(" Fortuna generator not initialized/seeded");
 
         if (length == 0)
             return;
@@ -466,7 +466,7 @@ public class FortunaGenerator implements RandomGenerator {
 
         /**
          * Resets the cipher's key. This is done after every reseed, which combines
-         * the old key and the seed, and processes that throigh the hash function.
+         * the old key and the seed, and processes that through the hash function.
          */
         private void resetKey() {
             cipher.reset();
