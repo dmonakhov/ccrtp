@@ -1,5 +1,5 @@
 # Copyright (C) 1999-2005 Open Source Telecom Corporation.
-# Copyright (C) 2006-2008 David Sugar, Tycho Softworks.
+# Copyright (C) 2006-2010 David Sugar, Tycho Softworks.
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -14,9 +14,9 @@ AC_INIT(src/ccrtp/rtp.h)
 cfg_options=""
 if test -z "$*" ; then
         if test -f ~/.configure ; then
-		cfg_options=`grep ^ccrtp: ~/.configure | sed -e s/^ccrtp://`
+        cfg_options=`grep ^ccrtp: ~/.configure | sed -e s/^ccrtp://`
         elif test -f /etc/configure.conf ; then
-		cfg_options=`grep ^ccrtp: /etc/configure.conf | sed -e s/^ccrtp://`
+        cfg_options=`grep ^ccrtp: /etc/configure.conf | sed -e s/^ccrtp://`
         fi
 fi
 
@@ -68,7 +68,7 @@ export PKG_CONFIG_PATH
 case $host in
 #  *-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
   *-*-cygwin*)
-	LDFLAGS="$LDFLAGS -no-undefined"
+    LDFLAGS="$LDFLAGS -no-undefined"
     ;;
   *)
     ;;
@@ -123,9 +123,9 @@ AC_SUBST(GNULIBS)
 # OST_CC_ENDIAN - now in Common C++
 # Are we using the GNU compiler?
 if test $GCC = yes ; then
-	WARN_FLAGS="-Wall -ansi -pedantic"
+    WARN_FLAGS="-Wall -ansi -pedantic"
 else
-	WARN_FLAGS=""
+    WARN_FLAGS=""
 fi
 AC_SUBST(WARN_FLAGS)
 
@@ -133,11 +133,11 @@ OST_DEBUG
 
 dnl --with-nana: check for nana, the GNU assertion checking and logging library
 AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging],[
-	AC_CHECK_HEADER(nana.h, [
-		AC_CHECK_HEADERS(DL.h, [
-			AC_CHECK_LIB(nana, main)
-			])
-	])
+    AC_CHECK_HEADER(nana.h, [
+        AC_CHECK_HEADERS(DL.h, [
+            AC_CHECK_LIB(nana, main)
+            ])
+    ])
 ])
 
 KDOC_DIR="\$(top_srcdir)/doc"
@@ -148,7 +148,7 @@ AC_PATH_PROG(DOXYGEN, doxygen, no)
 AC_SUBST(DOXYGEN)
 AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
 
-LIB_VERSION=`echo $LT_RELEASE | sed -e 's/[\.]/_/'` 
+LIB_VERSION=`echo $LT_RELEASE | sed -e 's/[\.]/_/'`
 LIB_MAJOR=`echo $LT_VERSION | sed -e 's/[:].*$//'`
 
 AC_SUBST(LIB_VERSION)
