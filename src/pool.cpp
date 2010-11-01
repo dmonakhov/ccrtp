@@ -48,9 +48,9 @@ using std::list;
 RTPSessionPool::RTPSessionPool()
 {
 #ifndef WIN32
-	highestSocket = 0;
-	setPoolTimeout(0,3000);
-	FD_ZERO(&recvSocketSet);
+    highestSocket = 0;
+    setPoolTimeout(0,3000);
+    FD_ZERO(&recvSocketSet);
 #endif
 }
 
@@ -58,21 +58,20 @@ bool
 RTPSessionPool::addSession(RTPSessionBase& session)
 {
 #ifndef WIN32
-	bool result = false;
-	poolLock.writeLock();
-	// insert in list.
-	PredEquals predEquals(&session);
-	if ( sessionList.end() ==
-	     std::find_if(sessionList.begin(),sessionList.end(),predEquals) ) {
-		result = true;
-		sessionList.push_back(new SessionListElement(&session));
-	} else {
-		result = false;
-	}
-	poolLock.unlock();
-	return result;
+    bool result = false;
+    poolLock.writeLock();
+    // insert in list.
+    PredEquals predEquals(&session);
+    if ( sessionList.end() == std::find_if(sessionList.begin(),sessionList.end(),predEquals) ) {
+        result = true;
+        sessionList.push_back(new SessionListElement(&session));
+    } else {
+        result = false;
+    }
+    poolLock.unlock();
+    return result;
 #else
-	return false;
+    return false;
 #endif
 }
 
@@ -80,22 +79,21 @@ bool
 RTPSessionPool::removeSession(RTPSessionBase& session)
 {
 #ifndef WIN32
-	bool result = false;
-	poolLock.writeLock();
-	// remove from list.
-	PredEquals predEquals(&session);
-	PoolIterator i;
-	if ( sessionList.end() !=
-	     (i = find_if(sessionList.begin(),sessionList.end(),predEquals)) ) {
-		(*i)->clear();
-		result = true;
-	} else {
-		result = false;
-	}
-	poolLock.unlock();
-	return result;
+    bool result = false;
+    poolLock.writeLock();
+    // remove from list.
+    PredEquals predEquals(&session);
+    PoolIterator i;
+    if ( sessionList.end() != (i = find_if(sessionList.begin(),sessionList.end(),predEquals)) ) {
+        (*i)->clear();
+        result = true;
+    } else {
+        result = false;
+    }
+    poolLock.unlock();
+    return result;
 #else
-	return false;
+    return false;
 #endif
 }
 
@@ -103,13 +101,13 @@ size_t
 RTPSessionPool::getPoolLength() const
 {
 #ifndef WIN32
-	size_t result;
-	poolLock.readLock();
-	result = sessionList.size();
-	poolLock.unlock();
-	return result;
+    size_t result;
+    poolLock.readLock();
+    result = sessionList.size();
+    poolLock.unlock();
+    return result;
 #else
-	return 0;
+    return 0;
 #endif
 }
 
@@ -117,261 +115,236 @@ void
 SingleRTPSessionPool::run()
 {
 #ifndef WIN32
-	SOCKET so;
-	microtimeout_t packetTimeout(0);
-	while ( isActive() ) {
-		poolLock.readLock();
-		// Make a copy of the list so that add and remove does
-		// not affect the list during this loop iteration
-		list<SessionListElement*> sessions(sessionList);
-		poolLock.unlock();
+    SOCKET so;
+    microtimeout_t packetTimeout(0);
+    while ( isActive() ) {
+        poolLock.readLock();
+        // Make a copy of the list so that add and remove does
+        // not affect the list during this loop iteration
+        list<SessionListElement*> sessions(sessionList);
+        poolLock.unlock();
 
-		PoolIterator i = sessions.begin();
-		while ( i != sessions.end() ) {
-			poolLock.readLock();
-			if (!(*i)->isCleared()) {
-				RTPSessionBase* session((*i)->get());
-				controlReceptionService(*session);
-				controlTransmissionService(*session);
-			}
-			poolLock.unlock();
-			i++;
-		}
-		timeval timeout = getPoolTimeout();
+        PoolIterator i = sessions.begin();
+        while ( i != sessions.end() ) {
+            poolLock.readLock();
+            if (!(*i)->isCleared()) {
+                RTPSessionBase* session((*i)->get());
+                controlReceptionService(*session);
+                controlTransmissionService(*session);
+            }
+            poolLock.unlock();
+            i++;
+        }
+        timeval timeout = getPoolTimeout();
 
-		// Reinitializa fd set
-		FD_ZERO(&recvSocketSet);
-		poolLock.readLock();
-		highestSocket = 0;
-		for (PoolIterator j = sessions.begin(); j !=
-			     sessions.end (); j++) {
-			if (!(*j)->isCleared()) {
-				RTPSessionBase* session((*j)->get());
-				SOCKET s = getDataRecvSocket(*session);
-				FD_SET(s,&recvSocketSet);
-				if ( s > highestSocket + 1 )
-					highestSocket = s + 1;
-			}
-		}
-		poolLock.unlock();
+        // Reinitializa fd set
+        FD_ZERO(&recvSocketSet);
+        poolLock.readLock();
+        highestSocket = 0;
+        for (PoolIterator j = sessions.begin(); j != sessions.end (); j++) {
+            if (!(*j)->isCleared()) {
+                RTPSessionBase* session((*j)->get());
+                SOCKET s = getDataRecvSocket(*session);
+                FD_SET(s,&recvSocketSet);
+                if ( s > highestSocket + 1 )
+                    highestSocket = s + 1;
+            }
+        }
+        poolLock.unlock();
 
 
-		int n = select(highestSocket,&recvSocketSet,NULL,NULL,
-			       &timeout);
+        int n = select(highestSocket,&recvSocketSet,NULL,NULL,
+                   &timeout);
 
-		i = sessions.begin();
-		while ( (i != sessions.end()) ) {
-			poolLock.readLock();
-			if (!(*i)->isCleared()) {
-				RTPSessionBase* session((*i)->get());
-				so = getDataRecvSocket(*session);
-				if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
-					takeInDataPacket(*session);
-				}
+        i = sessions.begin();
+        while ( (i != sessions.end()) ) {
+            poolLock.readLock();
+            if (!(*i)->isCleared()) {
+                RTPSessionBase* session((*i)->get());
+                so = getDataRecvSocket(*session);
+                if ( FD_ISSET(so,&recvSocketSet) && (n-- > 0) ) {
+                    takeInDataPacket(*session);
+                }
 
-				// schedule by timestamp, as in
-				// SingleThreadRTPSession (by Joergen
-				// Terner)
-				if (packetTimeout < 1000) {
-					packetTimeout = getSchedulingTimeout(*session);
-				}
-				microtimeout_t maxWait =
-					timeval2microtimeout(getRTCPCheckInterval(*session));
-				// make sure the scheduling timeout is
-				// <= the check interval for RTCP
-				// packets
-				packetTimeout = (packetTimeout > maxWait)? maxWait : packetTimeout;
-				if ( packetTimeout < 1000 ) { // !(packetTimeout/1000)
-					setCancel(cancelDeferred);
-					dispatchDataPacket(*session);
-					setCancel(cancelImmediate);
-					//timerTick();
-				} else {
-					packetTimeout = 0;
-				}
-			}
-			poolLock.unlock();
-			i++;
-		}
+                // schedule by timestamp, as in
+                // SingleThreadRTPSession (by Joergen
+                // Terner)
+                if (packetTimeout < 1000) {
+                    packetTimeout = getSchedulingTimeout(*session);
+                }
+                microtimeout_t maxWait =
+                    timeval2microtimeout(getRTCPCheckInterval(*session));
+                // make sure the scheduling timeout is
+                // <= the check interval for RTCP
+                // packets
+                packetTimeout = (packetTimeout > maxWait)? maxWait : packetTimeout;
+                if ( packetTimeout < 1000 ) { // !(packetTimeout/1000)
+                    setCancel(cancelDeferred);
+                    dispatchDataPacket(*session);
+                    setCancel(cancelImmediate);
+                    //timerTick();
+                } else {
+                    packetTimeout = 0;
+                }
+            }
+            poolLock.unlock();
+            i++;
+        }
 
-		// Purge elements for removed sessions.
-		poolLock.writeLock();
-		i = sessionList.begin();
-		while (i != sessionList.end()) {
-			if ((*i)->isCleared()) {
-				SessionListElement* element(*i);
-				i = sessionList.erase(i);
-				delete element;
-			}
-			else {
-				++i;
-			}
-		}
-		poolLock.unlock();
+        // Purge elements for removed sessions.
+        poolLock.writeLock();
+        i = sessionList.begin();
+        while (i != sessionList.end()) {
+            if ((*i)->isCleared()) {
+                SessionListElement* element(*i);
+                i = sessionList.erase(i);
+                delete element;
+            }
+            else {
+                ++i;
+            }
+        }
+        poolLock.unlock();
 
-		//GF we added that to allow the kernel scheduler  to
-		// give other tasks some time as if we have lots of
+        //GF we added that to allow the kernel scheduler  to
+        // give other tasks some time as if we have lots of
                 // active sessions the thread cann take all the CPU if we
                 // don't pause at all. We haven't found the best way to
                 // do that yet.
-		// usleep (10);
-		yield();
-	}
+        // usleep (10);
+        yield();
+    }
 #endif // ndef WIN32
 }
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-		const InetHostAddress& ia,
-			       tpport_t dataPort,
-			       tpport_t controlPort,
-			       int pri,
-			       uint32 memberssize,
-			       RTPApplication& app):
-		Thread(pri),
-		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app)
-	{ }
+const InetHostAddress& ia, tpport_t dataPort, tpport_t controlPort, int pri,
+uint32 memberssize, RTPApplication& app) :
+Thread(pri), TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+(ia,dataPort,controlPort,memberssize,app)
+{}
 
 SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-	const InetMcastAddress& ia,
-			       tpport_t dataPort,
-			       tpport_t controlPort,
-			       int pri,
-			       uint32 memberssize,
-			       RTPApplication& app,
-			       uint32 iface):
-		Thread(pri),
-		TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app,iface)
-	{ }
+const InetMcastAddress& ia, tpport_t dataPort, tpport_t controlPort, int pri,
+uint32 memberssize, RTPApplication& app, uint32 iface) :
+Thread(pri), TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>
+(ia,dataPort,controlPort,memberssize,app,iface)
+{}
 
 void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::startRunning()
 {
-	enableStack();
-	Thread::start();
+    enableStack();
+    Thread::start();
 }
 
 bool SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::isPendingData(microtimeout_t timeout)
 {
-	return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
+    return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
 }
 
 void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::timerTick(void)
-{
-}
+{}
 
 void SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>::run(void)
 {
-		microtimeout_t timeout = 0;
-		while ( ServiceQueue::isActive() ) {
-			if ( timeout < 1000 ){ // !(timeout/1000)
-				timeout = getSchedulingTimeout();
-			}
-			setCancel(cancelDeferred);
-			controlReceptionService();
-			controlTransmissionService();
-			setCancel(cancelImmediate);
-			microtimeout_t maxWait =
-				timeval2microtimeout(getRTCPCheckInterval());
-			// make sure the scheduling timeout is
-			// <= the check interval for RTCP
-			// packets
-			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( timeout < 1000 ) { // !(timeout/1000)
-				setCancel(cancelDeferred);
-				dispatchDataPacket();
-				setCancel(cancelImmediate);
-				timerTick();
-			} else {
-				if ( isPendingData(timeout/1000) ) {
-					setCancel(cancelDeferred);
-					takeInDataPacket();
-					setCancel(cancelImmediate);
-				}
-				timeout = 0;
-			}
-		}
-		dispatchBYE("GNU ccRTP stack finishing.");
-                Thread::exit();
+    microtimeout_t timeout = 0;
+    while ( ServiceQueue::isActive() ) {
+        if ( timeout < 1000 ){ // !(timeout/1000)
+            timeout = getSchedulingTimeout();
+        }
+        setCancel(cancelDeferred);
+        controlReceptionService();
+        controlTransmissionService();
+        setCancel(cancelImmediate);
+        microtimeout_t maxWait =
+            timeval2microtimeout(getRTCPCheckInterval());
+        // make sure the scheduling timeout is
+        // <= the check interval for RTCP
+        // packets
+        timeout = (timeout > maxWait)? maxWait : timeout;
+        if ( timeout < 1000 ) { // !(timeout/1000)
+            setCancel(cancelDeferred);
+            dispatchDataPacket();
+            setCancel(cancelImmediate);
+            timerTick();
+        } else {
+            if ( isPendingData(timeout/1000) ) {
+                setCancel(cancelDeferred);
+                takeInDataPacket();
+                setCancel(cancelImmediate);
+            }
+            timeout = 0;
+        }
+    }
+    dispatchBYE("GNU ccRTP stack finishing.");
+    Thread::exit();
 }
 
 
-#ifdef	CCXX_IPV6
+#ifdef  CCXX_IPV6
 
 SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-		const IPV6Host& ia,
-			       tpport_t dataPort,
-			       tpport_t controlPort,
-			       int pri,
-			       uint32 memberssize,
-			       RTPApplication& app):
-		Thread(pri),
-		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app)
-	{ }
+const IPV6Host& ia, tpport_t dataPort, tpport_t controlPort, int pri,
+uint32 memberssize, RTPApplication& app) :
+Thread(pri), TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+(ia,dataPort,controlPort,memberssize,app)
+{}
 
 SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::SingleThreadRTPSession<DualRTPUDPIPv4Channel,DualRTPUDPIPv4Channel,AVPQueue>(
-	const IPV6Multicast& ia,
-			       tpport_t dataPort,
-			       tpport_t controlPort,
-			       int pri,
-			       uint32 memberssize,
-			       RTPApplication& app,
-			       uint32 iface):
-		Thread(pri),
-		TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
-	(ia,dataPort,controlPort,memberssize,app,iface)
-	{ }
+const IPV6Multicast& ia, tpport_t dataPort, tpport_t controlPort, int pri,
+uint32 memberssize, RTPApplication& app, uint32 iface) :
+Thread(pri), TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>
+(ia,dataPort,controlPort,memberssize,app,iface)
+{}
 
 void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::startRunning()
 {
-	enableStack();
-	Thread::start();
+    enableStack();
+    Thread::start();
 }
 
 bool SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::isPendingData(microtimeout_t timeout)
 {
-	return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
+    return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);
 }
 
 void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::timerTick(void)
-{
-}
+{}
 
 void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQueue>::run(void)
 {
-		microtimeout_t timeout = 0;
-		while ( ServiceQueue::isActive() ) {
-			if ( timeout < 1000 ){ // !(timeout/1000)
-				timeout = getSchedulingTimeout();
-			}
-			setCancel(cancelDeferred);
-			controlReceptionService();
-			controlTransmissionService();
-			setCancel(cancelImmediate);
-			microtimeout_t maxWait =
-				timeval2microtimeout(getRTCPCheckInterval());
-			// make sure the scheduling timeout is
-			// <= the check interval for RTCP
-			// packets
-			timeout = (timeout > maxWait)? maxWait : timeout;
-			if ( timeout < 1000 ) { // !(timeout/1000)
-				setCancel(cancelDeferred);
-				dispatchDataPacket();
-				setCancel(cancelImmediate);
-				timerTick();
-			} else {
-				if ( isPendingData(timeout/1000) ) {
-					setCancel(cancelDeferred);
-					takeInDataPacket();
-					setCancel(cancelImmediate);
-				}
-				timeout = 0;
-			}
-		}
-		dispatchBYE("GNU ccRTP stack finishing.");
-                Thread::exit();
+    microtimeout_t timeout = 0;
+    while ( ServiceQueue::isActive() ) {
+        if ( timeout < 1000 ){ // !(timeout/1000)
+            timeout = getSchedulingTimeout();
+        }
+        setCancel(cancelDeferred);
+        controlReceptionService();
+        controlTransmissionService();
+        setCancel(cancelImmediate);
+        microtimeout_t maxWait =
+            timeval2microtimeout(getRTCPCheckInterval());
+        // make sure the scheduling timeout is
+        // <= the check interval for RTCP
+        // packets
+        timeout = (timeout > maxWait)? maxWait : timeout;
+        if ( timeout < 1000 ) { // !(timeout/1000)
+            setCancel(cancelDeferred);
+            dispatchDataPacket();
+            setCancel(cancelImmediate);
+            timerTick();
+        } else {
+            if ( isPendingData(timeout/1000) ) {
+                setCancel(cancelDeferred);
+                takeInDataPacket();
+                setCancel(cancelImmediate);
+            }
+            timeout = 0;
+        }
+    }
+    dispatchBYE("GNU ccRTP stack finishing.");
+    Thread::exit();
 }
 
 
@@ -387,6 +360,6 @@ void SingleThreadRTPSessionIPV6<DualRTPUDPIPv6Channel,DualRTPUDPIPv6Channel,AVPQ
 /** EMACS **
  * Local variables:
  * mode: c++
- * c-basic-offset: 8
+ * c-basic-offset: 4
  * End:
  */

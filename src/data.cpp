@@ -19,9 +19,9 @@
 // templates or use macros or inline functions from this file, or you compile
 // this file and link it with other files to produce an executable, this
 // file does not by itself cause the resulting executable to be covered by
-// the GNU General Public License.  This exception does not however    
+// the GNU General Public License.  This exception does not however
 // invalidate any other reasons why the executable file might be covered by
-// the GNU General Public License.    
+// the GNU General Public License.
 //
 // This exception applies only to the code released under the name GNU
 // ccRTP.  If you copy code from other releases into a copy of GNU
@@ -43,38 +43,37 @@
 #include "private.h"
 #include <ccrtp/queuebase.h>
 
-#ifdef	CCXX_NAMESPACES
+#ifdef  CCXX_NAMESPACES
 namespace ost {
 #endif
 
 AppDataUnit::AppDataUnit(const IncomingRTPPkt& packet, const SyncSource& src):
-	datablock(&packet), source(&src)
+datablock(&packet), source(&src)
 {
 
 }
 
-AppDataUnit::AppDataUnit(const AppDataUnit &origin): 
-	datablock(origin.datablock), source(origin.source)
+AppDataUnit::AppDataUnit(const AppDataUnit &origin):
+datablock(origin.datablock), source(origin.source)
 {
-	++datablock;
+    ++datablock;
 }
 
-AppDataUnit&
-AppDataUnit::operator=(const AppDataUnit &rhs)
+AppDataUnit& AppDataUnit::operator=(const AppDataUnit &rhs)
 {
-	datablock.operator=(rhs.datablock);
-	source = rhs.source;
-	return *this;
+    datablock.operator=(rhs.datablock);
+    source = rhs.source;
+    return *this;
 }
 
-#ifdef	CCXX_NAMESPACES
+#ifdef  CCXX_NAMESPACES
 }
 #endif
 
 /** EMACS **
  * Local variables:
  * mode: c++
- * c-basic-offset: 8
+ * c-basic-offset: 4
  * End:
  */
 

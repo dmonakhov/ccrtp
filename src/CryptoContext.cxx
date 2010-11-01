@@ -21,7 +21,7 @@
  * Authors: Israel Abad <i_abad@terra.es>
  *          Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *	    Joachim Orrblad <joachim@orrblad.com>
+ *      Joachim Orrblad <joachim@orrblad.com>
  *          Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
@@ -40,100 +40,100 @@ namespace ost {
 #endif
 
 CryptoContext::CryptoContext( uint32 ssrc ):
-	ssrc(ssrc),
-	using_mki(false),mkiLength(0),mki(NULL),
-	roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
-	replay_window(0),
-	master_key(NULL), master_key_length(0),
-	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
-	master_salt(NULL), master_salt_length(0),
-	n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
-	ealg(SrtpEncryptionNull), aalg(SrtpAuthenticationNull),
-	ekeyl(0), akeyl(0), skeyl(0),
-	seqNumSet(false), aesCipher(NULL), f8AesCipher(NULL)
-    {}
+ssrc(ssrc),
+using_mki(false),mkiLength(0),mki(NULL),
+roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
+replay_window(0),
+master_key(NULL), master_key_length(0),
+master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0),
+master_salt(NULL), master_salt_length(0),
+n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
+ealg(SrtpEncryptionNull), aalg(SrtpAuthenticationNull),
+ekeyl(0), akeyl(0), skeyl(0),
+seqNumSet(false), aesCipher(NULL), f8AesCipher(NULL)
+{}
 
 #ifdef SRTP_SUPPORT
-CryptoContext::CryptoContext( uint32 ssrc,
-                              int32 roc,
-                              int64 key_deriv_rate,
-                              const int32 ealg,
-			      const int32 aalg,
-			      uint8* master_key,
-			      int32 master_key_length,
-			      uint8* master_salt,
-			      int32 master_salt_length,
-			      int32 ekeyl,
-			      int32 akeyl,
-			      int32 skeyl,
-			      int32 tagLength):
+CryptoContext::CryptoContext(   uint32 ssrc,
+                                int32 roc,
+                                int64 key_deriv_rate,
+                                const int32 ealg,
+                                const int32 aalg,
+                                uint8* master_key,
+                                int32 master_key_length,
+                                uint8* master_salt,
+                                int32 master_salt_length,
+                                int32 ekeyl,
+                                int32 akeyl,
+                                int32 skeyl,
+                                int32 tagLength):
 
-	ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
-	roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
-	replay_window(0),
-	master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false),
-	aesCipher(NULL), f8AesCipher(NULL)
-    {
-	this->ealg = ealg;
-	this->aalg = aalg;
-	this->ekeyl = ekeyl;
-	this->akeyl = akeyl;
-	this->skeyl = skeyl;
+ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
+roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
+replay_window(0),
+master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false),
+aesCipher(NULL), f8AesCipher(NULL)
+{
+    this->ealg = ealg;
+    this->aalg = aalg;
+    this->ekeyl = ekeyl;
+    this->akeyl = akeyl;
+    this->skeyl = skeyl;
 
-	this->master_key_length = master_key_length;
-	this->master_key = new uint8[master_key_length];
-	memcpy(this->master_key, master_key, master_key_length);
+    this->master_key_length = master_key_length;
+    this->master_key = new uint8[master_key_length];
+    memcpy(this->master_key, master_key, master_key_length);
 
-	this->master_salt_length = master_salt_length;
-	this->master_salt = new uint8[master_salt_length];
-	memcpy(this->master_salt, master_salt, master_salt_length);
+    this->master_salt_length = master_salt_length;
+    this->master_salt = new uint8[master_salt_length];
+    memcpy(this->master_salt, master_salt, master_salt_length);
 
-	switch( ealg ){
-	    case SrtpEncryptionNull:
-		n_e = 0;
-		k_e = NULL;
-		n_s = 0;
-		k_s = NULL;
-		break;
+    switch( ealg ) {
+        case SrtpEncryptionNull:
+        n_e = 0;
+        k_e = NULL;
+        n_s = 0;
+        k_s = NULL;
+        break;
 
-	    case SrtpEncryptionAESF8:
-		f8AesCipher = new AesSrtp();
+        case SrtpEncryptionAESF8:
+        f8AesCipher = new AesSrtp();
 
-	    case SrtpEncryptionAESCM:
-		n_e = ekeyl;
-		k_e = new uint8[n_e];
-		n_s = skeyl;
-		k_s = new uint8[n_s];
-		aesCipher = new AesSrtp();
-		break;
-	}
-
-	switch( aalg ){
-	    case SrtpAuthenticationNull:
-		n_a = 0;
-		k_a = NULL;
-		this->tagLength = 0;
-		break;
-
-	    case SrtpAuthenticationSha1Hmac:
-		n_a = akeyl;
-		k_a = new uint8[n_a];
-		this->tagLength = tagLength;
-		break;
-	}
+        case SrtpEncryptionAESCM:
+        n_e = ekeyl;
+        k_e = new uint8[n_e];
+        n_s = skeyl;
+        k_s = new uint8[n_s];
+        aesCipher = new AesSrtp();
+        break;
     }
+
+    switch( aalg ) {
+        case SrtpAuthenticationNull:
+        n_a = 0;
+        k_a = NULL;
+        this->tagLength = 0;
+        break;
+
+        case SrtpAuthenticationSha1Hmac:
+        n_a = akeyl;
+        k_a = new uint8[n_a];
+        this->tagLength = tagLength;
+        break;
+    }
+}
 
 #endif
 
 CryptoContext::~CryptoContext(){
-    
+
     ealg = SrtpEncryptionNull;
     aalg = SrtpAuthenticationNull;
 
-#ifdef SRTP_SUPPORT    
+#ifdef SRTP_SUPPORT
     if (mki)
         delete [] mki;
-    
+
     if (master_key_length > 0) {
         master_key_length = 0;
         delete [] master_key;
@@ -165,96 +165,95 @@ CryptoContext::~CryptoContext(){
 #endif
 }
 
-void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc ) {
-
-	if (ealg == SrtpEncryptionNull) {
-	    return;
-	}
-#ifdef SRTP_SUPPORT
-	if (ealg == SrtpEncryptionAESCM) {
-
-	    /* Compute the CM IV (refer to chapter 4.1.1 in RFC 3711):
-	     *
-	     * k_s   XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-	     * SSRC              XX XX XX XX
-	     * index                         XX XX XX XX XX XX
-	     * ------------------------------------------------------XOR
-	     * IV    XX XX XX XX XX XX XX XX XX XX XX XX XX XX 00 00
-	     */
-
-	    unsigned char iv[16];
-	    memcpy( iv, k_s, 4 );
-
-	    int i;
-	    for(i = 4; i < 8; i++ ){
-		iv[i] = ( 0xFF & ( ssrc >> ((7-i)*8) ) ) ^ k_s[i];
-	    }
-	    for(i = 8; i < 14; i++ ){
-		iv[i] = ( 0xFF & (unsigned char)( index >> ((13-i)*8) ) ) ^ k_s[i];
-	    }
-	    iv[14] = iv[15] = 0;
-
-            int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-	    aesCipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
-			      rtp->getPayloadSize()+pad, iv);
-	}
-
-	if (ealg == SrtpEncryptionAESF8) {
-
-	    /* Create the F8 IV (refer to chapter 4.1.2.2 in RFC 3711):
-	     *
-	     * IV = 0x00 || M || PT || SEQ  ||      TS    ||    SSRC   ||    ROC
-	     *      8Bit  1bit  7bit  16bit       32bit        32bit        32bit
-	     * ------------\     /--------------------------------------------------
-	     *       XX       XX      XX XX   XX XX XX XX   XX XX XX XX  XX XX XX XX
-	     */
-
-	    unsigned char iv[16];
-	    uint32 *ui32p = (uint32 *)iv;
-
-	    memcpy(iv, rtp->getRawPacket(), 12);
-	    iv[0] = 0;
-
-	    // set ROC in network order into IV
-	    ui32p[3] = htonl(roc);
-
-            int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-	    aesCipher->f8_encrypt(rtp->getPayload(),
-				  rtp->getPayloadSize()+pad,
-				  iv, k_e, n_e, k_s, n_s, f8AesCipher);
-	}
-#endif
+void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
+{
+    if (ealg == SrtpEncryptionNull) {
+        return;
     }
+#ifdef SRTP_SUPPORT
+    if (ealg == SrtpEncryptionAESCM) {
+
+        /* Compute the CM IV (refer to chapter 4.1.1 in RFC 3711):
+         *
+         * k_s   XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+         * SSRC              XX XX XX XX
+         * index                         XX XX XX XX XX XX
+         * ------------------------------------------------------XOR
+         * IV    XX XX XX XX XX XX XX XX XX XX XX XX XX XX 00 00
+         */
+
+        unsigned char iv[16];
+        memcpy( iv, k_s, 4 );
+
+        int i;
+        for(i = 4; i < 8; i++ ){
+        iv[i] = ( 0xFF & ( ssrc >> ((7-i)*8) ) ) ^ k_s[i];
+        }
+        for(i = 8; i < 14; i++ ){
+        iv[i] = ( 0xFF & (unsigned char)( index >> ((13-i)*8) ) ) ^ k_s[i];
+        }
+        iv[14] = iv[15] = 0;
+
+        int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
+        aesCipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
+                  rtp->getPayloadSize()+pad, iv);
+    }
+
+    if (ealg == SrtpEncryptionAESF8) {
+
+        /* Create the F8 IV (refer to chapter 4.1.2.2 in RFC 3711):
+         *
+         * IV = 0x00 || M || PT || SEQ  ||      TS    ||    SSRC   ||    ROC
+         *      8Bit  1bit  7bit  16bit       32bit        32bit        32bit
+         * ------------\     /--------------------------------------------------
+         *       XX       XX      XX XX   XX XX XX XX   XX XX XX XX  XX XX XX XX
+         */
+
+        unsigned char iv[16];
+        uint32 *ui32p = (uint32 *)iv;
+
+        memcpy(iv, rtp->getRawPacket(), 12);
+        iv[0] = 0;
+
+        // set ROC in network order into IV
+        ui32p[3] = htonl(roc);
+
+            int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
+        aesCipher->f8_encrypt(rtp->getPayload(),
+                  rtp->getPayloadSize()+pad,
+                  iv, k_e, n_e, k_s, n_s, f8AesCipher);
+    }
+#endif
+}
 
 /* Warning: tag must have been initialized */
 void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
 {
-
-	if (aalg == SrtpAuthenticationNull) {
-	    return;
-	}
+    if (aalg == SrtpAuthenticationNull) {
+        return;
+    }
 #ifdef SRTP_SUPPORT
     int32 tag_length;
 
-	if (aalg == SrtpAuthenticationSha1Hmac) {
-	    unsigned char temp[20];
-	    const unsigned char* chunks[3];
-	    unsigned int chunkLength[3];
-	    uint32 beRoc = htonl(roc);
+    if (aalg == SrtpAuthenticationSha1Hmac) {
+        unsigned char temp[20];
+        const unsigned char* chunks[3];
+        unsigned int chunkLength[3];
+        uint32 beRoc = htonl(roc);
 
-	    chunks[0] = rtp->getRawPacket();
-	    chunkLength[0] = rtp->getRawPacketSize();
+        chunks[0] = rtp->getRawPacket();
+        chunkLength[0] = rtp->getRawPacketSize();
 
-	    chunks[1] = (unsigned char *)&beRoc;
-	    chunkLength[1] = 4;
-	    chunks[2] = NULL;
-	    hmac_sha1( k_a, n_a,
-		       chunks,           // data chunks to hash
-		       chunkLength,      // length of the data to hash
-		       temp, &tag_length );
-	    /* truncate the result */
-	    memcpy(tag, temp, getTagLength());
-	}
+        chunks[1] = (unsigned char *)&beRoc;
+        chunkLength[1] = 4;
+        chunks[2] = NULL;
+        hmac_sha1( k_a, n_a,
+               chunks,           // data chunks to hash
+               chunkLength,      // length of the data to hash
+               temp, &tag_length );
+        /* truncate the result */
+        memcpy(tag, temp, getTagLength());
+    }
 #endif
 }
 
@@ -264,35 +263,35 @@ static void computeIv(unsigned char* iv, uint64 label, uint64 index,
                       int64 kdv, unsigned char* master_salt)
 {
 
-	uint64 key_id;
+    uint64 key_id;
 
-	if (kdv == 0) {
-	    key_id = label << 48;
-	}
-	else {
-	    key_id = ((label << 48) | (index / kdv));
-	}
+    if (kdv == 0) {
+        key_id = label << 48;
+    }
+    else {
+        key_id = ((label << 48) | (index / kdv));
+    }
 
-	//printf( "Key_ID: %llx\n", key_id );
+    //printf( "Key_ID: %llx\n", key_id );
 
-	/* compute the IV
-	   key_id:                           XX XX XX XX XX XX XX
-	   master_salt: XX XX XX XX XX XX XX XX XX XX XX XX XX XX
-	   ------------------------------------------------------------ XOR
-	   IV:          XX XX XX XX XX XX XX XX XX XX XX XX XX XX 00 00
-	*/
+    /* compute the IV
+       key_id:                           XX XX XX XX XX XX XX
+       master_salt: XX XX XX XX XX XX XX XX XX XX XX XX XX XX
+       ------------------------------------------------------------ XOR
+       IV:          XX XX XX XX XX XX XX XX XX XX XX XX XX XX 00 00
+    */
 
-	int i;
-	for(i = 0; i < 7 ; i++ ) {
-	    iv[i] = master_salt[i];
-	}
+    int i;
+    for(i = 0; i < 7 ; i++ ) {
+        iv[i] = master_salt[i];
+    }
 
-	for(i = 7; i < 14 ; i++ ) {
-	    iv[i] = (unsigned char)(0xFF & (key_id >> (8*(13-i)))) ^
-		master_salt[i];
-	}
+    for(i = 7; i < 14 ; i++ ) {
+        iv[i] = (unsigned char)(0xFF & (key_id >> (8*(13-i)))) ^
+        master_salt[i];
+    }
 
-	iv[14] = iv[15] = 0;
+    iv[14] = iv[15] = 0;
 }
 #endif
 
@@ -300,102 +299,102 @@ static void computeIv(unsigned char* iv, uint64 label, uint64 index,
 void CryptoContext::deriveSrtpKeys(uint64 index)
 {
 #ifdef SRTP_SUPPORT
-	uint8 iv[16];
+    uint8 iv[16];
 
-	// prepare AES cipher to compute derived keys.
-	aesCipher->setNewKey(master_key, master_key_length);
+    // prepare AES cipher to compute derived keys.
+    aesCipher->setNewKey(master_key, master_key_length);
 
-	// compute the session encryption key
-	uint64 label = 0;
-	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aesCipher->get_ctr_cipher_stream(k_e, n_e, iv);
+    // compute the session encryption key
+    uint64 label = 0;
+    computeIv(iv, label, index, key_deriv_rate, master_salt);
+    aesCipher->get_ctr_cipher_stream(k_e, n_e, iv);
 
-	// compute the session authentication key
-	label = 0x01;
-	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aesCipher->get_ctr_cipher_stream(k_a, n_a, iv);
+    // compute the session authentication key
+    label = 0x01;
+    computeIv(iv, label, index, key_deriv_rate, master_salt);
+    aesCipher->get_ctr_cipher_stream(k_a, n_a, iv);
 
-	// compute the session salt
-	label = 0x02;
-	computeIv(iv, label, index, key_deriv_rate, master_salt);
-	aesCipher->get_ctr_cipher_stream(k_s, n_s, iv);
+    // compute the session salt
+    label = 0x02;
+    computeIv(iv, label, index, key_deriv_rate, master_salt);
+    aesCipher->get_ctr_cipher_stream(k_s, n_s, iv);
 
-	// as last step prepare AES cipher with derived key.
-	aesCipher->setNewKey(k_e, n_e);
+    // as last step prepare AES cipher with derived key.
+    aesCipher->setNewKey(k_e, n_e);
 #endif
 }
 
 /* Based on the algorithm provided in Appendix A - draft-ietf-srtp-05.txt */
-    uint64_t CryptoContext::guessIndex(uint16 new_seq_nb )
-    {
-	/*
-	 * Initialize the sequences number on first call that uses the
-	 * sequence number. Either GuessIndex() or checkReplay().
-	 */
-	if (!seqNumSet) {
-	    seqNumSet = true;
-	    s_l = new_seq_nb;
-	}
-	if (s_l < 32768){
-	    if (new_seq_nb - s_l > 32768) {
-		guessed_roc = roc - 1;
-	    }
-	    else {
-		guessed_roc = roc;
-	    }
-	}
-	else {
-	    if (s_l - 32768 > new_seq_nb) {
-		guessed_roc = roc + 1;
-	    }
-	    else {
-		guessed_roc = roc;
-	    }
-	}
-
-	return ((uint64)guessed_roc) << 16 | new_seq_nb;
+uint64_t CryptoContext::guessIndex(uint16 new_seq_nb )
+{
+    /*
+     * Initialize the sequences number on first call that uses the
+     * sequence number. Either GuessIndex() or checkReplay().
+     */
+    if (!seqNumSet) {
+        seqNumSet = true;
+        s_l = new_seq_nb;
     }
+    if (s_l < 32768){
+        if (new_seq_nb - s_l > 32768) {
+            guessed_roc = roc - 1;
+        }
+        else {
+            guessed_roc = roc;
+        }
+    }
+    else {
+        if (s_l - 32768 > new_seq_nb) {
+            guessed_roc = roc + 1;
+        }
+        else {
+            guessed_roc = roc;
+        }
+    }
+
+    return ((uint64)guessed_roc) << 16 | new_seq_nb;
+}
 
 bool CryptoContext::checkReplay( uint16 new_seq_nb )
 {
 #ifdef SRTP_SUPPORT
-	if ( aalg == SrtpAuthenticationNull && ealg == SrtpEncryptionNull ) {
-	    /* No security policy, don't use the replay protection */
-	    return true;
-	}
+    if ( aalg == SrtpAuthenticationNull && ealg == SrtpEncryptionNull ) {
+        /* No security policy, don't use the replay protection */
+        return true;
+    }
 
-	/*
-	 * Initialize the sequences number on first call that uses the
-	 * sequence number. Either guessIndex() or checkReplay().
-	 */
-	if (!seqNumSet) {
-	    seqNumSet = true;
-	    s_l = new_seq_nb;
-	}
-	uint64 guessed_index = guessIndex( new_seq_nb );
-	uint64 local_index = (((uint64_t)roc) << 16) | s_l;
+    /*
+     * Initialize the sequences number on first call that uses the
+     * sequence number. Either guessIndex() or checkReplay().
+     */
+    if (!seqNumSet) {
+        seqNumSet = true;
+        s_l = new_seq_nb;
+    }
+    uint64 guessed_index = guessIndex( new_seq_nb );
+    uint64 local_index = (((uint64_t)roc) << 16) | s_l;
 
-	int64 delta = guessed_index - local_index;
-	if (delta > 0) {
-	    /* Packet not yet received*/
-	    return true;
-	}
-	else {
-	    if( -delta > REPLAY_WINDOW_SIZE ) {
-		/* Packet too old */
-		return false;
-	    }
-	    else {
-		if((replay_window >> (-delta)) & 0x1) {
-		    /* Packet already received ! */
-		    return false;
-		}
-		else {
-		    /* Packet not yet received */
-		    return true;
-		}
-	    }
-	}
+    int64 delta = guessed_index - local_index;
+    if (delta > 0) {
+        /* Packet not yet received*/
+        return true;
+    }
+    else {
+        if( -delta > REPLAY_WINDOW_SIZE ) {
+            /* Packet too old */
+            return false;
+        }
+        else {
+            if((replay_window >> (-delta)) & 0x1) {
+                /* Packet already received ! */
+                return false;
+        }
+        else {
+            /* Packet not yet received */
+            return true;
+        }
+    }
+}
 #else
     return true;
 #endif
@@ -404,51 +403,52 @@ bool CryptoContext::checkReplay( uint16 new_seq_nb )
 void CryptoContext::update(uint16 new_seq_nb)
 {
 #ifdef SRTP_SUPPORT
-	int64 delta = guessIndex(new_seq_nb) - (((uint64)roc) << 16 | s_l );
+    int64 delta = guessIndex(new_seq_nb) - (((uint64)roc) << 16 | s_l );
 
-	/* update the replay bitmask */
-	if( delta > 0 ){
-	    replay_window = replay_window << delta;
-	    replay_window |= 1;
-	}
-	else {
-	    replay_window |= ( 1 << delta );
-	}
+    /* update the replay bitmask */
+    if( delta > 0 ){
+        replay_window = replay_window << delta;
+        replay_window |= 1;
+    }
+    else {
+        replay_window |= ( 1 << delta );
+    }
 
-	/* update the locally stored ROC and highest sequence number */
-	if( new_seq_nb > s_l ) {
-	    s_l = new_seq_nb;
-	}
-	if( guessed_roc > roc ) {
-	    roc = guessed_roc;
-	    s_l = new_seq_nb;
-	}
+    /* update the locally stored ROC and highest sequence number */
+    if( new_seq_nb > s_l ) {
+        s_l = new_seq_nb;
+    }
+    if( guessed_roc > roc ) {
+        roc = guessed_roc;
+        s_l = new_seq_nb;
+    }
 #endif
 }
 
-    CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate)
+CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate)
 {
 #ifdef SRTP_SUPPORT
-        CryptoContext* pcc = new CryptoContext(
-                ssrc,
-                roc,                                     // Roll over Counter,
-                keyDerivRate,                            // keyderivation << 48,
-                this->ealg,                              // encryption algo
-                this->aalg,                              // authentication algo
-                this->master_key,                        // Master Key
-                this->master_key_length,                 // Master Key length
-                this->master_salt,                       // Master Salt
-                this->master_salt_length,                // Master Salt length
-                this->ekeyl,                             // encryption keyl
-                this->akeyl,                             // authentication key len
-                this->skeyl,                             // session salt len
-                this->tagLength);                        // authentication tag len
+    CryptoContext* pcc = new CryptoContext(
+            ssrc,
+            roc,                                     // Roll over Counter,
+            keyDerivRate,                            // keyderivation << 48,
+            this->ealg,                              // encryption algo
+            this->aalg,                              // authentication algo
+            this->master_key,                        // Master Key
+            this->master_key_length,                 // Master Key length
+            this->master_salt,                       // Master Salt
+            this->master_salt_length,                // Master Salt length
+            this->ekeyl,                             // encryption keyl
+            this->akeyl,                             // authentication key len
+            this->skeyl,                             // session salt len
+            this->tagLength);                        // authentication tag len
 
-        return pcc;
+    return pcc;
 #else
     return NULL;
 #endif
-    }
+}
+
 #ifdef  CCXX_NAMESPACES
 }
 #endif
