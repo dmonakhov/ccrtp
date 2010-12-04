@@ -176,6 +176,19 @@ void RTPPacket::endPacket()
 #endif
 }
 
+void RTPPacket::reComputePayLength(bool padding)
+{
+    // If payloadsize was computed without padding set then re-compute
+    // payloadSize after the padding bit was set and set padding flag
+    // in RTP header - option for SRTP
+    if (padding) {
+        size_t len = 0;
+        getHeader()->padding = 1;
+        len -= buffer[payloadSize - 1];
+        payloadSize = (uint32)(payloadSize - len);
+    }
+}
+
 OutgoingRTPPkt::OutgoingRTPPkt(const uint32* const csrcs, uint16 numcsrc,
 const unsigned char* const hdrext, uint32 hdrextlen,
 const unsigned char* const data, size_t datalen,

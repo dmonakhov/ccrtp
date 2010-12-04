@@ -288,7 +288,20 @@ public:
         inline size_t
 	getSizeOfFixedHeader() const
 	{ return sizeof(RTPFixedHeader); }
-
+	
+	/**
+     * Re-compute payload length.
+     *
+     * This recomputation may be necessary in case of SRTP. We need to decrypt
+     * the packet before we can handle padding. See @c takeInDataPacket in
+     * @c incqueue.cpp
+     *
+     * @param padding
+     *     If true then set padding flag in RTP header and re-compute 
+     *     payloadSize.
+     */
+    void reComputePayLength(bool padding);
+    
 protected:
 	/**
 	 * Destructor, free the buffer provided in the constructor.

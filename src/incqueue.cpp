@@ -197,6 +197,15 @@ IncomingDataQueue::takeInDataPacket(void)
     struct timeval recvtime;
     gettimeofday(&recvtime,NULL);
 
+    // Special handling of padding to take care of encrypted content.
+    // In case of SRTP the padding length field is also encrypted, thus
+    // it gives a wrong length. Check and clear padding bit before
+    // creating the RTPPacket. Will be set and re-computed after a possible
+    // SRTP decryption.
+    uint8 padSet = (*buffer & 0x20);
+    if (padSet) {
+        *buffer = *buffer & ~0x20;          // clear padding bit
+    }    
     //  build a packet. It will link itself to its source
     IncomingRTPPkt* packet =
         new IncomingRTPPkt(buffer,rtn);
@@ -207,26 +216,29 @@ IncomingDataQueue::takeInDataPacket(void)
         return 0;
     }
 
-        CryptoContext* pcc = getInQueueCryptoContext( packet->getSSRC());
-        if (pcc == NULL) {
-            pcc = getInQueueCryptoContext(0);
-            if (pcc != NULL) {
-                pcc = pcc->newCryptoContextForSSRC(packet->getSSRC(), 0, 0L);
-                if (pcc != NULL) {
-                    pcc->deriveSrtpKeys(0);
-                    setInQueueCryptoContext(pcc);
-                }
-            }
-        }
+    CryptoContext* pcc = getInQueueCryptoContext( packet->getSSRC());
+    if (pcc == NULL) {
+        pcc = getInQueueCryptoContext(0);
         if (pcc != NULL) {
-            int32 ret = packet->unprotect(pcc);
-            if (ret < 0) {
-                if (!onSRTPPacketError(*packet, ret)) {
-                    delete packet;
-                    return 0;
-                }
+            pcc = pcc->newCryptoContextForSSRC(packet->getSSRC(), 0, 0L);
+            if (pcc != NULL) {
+                pcc->deriveSrtpKeys(0);
+                setInQueueCryptoContext(pcc);
             }
         }
+    }
+    if (pcc != NULL) {
+        int32 ret = packet->unprotect(pcc);
+        if (ret < 0) {
+           if (!onSRTPPacketError(*packet, ret)) {
+               delete packet;
+               return 0;
+            }
+        }
+    }
+    if (padSet) {
+        packet->reComputePayLength(true);
+    }
     // virtual for profile-specific validation and processing.
     if ( !onRTPPacketRecv(*packet) ) {
         delete packet;
