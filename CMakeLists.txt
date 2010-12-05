@@ -19,9 +19,9 @@ PROJECT(libccrtp1)
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 # set some global variables, in particular version variables
-set(VERSION 1.7.2)
-set(LT_RELEASE 1.7)
-set(REQUIRES 1.3.0)
+set (VERSION 1.7.2)
+set (LT_RELEASE 1.7)
+set (REQUIRES 1.3.0)
 
 # find project specific modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
