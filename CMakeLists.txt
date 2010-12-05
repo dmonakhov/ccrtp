@@ -19,7 +19,7 @@ PROJECT(libccrtp1)
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 # set some global variables, in particular version variables
-set(VERSION 1.7.1)
+set(VERSION 1.7.2)
 set(LT_RELEASE 1.7)
 set(REQUIRES 1.3.0)
 
@@ -29,12 +29,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # Set library postfix in case of 64 bit architecture
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
   set(LIB64 64)
-endif() 
+endif()
 
 include(AutoArgs)
 enable_arg(srtp true)
 
-# include all the fine stuff we need 
+# include all the fine stuff we need
 include(FindGcryptConfig)
 include(FindPkgConfig)
 include(CheckLibraryExists)
@@ -58,7 +58,7 @@ if (enable_srtp)
     set(LIBS ${LIBS} ${GCRYPT_LIBRARIES})
   else ()
     pkg_check_modules(OPENSSL libssl>=0.9.8)
-    if (OPENSSL_FOUND) 
+    if (OPENSSL_FOUND)
       check_include_files(openssl/bn.h HAVE_OPENSSL_BN_H)
       check_include_files(openssl/aes.h HAVE_OPENSSL_AES_H)
       check_include_files(openssl/sha.h HAVE_OPENSSL_SHA_H)
@@ -82,7 +82,7 @@ configure_file(libccrtp1.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libccrtp1.pc @ONLY)
 
 include(SourceDistribution)
 src_distribution_init()
-add_src_dist_files(AUTHORS COPYING INSTALL NEWS README ChangeLog 
+add_src_dist_files(AUTHORS COPYING INSTALL NEWS README ChangeLog
                    libccrtp1.pc.in ccrtp.spec.cmake COPYING.addendum)
 
 add_definitions(-g)
@@ -112,9 +112,9 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
    IMMEDIATE @ONLY)
 add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake") 
+  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-####### define target to build RPM 
+####### define target to build RPM
 include(UseRPMTools)
 if(RPMTools_FOUND)
   RPMTools_ADD_RPM_TARGETS(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/ccrtp.spec.cmake)

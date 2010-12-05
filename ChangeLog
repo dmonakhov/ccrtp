@@ -1,10 +1,21 @@
+2010-12-04  Werner Dittmann
+
+	Added a new method to RTPPacket and modified the takeInData to fix 
+	the handling of padding in case SRTP is active. SRTP encrypts the 
+	full payload including the padded bytes thus at the receiving end 
+	this would give the wrong number of bytes added to the payload.
+
+2010-10-04  David Sugar <dyfet@gnutelephony.org>
+
+	More code cleanup for new 1.7.1 release.
+
 2008-12-12  David Sugar <dyfet@gnutelephony.org>
 
 	General code cleanup and pedantic check for what will be release 1.7.0.
 
 2008-08-20  David Sugar <dyfet@gnutelephony.org>
 
-    Taking in debian gcc-4.3 cleanness patch and upstream patches...
+	Taking in debian gcc-4.3 cleanness patch and upstream patches...
 
 2008-06-01  David Sugar <dyfet@gnutelephony.org>
 
