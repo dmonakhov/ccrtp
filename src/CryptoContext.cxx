@@ -31,6 +31,7 @@
 
 #ifdef SRTP_SUPPORT
 #include <ccrtp/crypto/hmac.h>
+#include <ccrtp/crypto/macSkein.h>
 #endif
 
 #include <ccrtp/CryptoContext.h>
@@ -116,6 +117,7 @@ aesCipher(NULL), f8AesCipher(NULL)
         break;
 
         case SrtpAuthenticationSha1Hmac:
+        case SrtpAuthenticationSkeinHmac:
         n_a = akeyl;
         k_a = new uint8[n_a];
         this->tagLength = tagLength;
@@ -161,6 +163,17 @@ CryptoContext::~CryptoContext(){
     if (f8AesCipher != NULL) {
         delete f8AesCipher;
         f8AesCipher = NULL;
+    }
+    if (macCtx != NULL) {
+        switch(aalg) {
+        case SrtpAuthenticationSha1Hmac:
+            freeSha1HmacContext(macCtx);
+            break;
+
+        case SrtpAuthenticationSkeinHmac:
+            freeSkeinMacContext(macCtx);
+            break;
+        }
     }
 #endif
 }
@@ -233,26 +246,37 @@ void CryptoContext::srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag )
         return;
     }
 #ifdef SRTP_SUPPORT
-    int32 tag_length;
+    int32_t macL;
 
-    if (aalg == SrtpAuthenticationSha1Hmac) {
-        unsigned char temp[20];
-        const unsigned char* chunks[3];
-        unsigned int chunkLength[3];
-        uint32 beRoc = htonl(roc);
+    unsigned char temp[20];
+    const unsigned char* chunks[3];
+    unsigned int chunkLength[3];
+    uint32_t beRoc = htonl(roc);
 
-        chunks[0] = rtp->getRawPacket();
-        chunkLength[0] = rtp->getRawPacketSize();
+    chunks[0] = rtp->getRawPacket();
+    chunkLength[0] = rtp->getRawPacketSize();
 
-        chunks[1] = (unsigned char *)&beRoc;
-        chunkLength[1] = 4;
-        chunks[2] = NULL;
-        hmac_sha1( k_a, n_a,
-               chunks,           // data chunks to hash
-               chunkLength,      // length of the data to hash
-               temp, &tag_length );
+    chunks[1] = (unsigned char *)&beRoc;
+    chunkLength[1] = 4;
+    chunks[2] = NULL;
+
+    switch (aalg) {
+    case SrtpAuthenticationSha1Hmac:
+        hmacSha1Ctx(macCtx,
+                    chunks,           // data chunks to hash
+                    chunkLength,      // length of the data to hash
+                    temp, &macL);
         /* truncate the result */
         memcpy(tag, temp, getTagLength());
+        break;
+    case SrtpAuthenticationSkeinHmac:
+        macSkeinCtx(macCtx,
+                    chunks,           // data chunks to hash
+                    chunkLength,      // length of the data to hash
+                    temp);
+        /* truncate the result */
+        memcpy(tag, temp, getTagLength());
+        break;
     }
 #endif
 }
@@ -313,7 +337,16 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
     label = 0x01;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
     aesCipher->get_ctr_cipher_stream(k_a, n_a, iv);
-
+    // Initialize MAC context with the derived key
+    switch (aalg) {
+    case SrtpAuthenticationSha1Hmac:
+        macCtx = createSha1HmacContext(k_a, n_a);
+        break;
+    case SrtpAuthenticationSkeinHmac:
+        // Skein MAC uses number of bits as MAC size, not just bytes
+        macCtx = createSkeinMacContext(k_a, n_a, tagLength*8, Skein512);
+        break;
+    }
     // compute the session salt
     label = 0x02;
     computeIv(iv, label, index, key_deriv_rate, master_salt);

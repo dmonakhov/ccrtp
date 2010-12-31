@@ -94,4 +94,67 @@ __EXPORT void hmac_sha1( uint8* key, int32 key_length,
                 const uint8* data[], uint32 data_length[],
                 uint8* mac, int32* mac_length );
 
+/**
+ * Create and initialize a SHA1 HMAC context.
+ *
+ * An application uses this context to hash several data into one SHA1
+ * digest. 
+ *
+ * @param key
+ *    The MAC key.
+ * @param key_length
+ *    Lenght of the MAC key in bytes
+ * @return Returns a pointer to the initialized context
+ */
+__EXPORT void* createSha1HmacContext(uint8_t* key, int32_t key_length);
+
+/**
+ * Compute SHA1 HMAC.
+ *
+ * This functions takes one data chunk and computes its SHA1 HMAC.
+ *
+ * @param ctx
+ *     Pointer to initialized SHA1 HMAC context
+ * @param data
+ *    Points to the data chunk.
+ * @param data_length
+ *    Length of the data in bytes
+ * @param mac
+ *    Points to a buffer that receives the computed digest. This
+ *    buffer must have a size of at least 20 bytes (SHA1_DIGEST_LENGTH).
+ * @param mac_length
+ *    Point to an integer that receives the length of the computed HMAC.
+ */
+
+__EXPORT void hmacSha1Ctx(void* ctx, const uint8_t* data, uint32_t data_length,
+                uint8_t* mac, int32_t* mac_length );
+
+/**
+ * Compute SHA1 HMAC over several data cunks.
+ *
+ * This functions takes several data chunk and computes the SHA1 HAMAC.
+ *
+ * @param ctx 
+ *     Pointer to initialized SHA1 HMAC context
+ * @param data
+ *    Points to an array of pointers that point to the data chunks. A NULL
+ *    pointer in an array element terminates the data chunks.
+ * @param data_length
+ *    Points to an array of integers that hold the length of each data chunk.
+ * @param mac
+ *    Points to a buffer that receives the computed digest. This
+ *    buffer must have a size of at least 20 bytes (SHA1_DIGEST_LENGTH).
+ * @param mac_length
+ *    Point to an integer that receives the length of the computed HMAC.
+ */
+__EXPORT void hmacSha1Ctx(void* ctx, const uint8_t* data[], uint32_t data_length[],
+                uint8_t* mac, int32_t* mac_length );
+
+/**
+ * Free SHA1 HMAC context.
+ *
+ * @param ctx a pointer to SHA1 HMAC context
+ */
+void freeSha1HmacContext(void* ctx);
+
 #endif

@@ -19,7 +19,7 @@ LIBS = @GNULIBS@
 lib_LTLIBRARIES = libccrtp1.la
 
 if SRTP_OPENSSL
-srtp_src_o = 	ccrtp/crypto/openssl/hmac.cxx \
+srtp_src_o = 	ccrtp/crypto/openssl/hmac.cpp \
 		ccrtp/crypto/openssl/AesSrtp.cxx \
 		ccrtp/crypto/openssl/InitializeOpenSSL.cxx
 endif
@@ -30,12 +30,17 @@ srtp_src_g =    ccrtp/crypto/gcrypt/gcrypthmac.cxx \
 		ccrtp/crypto/gcrypt/InitializeGcrypt.cxx
 endif
 
+skein_srcs= ccrtp/crypto/macSkein.cpp \
+        ccrtp/crypto/skein.c \
+        ccrtp/crypto/skein_block.c \
+        ccrtp/crypto/SkeinMACApi.c
+
 
 SUBDIRS = ccrtp ccrtp/crypto
 
 libccrtp1_la_SOURCES = rtppkt.cpp rtcppkt.cpp source.cpp data.cpp incqueue.cpp \
 	outqueue.cpp queue.cpp control.cpp members.cpp socket.cpp duplex.cpp pool.cpp \
-	CryptoContext.cxx $(srtp_src_g) $(srtp_src_o)
+	CryptoContext.cxx $(srtp_src_g) $(srtp_src_o) $(skein_srcs)
 
 libccrtp1_la_LDFLAGS = $(RELEASE)
 

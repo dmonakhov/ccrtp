@@ -380,14 +380,16 @@ namespace ost {
 	    int32  n_s;
 	    uint8* k_s;
 
-	    uint8 ealg;
-	    uint8 aalg;
-	    uint8 ekeyl;
-	    uint8 akeyl;
-	    uint8 skeyl;
-	    uint8 tagLength;
+	    int32 ealg;
+	    int32 aalg;
+	    int32 ekeyl;
+	    int32 akeyl;
+	    int32 skeyl;
+	    int32 tagLength;
 	    bool  seqNumSet;
-	    
+
+        void*   macCtx;
+
 #ifdef SRTP_SUPPORT
 	    AesSrtp* aesCipher;
 	    AesSrtp* f8AesCipher;

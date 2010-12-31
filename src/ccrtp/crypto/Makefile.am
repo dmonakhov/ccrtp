@@ -11,7 +11,7 @@
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
 ccxxincludedir=$(includedir)/ccrtp/crypto
 
-noinst_HEADERS = AesSrtp.h hmac.h
+noinst_HEADERS = AesSrtp.h hmac.h macSkein.h skein.h skein_iv.h skein_port.h SkeinMACApi.h
 
 kdoc_headers = AesSrtp.h hmac.h
 

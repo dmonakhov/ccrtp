@@ -12,5 +12,5 @@
 #
 include(SourceDistribution)
 src_distribution_init()
-file(GLOB distribute RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
+file(GLOB distribute RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h *.c *.cpp *.cxx)
 add_src_dist_files(${distribute})
