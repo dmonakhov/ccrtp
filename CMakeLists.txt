@@ -19,8 +19,8 @@ PROJECT(libccrtp1)
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 # set some global variables, in particular version variables
-set (VERSION 1.7.2)
-set (LT_RELEASE 1.7)
+set (VERSION 1.8.0)
+set (LT_RELEASE 1.8)
 set (REQUIRES 1.3.0)
 
 # find project specific modules

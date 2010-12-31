@@ -26,7 +26,7 @@ set(gcrypt_srcs ccrtp/crypto/gcrypt/gcrypthmac.cxx
 set(skein_srcs ccrtp/crypto/macSkein.cpp
         ccrtp/crypto/skein.c
         ccrtp/crypto/skein_block.c
-        ccrtp/crypto/SkeinMACApi.c)
+        ccrtp/crypto/skeinApi.c)
 
 if (SRTP_SUPPORT)
   if(GCRYPT_FOUND)

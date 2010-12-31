@@ -33,7 +33,7 @@ endif
 skein_srcs= ccrtp/crypto/macSkein.cpp \
         ccrtp/crypto/skein.c \
         ccrtp/crypto/skein_block.c \
-        ccrtp/crypto/SkeinMACApi.c
+        ccrtp/crypto/skeinApi.c
 
 
 SUBDIRS = ccrtp ccrtp/crypto
