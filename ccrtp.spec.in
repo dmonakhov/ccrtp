@@ -1,7 +1,7 @@
 %{!?release: %define release 0}
 %{!?version: %define version @VERSION@}
 
-%define _libname libccrtp1-@LIB_VERSION@-@LIB_MAJOR@
+%define _libname libccrtp1
 %define _devname libccrtp-devel
 
 Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
@@ -11,9 +11,9 @@ Release: %{release}%{?dist}
 License: LGPL v2 or later
 Group: Development/Libraries
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
-Source0: ftp://ftp.gnu.org/gnu/cccrtp/ccrtp-%{PACKAGE_VERSION}.tar.gz
+Source0: ftp://ftp.gnu.org/gnu/ccrtp/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
-BuildRequires: libcommoncpp2-devel >= 1.4.0
+BuildRequires: commoncpp2-devel >= 1.4.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
 BuildRequires: libgcrypt-devel
@@ -37,7 +37,7 @@ Provides: %{name} = %{version}-%{release}
 Group: Development/Libraries
 Summary: Headers and static link library for ccrtp.
 Requires: %{_libname} = %{version} 
-Requires: libcommoncpp2-devel >= 1.4.0
+Requires: commoncpp2-devel >= 1.4.0
 Requires: libgcrypt-devel
 Provides: %{name}-devel = %{version}-%{release}
 
