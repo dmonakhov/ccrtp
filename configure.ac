@@ -156,4 +156,4 @@ AC_SUBST(LIB_MAJOR)
 
 AC_OUTPUT(Makefile m4/Makefile src/Makefile src/ccrtp/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec
-ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile)
+libccrtp.spec ccrtp.list libccrtp1.pc src/ccrtp/crypto/Makefile)

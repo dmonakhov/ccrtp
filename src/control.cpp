@@ -43,6 +43,7 @@
  **/
 
 #include "private.h"
+#include <cstdlib>
 #include <ccrtp/cqueue.h>
 #include <cstdlib>
 #include <climits>

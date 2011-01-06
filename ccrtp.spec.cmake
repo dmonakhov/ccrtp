@@ -4,19 +4,20 @@
 %define _libname libccrtp1
 %define _devname libccrtp-devel
 
-Summary: "ccrtp" - a Common C++ class framework for RTP/RTCP
-Name: ccrtp
+Summary: A Common C++ Class Framework for RTP Packets
+Name: libccrtp
 Version: %{version}
 Release: %{release}%{?dist}
 License: LGPL v2 or later
-Group: System/Libraries
+Group: Development/Libraries/C and C++
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
-Source0: ftp://ftp.gnu.org/gnu/ccrtp/%{name}-%{version}.tar.gz
+Source0: ccrtp-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
 BuildRequires: commoncpp2-devel >= 1.4.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
 BuildRequires: libgcrypt-devel
+BuildRequires: gcc-c++
 
 %define srcdirname %{name}-%{version}
 
@@ -31,13 +32,13 @@ automatically, supports different threading models and is generic as
 for underlying network and transport protocols.
 
 %package -n %{_libname}
-Group: System/Libraries
+Group: Development/Libraries/C and C++
 Summary: Runtime library for GNU RTP Stack
 Provides: %{name} = %{version}-%{release}
 
 %package -n %{_devname}
-Group: Development/Libraries
-Summary: Headers and static link library for ccrtp.
+Group: Development/Libraries/C and C++
+Summary: Headers and static link library for ccrtp
 Requires: %{_libname} = %{version} 
 Requires: commoncpp2-devel >= 1.4.0
 Requires: libgcrypt-devel
@@ -45,11 +46,11 @@ Provides: %{name}-devel = %{version}-%{release}
 
 %description -n %{_libname}
 This package contains the runtime library needed by applications that use 
-the GNU RTP stack.
+the GNU RTP stack
 
 %description -n %{_devname}
 This package provides the header files, link libraries, and 
-documentation for building applications that use GNU ccrtp. 
+documentation for building applications that use GNU ccrtp
 
 %prep
 %setup -q
@@ -89,4 +90,9 @@ cd ../build_tree
 
 %post -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig  
+%postun -p /sbin/ldconfig 
+
+%changelog
+* Tue Jan 06 2011 - Werner Dittmann <werner.dittmann@t-online.de>
+- Add Skein MAC authentication algorithm
+
