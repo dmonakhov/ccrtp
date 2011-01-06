@@ -25,9 +25,6 @@
 
 #include <ccrtp/rtppkt.h>
 
-#ifdef SRTP_SUPPORT
-#include <ccrtp/crypto/AesSrtp.h>
-#endif
 
 #define REPLAY_WINDOW_SIZE 64
 
@@ -41,6 +38,10 @@ const int SrtpEncryptionAESCM = 1;
 const int SrtpEncryptionAESF8 = 2;
 const int SrtpEncryptionTWOCM = 3;
 const int SrtpEncryptionTWOF8 = 4;
+
+#ifdef SRTP_SUPPORT
+#include <ccrtp/crypto/AesSrtp.h>
+#endif
 
 #ifdef CCXX_NAMESPACES
 namespace ost {
@@ -391,11 +392,11 @@ namespace ost {
         void*   macCtx;
 
 #ifdef SRTP_SUPPORT
-	    AesSrtp* aesCipher;
-	    AesSrtp* f8AesCipher;
+	    AesSrtp* cipher;
+	    AesSrtp* f8Cipher;
 #else
-	    void* aesCipher;
-	    void* f8AesCipher;
+	    void* cipher;
+	    void* f8Cipher;
 #endif
 
     };

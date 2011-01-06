@@ -55,8 +55,10 @@
 
 #include <cc++/config.h>
 
-#ifndef AES_BLOCK_SIZE
-#define AES_BLOCK_SIZE 16
+#include <ccrtp/CryptoContext.h>
+
+#ifndef SRTP_BLOCK_SIZE
+#define SRTP_BLOCK_SIZE 16
 #endif
 
 typedef struct _f8_ctx {
@@ -68,8 +70,8 @@ typedef struct _f8_ctx {
 
 class __EXPORT AesSrtp {
 public:
-    AesSrtp();
-    AesSrtp(uint8* key, int32 key_length);
+    AesSrtp(int algo = SrtpEncryptionAESCM);
+    AesSrtp(uint8* key, int32 key_length, int algo = SrtpEncryptionAESCM);
     ~AesSrtp();
 
     /**
@@ -249,6 +251,7 @@ private:
 		     int32 length,
 		     uint8* out);
     void* key;
+    int32_t algorithm;
 };
 
 #endif

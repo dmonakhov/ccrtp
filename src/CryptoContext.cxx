@@ -51,7 +51,7 @@ master_salt(NULL), master_salt_length(0),
 n_e(0),k_e(NULL),n_a(0),k_a(NULL),n_s(0),k_s(NULL),
 ealg(SrtpEncryptionNull), aalg(SrtpAuthenticationNull),
 ekeyl(0), akeyl(0), skeyl(0),
-seqNumSet(false), aesCipher(NULL), f8AesCipher(NULL)
+seqNumSet(false), cipher(NULL), f8Cipher(NULL)
 {}
 
 #ifdef SRTP_SUPPORT
@@ -73,7 +73,7 @@ ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
 roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
 replay_window(0),
 master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false),
-aesCipher(NULL), f8AesCipher(NULL)
+cipher(NULL), f8Cipher(NULL)
 {
     this->ealg = ealg;
     this->aalg = aalg;
@@ -97,15 +97,26 @@ aesCipher(NULL), f8AesCipher(NULL)
         k_s = NULL;
         break;
 
+        case SrtpEncryptionTWOF8:
+        f8Cipher = new AesSrtp(SrtpEncryptionTWOCM);
+
+        case SrtpEncryptionTWOCM:
+        n_e = ekeyl;
+        k_e = new uint8[n_e];
+        n_s = skeyl;
+        k_s = new uint8[n_s];
+        cipher = new AesSrtp(SrtpEncryptionTWOCM);
+        break;
+
         case SrtpEncryptionAESF8:
-        f8AesCipher = new AesSrtp();
+        f8Cipher = new AesSrtp(SrtpEncryptionAESCM);
 
         case SrtpEncryptionAESCM:
         n_e = ekeyl;
         k_e = new uint8[n_e];
         n_s = skeyl;
         k_s = new uint8[n_s];
-        aesCipher = new AesSrtp();
+        cipher = new AesSrtp(SrtpEncryptionAESCM);
         break;
     }
 
@@ -156,13 +167,13 @@ CryptoContext::~CryptoContext(){
         n_a = 0;
         delete [] k_a;
     }
-    if (aesCipher != NULL) {
-        delete aesCipher;
-        aesCipher = NULL;
+    if (cipher != NULL) {
+        delete cipher;
+        cipher = NULL;
     }
-    if (f8AesCipher != NULL) {
-        delete f8AesCipher;
-        f8AesCipher = NULL;
+    if (f8Cipher != NULL) {
+        delete f8Cipher;
+        f8Cipher = NULL;
     }
     if (macCtx != NULL) {
         switch(aalg) {
@@ -208,7 +219,7 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
         iv[14] = iv[15] = 0;
 
         int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-        aesCipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
+        cipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
                   rtp->getPayloadSize()+pad, iv);
     }
 
@@ -231,10 +242,10 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
         // set ROC in network order into IV
         ui32p[3] = htonl(roc);
 
-            int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-        aesCipher->f8_encrypt(rtp->getPayload(),
+        int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
+        cipher->f8_encrypt(rtp->getPayload(),
                   rtp->getPayloadSize()+pad,
-                  iv, k_e, n_e, k_s, n_s, f8AesCipher);
+                  iv, k_e, n_e, k_s, n_s, f8Cipher);
     }
 #endif
 }
@@ -326,17 +337,17 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
     uint8 iv[16];
 
     // prepare AES cipher to compute derived keys.
-    aesCipher->setNewKey(master_key, master_key_length);
+    cipher->setNewKey(master_key, master_key_length);
 
     // compute the session encryption key
     uint64 label = 0;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
-    aesCipher->get_ctr_cipher_stream(k_e, n_e, iv);
+    cipher->get_ctr_cipher_stream(k_e, n_e, iv);
 
     // compute the session authentication key
     label = 0x01;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
-    aesCipher->get_ctr_cipher_stream(k_a, n_a, iv);
+    cipher->get_ctr_cipher_stream(k_a, n_a, iv);
     // Initialize MAC context with the derived key
     switch (aalg) {
     case SrtpAuthenticationSha1Hmac:
@@ -350,10 +361,10 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
     // compute the session salt
     label = 0x02;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
-    aesCipher->get_ctr_cipher_stream(k_s, n_s, iv);
+    cipher->get_ctr_cipher_stream(k_s, n_s, iv);
 
     // as last step prepare AES cipher with derived key.
-    aesCipher->setNewKey(k_e, n_e);
+    cipher->setNewKey(k_e, n_e);
 #endif
 }
 
