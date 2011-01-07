@@ -74,7 +74,7 @@ PreReq:         %install_info_prereq
 
 %description devel
 This package contains files needed when developing applications using
-ccrtp,
+ccrtp
 
 
 
