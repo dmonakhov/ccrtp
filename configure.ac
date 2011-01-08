@@ -123,7 +123,7 @@ AC_SUBST(GNULIBS)
 # OST_CC_ENDIAN - now in Common C++
 # Are we using the GNU compiler?
 if test $GCC = yes ; then
-    WARN_FLAGS="-Wall -ansi -pedantic"
+    WARN_FLAGS="-fno-strict-aliasing -Wall -ansi -pedantic"
 else
     WARN_FLAGS=""
 fi

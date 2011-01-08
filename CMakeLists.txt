@@ -18,10 +18,15 @@ PROJECT(libccrtp1)
 # for debug and trace during CMakeList development
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
+SET(CPACK_PACKAGE_VERSION_MAJOR 1)
+SET(CPACK_PACKAGE_VERSION_MINOR 8)
+SET(CPACK_PACKAGE_VERSION_PATCH 0)
+
 # set some global variables, in particular version variables
 set (VERSION 1.8.0)
 set (LT_RELEASE 1.8)
 set (REQUIRES 1.3.0)
+set (PACKAGE ccrtp)
 
 # find project specific modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -39,6 +44,9 @@ include(FindGcryptConfig)
 include(FindPkgConfig)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
+include(GeneratePackage)
+
+GENERATE_PACKAGING(${PACKAGE} ${VERSION})
 
 # setup the Thread include and lib
 find_package(Threads)
@@ -79,14 +87,11 @@ set(exec_prefix ${prefix}/bin)
 set(libdir ${prefix}/lib)
 set(includedir ${prefix}/include)
 set(PACKAGE pkgconfig)
+
 configure_file(libccrtp1.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libccrtp1.pc @ONLY)
+configure_file(libccrtp.spec.cmake ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.spec @ONLY)
 
-include(SourceDistribution)
-src_distribution_init()
-add_src_dist_files(AUTHORS COPYING INSTALL NEWS README ChangeLog
-                   libccrtp1.pc.in ccrtp.spec.cmake COPYING.addendum)
-
-add_definitions(-g)
+add_definitions(-g -O2 -fno-strict-aliasing)
 if(CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(-Wno-long-long -Wno-char-subscripts)
   add_definitions(-Wall -ansi -pedantic)
@@ -96,13 +101,10 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src)
-add_src_dist_dirs(src)
 
 add_subdirectory(demo)
-add_src_dist_dirs(demo)
 
-#add_subdirectory(doc)
-#add_src_dist_dirs(doc)
+add_subdirectory(doc)
 
 ########### install files ###############
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libccrtp1.pc DESTINATION lib${LIB64}/pkgconfig)
@@ -116,7 +118,7 @@ add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 ####### define target to build RPM
-include(UseRPMTools)
-if(RPMTools_FOUND)
-  RPMTools_ADD_RPM_TARGETS(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/ccrtp.spec.cmake)
-endif()
+#include(UseRPMTools)
+#if(RPMTools_FOUND)
+#  RPMTools_ADD_RPM_TARGETS(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/ccrtp.spec.cmake)
+#endif()

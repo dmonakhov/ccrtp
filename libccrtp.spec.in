@@ -21,7 +21,7 @@
 Name:           libccrtp
 BuildRequires:  commoncpp2-devel gcc-c++ openssl-devel pkgconfig
 Url:            http://www.gnu.org/software/ccrtp/
-License:        GPL v2 or later
+License:        GPL v3 or later
 Group:          System/Libraries
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 AutoReqProv:    on
@@ -45,7 +45,7 @@ Authors:
     Frederico Montesino Pouzols <p5087@quintero.fie.us.es>
 
 %package -n libccrtp1
-License:        GPL v2 or later
+License:        GPL v3 or later
 Group:          System/Libraries
 Summary:        A Common C++ Class Framework for RTP Packets
 Provides:       ccrtp = %{version}
@@ -66,7 +66,7 @@ Authors:
     Frederico Montesino Pouzols <p5087@quintero.fie.us.es>
 
 %package devel
-License:        GPL v2 or later
+License:        GPL v3 or later
 Summary:        Include-files and documentation for ccrtp
 Group:          Development/Libraries/Other
 Requires:       %{name} = %{version} commoncpp2-devel

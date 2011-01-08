@@ -51,18 +51,11 @@ set(ccrtp1_srcs
     pool.cpp
     CryptoContext.cxx)
 
-include(SourceDistribution)
-src_distribution_init()
-add_src_dist_files(${ccrtp1_srcs} ${gcrypt_srcs} ${openssl_srcs} ${skein_srcs}
-		   config.h.cmake private.h)
-
 add_subdirectory(ccrtp)
-add_src_dist_dirs(ccrtp)
 
 add_library(ccrtp1 SHARED ${ccrtp1_srcs} ${crypto_srcs} ${skein_srcs})
 set_target_properties(ccrtp1 PROPERTIES VERSION ${VERSION} SOVERSION ${LT_RELEASE})
 
-message("src libraries: ${LIBS}")
 target_link_libraries(ccrtp1 ${LIBS})
 
 ########### install files ###############
