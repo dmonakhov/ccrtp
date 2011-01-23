@@ -171,7 +171,7 @@ public:
             new CryptoContext(pattern.getSsrc(),
                   0,                           // roc,
                   0L,                          // keydr << 48,
-                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpEncryptionTWOCM,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -226,7 +226,7 @@ public:
             new CryptoContext(0,                // SSRC == 0 -> Context template
                     0,                          // roc,
                     0L,                         // keydr << 48,
-                    SrtpEncryptionAESCM,        // encryption algo
+                    SrtpEncryptionTWOCM,        // encryption algo
                     SrtpAuthenticationSha1Hmac, // authtication algo
                     masterKey,                  // Master Key
                     128 / 8,                    // Master Key length
@@ -311,8 +311,8 @@ static int testF8()
     unsigned char derivedIv[16];
     uint32 *ui32p = (uint32 *)derivedIv;
 
+    memcpy(derivedIv, rtp->getRawPacket(), 12);
     derivedIv[0] = 0;
-    memcpy(&derivedIv[1], rtp->getRawPacket()+1, 11);
 
     // set ROC in network order into IV
     ui32p[3] = htonl(ROC);

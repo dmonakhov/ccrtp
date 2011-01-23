@@ -195,7 +195,7 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
         return;
     }
 #ifdef SRTP_SUPPORT
-    if (ealg == SrtpEncryptionAESCM) {
+    if (ealg == SrtpEncryptionAESCM || ealg == SrtpEncryptionTWOCM) {
 
         /* Compute the CM IV (refer to chapter 4.1.1 in RFC 3711):
          *
@@ -223,7 +223,7 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
                             rtp->getPayloadSize()+pad, iv);
     }
 
-    if (ealg == SrtpEncryptionAESF8) {
+    if (ealg == SrtpEncryptionAESF8 || ealg == SrtpEncryptionTWOF8) {
 
         /* Create the F8 IV (refer to chapter 4.1.2.2 in RFC 3711):
          *

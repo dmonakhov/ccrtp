@@ -99,6 +99,28 @@ void AesSrtp::encrypt(const uint8* input, uint8* output ) {
     }
 }
 
+void AesSrtp::get_ctr_cipher_stream(uint8* output, uint32 length,
+                                    uint8* iv ) {
+    uint16 ctr = 0;
+    unsigned char temp[SRTP_BLOCK_SIZE];
+
+    for(ctr = 0; ctr < length/SRTP_BLOCK_SIZE; ctr++) {
+        //compute the cipher stream
+        iv[14] = (uint8)((ctr & 0xFF00) >>  8);
+        iv[15] = (uint8)((ctr & 0x00FF));
+
+        encrypt(iv, &output[ctr*SRTP_BLOCK_SIZE]);
+    }
+    if ((length % SRTP_BLOCK_SIZE) > 0) {
+        // Treat the last bytes:
+        iv[14] = (uint8)((ctr & 0xFF00) >>  8);
+        iv[15] = (uint8)((ctr & 0x00FF));
+
+        encrypt(iv, temp);
+        memcpy(&output[ctr*SRTP_BLOCK_SIZE], temp, length % SRTP_BLOCK_SIZE );
+    }
+}
+
 void AesSrtp::ctr_encrypt(const uint8* input, uint32 input_length,
                            uint8* output, uint8* iv ) {
 
@@ -109,7 +131,7 @@ void AesSrtp::ctr_encrypt(const uint8* input, uint32 input_length,
     unsigned char temp[SRTP_BLOCK_SIZE];
 
     int l = input_length/SRTP_BLOCK_SIZE;
-    for ( ctr = 0; ctr < l; ctr++ ) {
+    for (ctr = 0; ctr < l; ctr++ ) {
         iv[14] = (uint8)((ctr & 0xFF00) >>  8);
         iv[15] = (uint8)((ctr & 0x00FF));
 

@@ -48,6 +48,10 @@ Provides: %{name}-devel = %{version}-%{release}
 This package contains the runtime library needed by applications that use 
 the GNU RTP stack
 
+%description -n %{_libname}
+This package contains the runtime library needed by applications that use 
+the GNU RTP stack.
+
 %description -n %{_devname}
 This package provides the header files, link libraries, and 
 documentation for building applications that use GNU ccrtp
