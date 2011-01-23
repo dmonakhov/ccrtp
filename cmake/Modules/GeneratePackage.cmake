@@ -12,7 +12,7 @@ MACRO(GENERATE_PACKAGING PACKAGE VERSION)
   "\\\\.swp$"
   # backup files
   "~$"
-  # eclipse files
+  # eclipse, kdevelop and othe IDE files
   "\\\\.cdtproject$"
   "\\\\.cproject$"
   "\\\\.project$"
@@ -22,7 +22,10 @@ MACRO(GENERATE_PACKAGING PACKAGE VERSION)
   # others
   "\\\\.#"
   "/#"
+  # don't copy build, extensions, and contributions for bare ccRTP
   "/build/"
+  "/extensions/"
+  "/contributions/"
   "/autom4te\\\\.cache/"
   "/_build/"
   "/\\\\.git/"

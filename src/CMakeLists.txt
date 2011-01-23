@@ -28,6 +28,8 @@ set(skein_srcs ccrtp/crypto/macSkein.cpp
         ccrtp/crypto/skein_block.c
         ccrtp/crypto/skeinApi.c)
 
+set(twofish_srcs ccrtp/crypto/twofish.c)
+
 if (SRTP_SUPPORT)
   if(GCRYPT_FOUND)
     set(crypto_srcs ${gcrypt_srcs})
@@ -53,7 +55,7 @@ set(ccrtp1_srcs
 
 add_subdirectory(ccrtp)
 
-add_library(ccrtp1 SHARED ${ccrtp1_srcs} ${crypto_srcs} ${skein_srcs})
+add_library(ccrtp1 SHARED ${ccrtp1_srcs} ${crypto_srcs} ${skein_srcs} ${twofish_srcs})
 set_target_properties(ccrtp1 PROPERTIES VERSION ${VERSION} SOVERSION ${LT_RELEASE})
 
 target_link_libraries(ccrtp1 ${LIBS})

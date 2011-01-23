@@ -103,23 +103,6 @@ public:
     bool setNewKey(const uint8* key, int32 keyLength);
 
     /**
-     * Computes the cipher stream for AES CM mode.
-     *
-     * @param output
-     *    Pointer to a buffer that receives the cipher stream. Must be
-     *    at least <code>length</code> bytes long.
-     *
-     * @param length
-     *    Number of cipher stream bytes to produce. Usually the same
-     *    length as the data to be encrypted.
-     *
-     * @param iv
-     *    The initialization vector as input to create the cipher stream.
-     *    Refer to chapter 4.1.1 in RFC 3711.
-     */
-    void get_ctr_cipher_stream(uint8* output, uint32 length, uint8* iv);
-
-    /**
      * Counter-mode encryption.
      *
      * This method performs the AES CM encryption.

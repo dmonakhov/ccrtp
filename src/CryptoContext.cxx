@@ -211,16 +211,16 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
 
         int i;
         for(i = 4; i < 8; i++ ){
-        iv[i] = ( 0xFF & ( ssrc >> ((7-i)*8) ) ) ^ k_s[i];
+            iv[i] = ( 0xFF & ( ssrc >> ((7-i)*8) ) ) ^ k_s[i];
         }
         for(i = 8; i < 14; i++ ){
-        iv[i] = ( 0xFF & (unsigned char)( index >> ((13-i)*8) ) ) ^ k_s[i];
+            iv[i] = ( 0xFF & (unsigned char)( index >> ((13-i)*8) ) ) ^ k_s[i];
         }
         iv[14] = iv[15] = 0;
 
         int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-        cipher->ctr_encrypt( const_cast<uint8*>(rtp->getPayload()),
-                  rtp->getPayloadSize()+pad, iv);
+        cipher->ctr_encrypt(const_cast<uint8*>(rtp->getPayload()),
+                            rtp->getPayloadSize()+pad, iv);
     }
 
     if (ealg == SrtpEncryptionAESF8) {
