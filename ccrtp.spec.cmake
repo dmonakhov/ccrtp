@@ -12,8 +12,8 @@ License: LGPL v2 or later
 Group: Development/Libraries/C and C++
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
 Source0: ccrtp-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root 
-BuildRequires: commoncpp2-devel >= 1.4.0
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: ucommon-devel >= 5.0.0
 BuildRequires: pkgconfig
 BuildRequires: libstdc++-devel
 BuildRequires: libgcrypt-devel
@@ -39,21 +39,21 @@ Provides: %{name} = %{version}-%{release}
 %package -n %{_devname}
 Group: Development/Libraries/C and C++
 Summary: Headers and static link library for ccrtp
-Requires: %{_libname} = %{version} 
-Requires: commoncpp2-devel >= 1.4.0
+Requires: %{_libname} = %{version}
+Requires: ucommon-devel >= 5.0.0
 Requires: libgcrypt-devel
 Provides: %{name}-devel = %{version}-%{release}
 
 %description -n %{_libname}
-This package contains the runtime library needed by applications that use 
+This package contains the runtime library needed by applications that use
 the GNU RTP stack
 
 %description -n %{_libname}
-This package contains the runtime library needed by applications that use 
+This package contains the runtime library needed by applications that use
 the GNU RTP stack.
 
 %description -n %{_devname}
-This package provides the header files, link libraries, and 
+This package provides the header files, link libraries, and
 documentation for building applications that use GNU ccrtp
 
 %prep
@@ -67,12 +67,12 @@ cd build_tree
 cmake -DCMAKE_INSTALL_PREFIX=%{buildroot}%{_prefix} ../%{srcdirname}
 %{__make}
 
-%install 
+%install
 cd ../build_tree
 %{__make} install
 
 #%makeinstall
-#rm -rf %{buildroot}/%{_infodir} 
+#rm -rf %{buildroot}/%{_infodir}
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -87,14 +87,14 @@ cd ../build_tree
 %defattr(-,root,root,0755)
 #%{_libdir}/*.a
 %{_libdir}/*.so
-#%{_libdir}/*.la   
+#%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 
 %post -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig 
+%postun -p /sbin/ldconfig
 
 %changelog
 * Tue Jan 06 2011 - Werner Dittmann <werner.dittmann@t-online.de>

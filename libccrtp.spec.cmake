@@ -43,7 +43,7 @@ Authors:
     David Sugar <dyfet@ostel.com>
     Frederico Montesino Pouzols <p5087@quintero.fie.us.es>
 
-%package -n libccrtp1
+%package -n libccrtp2
 License:        GPL v3 or later
 Group:          System/Libraries
 Summary:        A Common C++ Class Framework for RTP Packets
@@ -52,7 +52,7 @@ Provides:       %{name} = %{version}
 Obsoletes:      ccrtp < %{version}
 Obsoletes:      %{name} < %{version}
 
-%description -n libccrtp1
+%description -n libccrtp2
 The ccrtp package offers a generic framework for sending and receiving
 real-time streaming data over UDP packets using sending and receiving
 packet queues.
@@ -95,7 +95,7 @@ cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_VERBOSE_MAKEFILE=TRUE \
       -DCMAKE_C_FLAGS_RELEASE:STRING="$RPM_OPT_FLAGS" \
       -DCMAKE_CXX_FLAGS_RELEASE:STRING="$RPM_OPT_FLAGS" \
-      ..  
+      ..
 
 make %{?_smp_mflags}
 
@@ -107,11 +107,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT;
 
-%post -n libccrtp1 -p /sbin/ldconfig
+%post -n libccrtp2 -p /sbin/ldconfig
 
-%postun -n libccrtp1 -p /sbin/ldconfig
+%postun -n libccrtp2 -p /sbin/ldconfig
 
-%files -n libccrtp1
+%files -n libccrtp2
 %defattr(-,root,root,0755)
 %_libdir/libccrtp*.so.*
 
@@ -119,7 +119,7 @@ rm -rf $RPM_BUILD_ROOT;
 %defattr(-,root,root,0755)
 %doc AUTHORS COPYING NEWS README TODO ChangeLog
 %_libdir/libccrtp*.so
-%_libdir/pkgconfig/libccrtp1.pc
+%_libdir/pkgconfig/libccrtp.pc
 %dir %{_includedir}/ccrtp
 %{_includedir}/ccrtp/*.h
 %{_infodir}/ccrtp.info*

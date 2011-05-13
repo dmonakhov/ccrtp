@@ -43,9 +43,12 @@ include(cmake/Modules/FindGcryptConfig.cmake)
 include(FindPkgConfig)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
-include(cmake/Modules/GeneratePackage.cmake)
 
-GENERATE_PACKAGING(${PACKAGE} ${VERSION})
+if(EXISTS ".svn" AND (${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME}))
+    include(cmake/Modules/GeneratePackage.cmake)
+
+    GENERATE_PACKAGING(${PACKAGE} ${VERSION})
+endif()
 
 # setup the Thread include and lib
 find_package(Threads)
@@ -117,13 +120,16 @@ add_subdirectory(doc)
 ########### install files ###############
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.pc DESTINATION lib${LIB64}/pkgconfig)
 
-########### Add uninstall target ###############
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-   IMMEDIATE @ONLY)
-add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
+
+    ########### Add uninstall target ###############
+    configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+    add_custom_target(uninstall
+    "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+endif()
 
 ####### define target to build RPM
 #include(UseRPMTools)

@@ -3,11 +3,11 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libccrtp1
+Name: libccrtp
 Description: GNU ccRTP core library
 Version: @VERSION@
-Requires: libccgnu2 >= 1.3.0
+Requires: commoncpp >= 5.0.0
 Libs:  -lccrtp1
- 
 
- 
+
+
