@@ -38,9 +38,7 @@
 #include "private.h"
 #include <ccrtp/iqueue.h>
 
-#ifdef CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 const size_t IncomingDataQueueBase::defaultMaxRecvPacketSize = 65534;
 
@@ -205,7 +203,7 @@ IncomingDataQueue::takeInDataPacket(void)
     uint8 padSet = (*buffer & 0x20);
     if (padSet) {
         *buffer = *buffer & ~0x20;          // clear padding bit
-    }    
+    }
     //  build a packet. It will link itself to its source
     IncomingRTPPkt* packet =
         new IncomingRTPPkt(buffer,rtn);
@@ -782,9 +780,7 @@ IncomingDataQueue::getInQueueCryptoContext(uint32 ssrc)
     return NULL;
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

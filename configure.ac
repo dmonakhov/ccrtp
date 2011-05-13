@@ -32,10 +32,9 @@ if test ! -z "$cfg_options" ; then
         exit -1
 fi
 
-VERSION="1.8.1"
-REQUIRES="1.3.0"
-LT_RELEASE="1.8"
-LT_VERSION="0:1"
+VERSION="2.0.0"
+REQUIRES="5.0.0"
+LT_VERSION="5:0:0"
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CANONICAL_SYSTEM
 AC_PROG_CPP
@@ -115,10 +114,9 @@ OST_PROG_LIBVER
 OST_PROG_LIBRARY(CCXX,[$LT_VERSION])
 OST_AUTOMAKE_MODE
 OST_MAINTAINER_MODE
-PKG_CHECK_MODULES(COMMON, libccgnu2 >= $REQUIRES)
+PKG_CHECK_MODULES(COMMON, commoncpp >= $REQUIRES)
 CXXFLAGS="$CXXFLAGS $COMMON_CFLAGS"
-COMMON_LIBPATH=`pkg-config --variable=libdir libccgnu2`
-GNULIBS="-L$COMMON_LIBPATH $COMMON_LIBS $LIBS"
+GNULIBS="$COMMON_LIBS $LIBS"
 AC_SUBST(GNULIBS)
 # OST_CC_ENDIAN - now in Common C++
 # Are we using the GNU compiler?
@@ -141,18 +139,12 @@ AC_ARG_WITH(nana,[  --with-nana             use GNU nana for asserts and logging
 ])
 
 KDOC_DIR="\$(top_srcdir)/doc"
-AC_SUBST(LT_RELEASE)
 AC_SUBST(KDOC_DIR)
+AC_SUBST(LT_VERSION)
 
 AC_PATH_PROG(DOXYGEN, doxygen, no)
 AC_SUBST(DOXYGEN)
 AM_CONDITIONAL(DOXY, test "$DOXYGEN" != "no")
-
-LIB_VERSION=`echo $LT_RELEASE | sed -e 's/[\.]/_/'`
-LIB_MAJOR=`echo $LT_VERSION | sed -e 's/[:].*$//'`
-
-AC_SUBST(LIB_VERSION)
-AC_SUBST(LIB_MAJOR)
 
 AC_OUTPUT(Makefile m4/Makefile src/Makefile src/ccrtp/Makefile
 doc/Makefile demo/Makefile phone/Makefile w32/Makefile ccrtp.spec

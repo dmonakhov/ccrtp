@@ -32,11 +32,10 @@
 // In order to use ccRTP, the RTP stack of CommonC++, you only need to
 // include ...
 #include <ccrtp/rtp.h>
+#include <fcntl.h>
 
-#ifdef  CCXX_NAMESPACES
 using namespace ost;
 using namespace std;
-#endif
 
 /**
  * @class ccRTP_AudioTransmitter
@@ -138,7 +137,6 @@ public:
         // This will be useful for periodic execution
         TimerPort::setTimer(PERIOD);
 
-        setCancel(cancelImmediate);
         // This is the main loop, where packets are transmitted.
         for( int i = 0 ; (!sendingfile || count > 0) ; i++ ) {
 

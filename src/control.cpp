@@ -48,9 +48,7 @@
 #include <cstdlib>
 #include <climits>
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 const uint16 QueueRTCPManager::TIMEOUT_MULTIPLIER = 5;
 const double QueueRTCPManager::RECONSIDERATION_COMPENSATION = 2.718281828 - 1.5;
@@ -1115,9 +1113,7 @@ size_t QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t
     return count;
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

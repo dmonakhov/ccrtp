@@ -16,12 +16,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 ########### next target ###############
 
 set(openssl_srcs ccrtp/crypto/openssl/hmac.cpp
-		 ccrtp/crypto/openssl/AesSrtp.cxx
-		 ccrtp/crypto/openssl/InitializeOpenSSL.cxx)
+         ccrtp/crypto/openssl/AesSrtp.cxx
+         ccrtp/crypto/openssl/InitializeOpenSSL.cxx)
 
 set(gcrypt_srcs ccrtp/crypto/gcrypt/gcrypthmac.cxx
-		ccrtp/crypto/gcrypt/gcryptAesSrtp.cxx
-		ccrtp/crypto/gcrypt/InitializeGcrypt.cxx)
+        ccrtp/crypto/gcrypt/gcryptAesSrtp.cxx
+        ccrtp/crypto/gcrypt/InitializeGcrypt.cxx)
 
 set(skein_srcs ccrtp/crypto/macSkein.cpp
         ccrtp/crypto/skein.c
@@ -38,7 +38,7 @@ if (SRTP_SUPPORT)
   endif()
 endif()
 
-set(ccrtp1_srcs
+set(ccrtp_srcs
     rtppkt.cpp
     rtcppkt.cpp
     source.cpp
@@ -55,11 +55,11 @@ set(ccrtp1_srcs
 
 add_subdirectory(ccrtp)
 
-add_library(ccrtp1 SHARED ${ccrtp1_srcs} ${crypto_srcs} ${skein_srcs} ${twofish_srcs})
-set_target_properties(ccrtp1 PROPERTIES VERSION ${VERSION} SOVERSION ${LT_RELEASE})
-
-target_link_libraries(ccrtp1 ${LIBS})
+add_library(ccrtp SHARED ${ccrtp_srcs} ${crypto_srcs} ${skein_srcs} ${twofish_srcs})
+set_target_properties(ccrtp PROPERTIES VERSION ${VERSION} SOVERSION ${SOVERSION})
+target_link_libraries(ccrtp commoncpp ${LIBS})
+add_dependencies(ccrtp commoncpp)
 
 ########### install files ###############
 
-install(TARGETS ccrtp1 DESTINATION lib${LIB64})
+install(TARGETS ccrtp DESTINATION lib${LIB64})

@@ -86,11 +86,12 @@
 #ifndef CCXX_RTP_PRIVATE_H_
 #define CCXX_RTP_PRIVATE_H_
 
-#include <cc++/config.h>
-#include <cc++/thread.h>
-#include <cc++/socket.h>
-#include <cc++/process.h>
-#include <cc++/export.h>
+#include <commoncpp/config.h>
+#include <commoncpp/thread.h>
+#include <commoncpp/socket.h>
+#include <commoncpp/udp.h>
+#include <commoncpp/process.h>
+#include <commoncpp/export.h>
 
 #ifndef CCRTP_CAPE
 #include "config.h"
@@ -110,11 +111,9 @@
 #   define VDL(e)  /* empty */
 #endif
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
-#ifdef WIN32
+#ifdef _MSWINDOWS_
 
 #ifndef timeradd
 #define timeradd(a, b, result)                              \
@@ -146,9 +145,7 @@ const uint32 NTP_EPOCH_OFFSET = static_cast<uint32>(2208992400ul);
 uint32 random32();
 uint16 random16();
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 #endif // ifndef CCXX_RTP_PRIVATE_H_
 

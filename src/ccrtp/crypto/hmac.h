@@ -39,7 +39,7 @@
 #ifndef HMAC_H
 #define HMAC_H
 
-#include <cc++/config.h>
+#include <commoncpp/config.h>
 
 #ifndef SHA1_DIGEST_LENGTH
 #define SHA1_DIGEST_LENGTH 20
@@ -98,7 +98,7 @@ __EXPORT void hmac_sha1( uint8* key, int32 key_length,
  * Create and initialize a SHA1 HMAC context.
  *
  * An application uses this context to hash several data into one SHA1
- * digest. 
+ * digest.
  *
  * @param key
  *    The MAC key.
@@ -134,7 +134,7 @@ __EXPORT void hmacSha1Ctx(void* ctx, const uint8_t* data, uint32_t data_length,
  *
  * This functions takes several data chunk and computes the SHA1 HAMAC.
  *
- * @param ctx 
+ * @param ctx
  *     Pointer to initialized SHA1 HMAC context
  * @param data
  *    Points to an array of pointers that point to the data chunks. A NULL

@@ -53,7 +53,7 @@
 #ifndef AESSRTP_H
 #define AESSRTP_H
 
-#include <cc++/config.h>
+#include <commoncpp/config.h>
 
 #include <ccrtp/CryptoContext.h>
 
@@ -92,7 +92,7 @@ public:
      * Set new key
      *
      * @param key
-     *   Pointer to key data, must have at least a size of keyLength 
+     *   Pointer to key data, must have at least a size of keyLength
      *
      * @param keyLength
      *   Length of the key in bytes, must be 16, 24, or 32
@@ -138,8 +138,8 @@ public:
      *    Refer to chapter 4.1.1 in RFC 3711.
      */
     void ctr_encrypt( const uint8* input,
-		      uint32 inputLen,
-		      uint8* output, uint8* iv );
+              uint32 inputLen,
+              uint8* output, uint8* iv );
 
     /**
      * Counter-mode encryption, in place.
@@ -158,8 +158,8 @@ public:
      *    Refer to chapter 4.1.1 in RFC 3711.
      */
     void ctr_encrypt( uint8* data,
-		      uint32 data_length,
-		      uint8* iv );
+              uint32 data_length,
+              uint8* iv );
 
     /**
      * AES F8 mode encryption, in place.
@@ -194,13 +194,13 @@ public:
      *   An AES cipher context used for intermediate f8 AES encryption.
      */
     void f8_encrypt( const uint8* data,
-		     uint32 dataLen,
-		     uint8* iv,
-		     uint8* key,
-		     int32  keyLen,
-		     uint8* salt,
-		     int32  saltLen,
-	AesSrtp* f8Cipher);
+             uint32 dataLen,
+             uint8* iv,
+             uint8* key,
+             int32  keyLen,
+             uint8* salt,
+             int32  saltLen,
+    AesSrtp* f8Cipher);
 
     /**
      * AES F8 mode encryption.
@@ -235,21 +235,21 @@ public:
      *    The length in bytes of the computed SRTP session salt.
      */
     void f8_encrypt(const uint8* data,
-		    uint32 dataLen,
-		    uint8* out,
-		    uint8* iv,
-		    uint8* key,
-		    int32  keyLen,
-		    uint8* salt,
-		    int32  saltLen,
-	AesSrtp* f8Cipher);
+            uint32 dataLen,
+            uint8* out,
+            uint8* iv,
+            uint8* key,
+            int32  keyLen,
+            uint8* salt,
+            int32  saltLen,
+    AesSrtp* f8Cipher);
 
 
 private:
     int processBlock(F8_CIPHER_CTX *f8ctx,
-		     const uint8* in,
-		     int32 length,
-		     uint8* out);
+             const uint8* in,
+             int32 length,
+             uint8* out);
     void* key;
     int32_t algorithm;
 };

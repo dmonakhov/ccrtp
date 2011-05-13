@@ -36,9 +36,7 @@
 
 #include <ccrtp/CryptoContext.h>
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 CryptoContext::CryptoContext( uint32 ssrc ):
 ssrc(ssrc),
@@ -493,9 +491,7 @@ CryptoContext* CryptoContext::newCryptoContextForSSRC(uint32 ssrc, int roc, int6
 #endif
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

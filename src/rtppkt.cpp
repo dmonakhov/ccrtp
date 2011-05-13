@@ -46,9 +46,7 @@
 #include <ccrtp/rtppkt.h>
 #include <ccrtp/CryptoContext.h>
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 // Default to 8Khz when no value is specified.
 const uint32 PayloadFormat::defaultRTPClockRate = 8000;
@@ -351,9 +349,7 @@ int32 IncomingRTPPkt::unprotect(CryptoContext* pcc)
     return 1;
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

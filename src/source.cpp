@@ -44,12 +44,10 @@
 #include "private.h"
 #include <ccrtp/sources.h>
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 #ifndef HAVE_GETTIMEOFDAY
-#ifdef WIN32
+#ifdef _MSWINDOWS_
 int gettimeofday(struct timeval *tv_,  void *tz_)
 {
     // We could use _ftime(), but it is not available on WinCE.
@@ -66,7 +64,7 @@ int gettimeofday(struct timeval *tv_,  void *tz_)
 static void
 findusername(std::string &username);
 
-#ifndef WIN32
+#ifndef _MSWINDOWS_
 static void
 findusername(std::string &username)
 {
@@ -244,9 +242,7 @@ RTPApplication::findCNAME()
             username + "@" + hname);
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

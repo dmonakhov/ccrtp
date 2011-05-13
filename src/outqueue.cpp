@@ -38,9 +38,7 @@
 #include "private.h"
 #include <ccrtp/oqueue.h>
 
-#ifdef  CCXX_NAMESPACES
-namespace ost {
-#endif
+NAMESPACE_COMMONCPP
 
 const size_t OutgoingDataQueueBase::defaultMaxSendSegmentSize = 65536;
 
@@ -671,9 +669,7 @@ OutgoingDataQueue::getOutQueueCryptoContext(uint32 ssrc)
     return NULL;
 }
 
-#ifdef  CCXX_NAMESPACES
-}
-#endif
+END_NAMESPACE
 
 /** EMACS **
  * Local variables:

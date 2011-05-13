@@ -18,33 +18,32 @@ PROJECT(libccrtp)
 # for debug and trace during CMakeList development
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
-SET(CPACK_PACKAGE_VERSION_MAJOR 1)
-SET(CPACK_PACKAGE_VERSION_MINOR 8)
-SET(CPACK_PACKAGE_VERSION_PATCH 1)
+SET(CPACK_PACKAGE_VERSION_MAJOR 2)
+SET(CPACK_PACKAGE_VERSION_MINOR 0)
+SET(CPACK_PACKAGE_VERSION_PATCH 0)
 
 # set some global variables, in particular version variables
-set (VERSION 1.8.1)
-set (LT_RELEASE 1.8)
-set (REQUIRES 1.3.0)
+set (VERSION 2.0.0)
+set (SOVERSION 2)
+set (REQUIRES 5.0.0)
 set (PACKAGE ccrtp)
-
-# find project specific modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Set library postfix in case of 64 bit architecture
 if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
   set(LIB64 64)
 endif()
 
-include(AutoArgs)
+include(cmake/Modules/AutoArgs.cmake)
 enable_arg(srtp true)
 
+MESSAGE( STATUS "Configuring GNU ${PROJECT_NAME} ${VERSION}...")
+
 # include all the fine stuff we need
-include(FindGcryptConfig)
+include(cmake/Modules/FindGcryptConfig.cmake)
 include(FindPkgConfig)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
-include(GeneratePackage)
+include(cmake/Modules/GeneratePackage.cmake)
 
 GENERATE_PACKAGING(${PACKAGE} ${VERSION})
 
@@ -55,8 +54,17 @@ if (CMAKE_HAVE_PTHREAD_H)
 endif()
 set (LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-pkg_check_modules(COMMON libccgnu2>=${REQUIRES})
-set (LIBS ${LIBS} ${COMMON_LDFLAGS})
+if (USES_UCOMMON_INCLUDE_DIRS)
+    message(STATUS "  Using local commoncpp dependency")
+else()
+    find_package(PkgConfig)
+    pkg_check_modules(USES_UCOMMON commoncpp>=${REQUIRES})
+endif()
+
+include_directories(${USES_UCOMMON_INCLUDE_DIRS})
+link_directories(${USES_UCOMMON_LIBRARY_DIRS})
+add_definitions(${USES_UCOMMON_CFLAGS})
+set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
 
 if (enable_srtp)
   # now get info about crypto libraries
