@@ -7,7 +7,7 @@ Name: libccrtp
 Description: GNU ccRTP core library
 Version: @VERSION@
 Requires: commoncpp >= 5.0.0
-Libs:  -lccrtp1
+Libs:  -lccrtp
 
 
 
