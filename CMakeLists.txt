@@ -96,7 +96,7 @@ set(libdir ${prefix}/lib)
 set(includedir ${prefix}/include)
 set(PACKAGE pkgconfig)
 
-configure_file(libccrtp1.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libccrtp1.pc @ONLY)
+configure_file(libccrtp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.pc @ONLY)
 configure_file(libccrtp.spec.cmake ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.spec @ONLY)
 
 add_definitions(-g -O2 -fno-strict-aliasing)
@@ -115,7 +115,7 @@ add_subdirectory(demo)
 add_subdirectory(doc)
 
 ########### install files ###############
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libccrtp1.pc DESTINATION lib${LIB64}/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.pc DESTINATION lib${LIB64}/pkgconfig)
 
 ########### Add uninstall target ###############
 configure_file(
