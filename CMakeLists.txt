@@ -36,6 +36,13 @@ endif()
 include(cmake/Modules/AutoArgs.cmake)
 enable_arg(srtp true)
 
+if(MSVC60)
+    set(BUILD_STATIC ON CACHE BOOL "static linking only" FORCE)
+    MARK_AS_ADVANCED(BUILD_STATIC)
+else()
+    option(BUILD_STATIC "Set to OFF to build shared libraries" OFF)
+endif()
+
 MESSAGE( STATUS "Configuring GNU ${PROJECT_NAME} ${VERSION}...")
 
 # include all the fine stuff we need
@@ -44,7 +51,13 @@ include(FindPkgConfig)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
 
-if(EXISTS ".svn" AND (${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME}))
+if(BUILD_STATIC AND NOT BUILD_SHARED)
+    set(BUILD_LIBRARY_TYPE STATIC)
+else()
+    set(BUILD_LIBRARY_TYPE SHARED)
+endif()
+
+if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
     include(cmake/Modules/GeneratePackage.cmake)
 
     GENERATE_PACKAGING(${PACKAGE} ${VERSION})
