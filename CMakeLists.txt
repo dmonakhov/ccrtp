@@ -51,12 +51,6 @@ include(FindPkgConfig)
 include(CheckLibraryExists)
 include(CheckIncludeFiles)
 
-if(BUILD_STATIC AND NOT BUILD_SHARED)
-    set(BUILD_LIBRARY_TYPE STATIC)
-else()
-    set(BUILD_LIBRARY_TYPE SHARED)
-endif()
-
 if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
     include(cmake/Modules/GeneratePackage.cmake)
 
