@@ -77,7 +77,8 @@ link_directories(${USES_UCOMMON_LIBRARY_DIRS})
 add_definitions(${USES_UCOMMON_CFLAGS})
 set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
 
-if (BUILD_SRTP AND enable_srtp)
+if (BUILD_SRTP)
+if (enable_srtp)
   # now get info about crypto libraries
   gcr_check(GCRYPT gcrypt)
   if (GCRYPT_FOUND)
@@ -97,6 +98,7 @@ if (BUILD_SRTP AND enable_srtp)
     endif()
   endif()
   set(SRTP_SUPPORT TRUE)
+endif()
 endif()
 
 # the following set(...) commands are only to have backward
