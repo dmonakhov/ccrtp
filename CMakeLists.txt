@@ -77,7 +77,7 @@ link_directories(${USES_UCOMMON_LIBRARY_DIRS})
 add_definitions(${USES_UCOMMON_CFLAGS})
 set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
 
-if (enable_srtp and BUILD_SRTP)
+if (BUILD_SRTP AND enable_srtp)
   # now get info about crypto libraries
   gcr_check(GCRYPT gcrypt)
   if (GCRYPT_FOUND)
