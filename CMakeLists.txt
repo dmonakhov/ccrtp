@@ -35,7 +35,6 @@ endif()
 
 include(cmake/Modules/AutoArgs.cmake)
 enable_arg(srtp true)
-option(BUILD_SRTP "Set to OFF to disable SRTP support" ON)
 
 if(MSVC60)
     set(BUILD_STATIC ON CACHE BOOL "static linking only" FORCE)
@@ -77,7 +76,6 @@ link_directories(${USES_UCOMMON_LIBRARY_DIRS})
 add_definitions(${USES_UCOMMON_CFLAGS})
 set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
 
-if (BUILD_SRTP)
 if (enable_srtp)
   # now get info about crypto libraries
   gcr_check(GCRYPT gcrypt)
@@ -98,7 +96,6 @@ if (enable_srtp)
     endif()
   endif()
   set(SRTP_SUPPORT TRUE)
-endif()
 endif()
 
 # the following set(...) commands are only to have backward
