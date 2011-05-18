@@ -66,12 +66,6 @@ set_target_properties(ccrtp PROPERTIES VERSION ${VERSION} SOVERSION ${SOVERSION}
 target_link_libraries(ccrtp commoncpp ${LIBS})
 add_dependencies(ccrtp commoncpp)
 
-if(WIN32 AND NOT BUILD_STATIC)
-    add_library(static-ccrtp STATIC ${ccrtp_srcs} ${crypto_srcs} ${skein_srcs} ${twofish_srcs})
-    add_dependencies(static-ccrtp static-commoncpp)
-    install(TARGETS static-ccrtp DESTINATION lib${LIB64})
-endif()
-
 ########### install files ###############
 
 install(TARGETS ccrtp DESTINATION lib${LIB64})
