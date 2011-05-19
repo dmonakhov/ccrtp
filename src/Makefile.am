@@ -25,7 +25,7 @@ endif
 if SRTP_GCRYPT
 srtp_src_g =    ccrtp/crypto/gcrypt/gcrypthmac.cxx \
         ccrtp/crypto/gcrypt/gcryptAesSrtp.cxx \
-        ccrtp/crypto/gcrypt/InitializeGcrypt.cxx
+        ccrtp/crypto/gcrypt/InitializeGcrypt.cxx ccrtp/crypto/twofish.c
 endif
 
 skein_srcs= ccrtp/crypto/macSkein.cpp \
