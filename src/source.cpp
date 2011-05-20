@@ -46,21 +46,6 @@
 
 NAMESPACE_COMMONCPP
 
-#ifndef HAVE_GETTIMEOFDAY
-#ifdef _MSWINDOWS_
-int gettimeofday(struct timeval *tv_,  void *tz_)
-{
-    // We could use _ftime(), but it is not available on WinCE.
-    // (WinCE also lacks time.h)
-    // Note also that the average error of _ftime is around 20 ms :)
-    DWORD ms = GetTickCount();
-    tv_->tv_sec = ms / 1000;
-    tv_->tv_usec = ms * 1000;
-    return 0;
-}
-#endif //WIN32
-#endif
-
 static void
 findusername(std::string &username);
 

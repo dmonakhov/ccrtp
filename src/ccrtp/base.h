@@ -112,13 +112,6 @@ const tpport_t DefaultRTPDataPort = 5004;
 /// registered default RTCP transport port
 const tpport_t DefaultRTCPPort = 5005;
 
-#ifndef HAVE_GETTIMEOFDAY
-#ifdef  _MSWINDOWS_
-__EXPORT int
-gettimeofday(struct timeval *tv_, void *tz_);
-#endif
-#endif
-
 END_NAMESPACE
 
 #endif  // ndef CCXX_RTP_BASE_H_
