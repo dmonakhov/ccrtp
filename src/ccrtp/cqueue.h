@@ -624,7 +624,7 @@ private:
  *
  * @author Federico Montesino Pouzols <fedemp@altern.org>
  **/
-class AVPQueue : public QueueRTCPManager
+class __EXPORT AVPQueue : public QueueRTCPManager
 {
 public:
     /**

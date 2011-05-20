@@ -34,6 +34,8 @@
 #include <ccrtp/crypto/macSkein.h>
 #endif
 
+#include <commoncpp/commoncpp.h>
+#include <commoncpp/export.h>
 #include <ccrtp/CryptoContext.h>
 
 NAMESPACE_COMMONCPP

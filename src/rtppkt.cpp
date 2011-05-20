@@ -330,7 +330,7 @@ int32 IncomingRTPPkt::unprotect(CryptoContext* pcc)
     /* Guess the index */
     uint64 guessedIndex = pcc->guessIndex(cachedSeqNum);
 
-    uint32 guessedRoc = guessedIndex >> 16;
+    uint32 guessedRoc = (uint32)(guessedIndex >> 16);
     uint8* mac = new uint8[pcc->getTagLength()];
 
     pcc->srtpAuthenticate(this, guessedRoc, mac);
