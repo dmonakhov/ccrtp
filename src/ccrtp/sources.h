@@ -404,7 +404,7 @@ public:
     public:
         typedef std::forward_iterator_tag iterator_category;
         typedef Participant value_type;
-        typedef ptrdiff_t difference_type;
+        typedef std::ptrdiff_t difference_type;
         typedef const Participant* pointer;
         typedef const Participant& reference;
 

@@ -573,7 +573,7 @@ bool QueueRTCPManager::onGotSDES(SyncSource& source, RTCPPacket& pkt)
     // 8-bit long, so no ntoh[s|l] is required
     bool cname_found = false;
 
-    ptrdiff_t pointer = reinterpret_cast<unsigned char*>(&pkt) - rtcpRecvBuffer;
+    std::ptrdiff_t pointer = reinterpret_cast<unsigned char*>(&pkt) - rtcpRecvBuffer;
     uint16 i = 0;
     do {
         size_t len = pkt.getLength();
@@ -647,7 +647,7 @@ bool QueueRTCPManager::onGotSDESChunk(SyncSource& source, SDESChunk& chunk, size
             pointer++;
             pointer += (pointer & 0x03); // padding
         } else if ( item->type == SDESItemTypePRIV ) {
-            ptrdiff_t prevpointer = pointer;
+            std::ptrdiff_t prevpointer = pointer;
             uint8 plength = *( &(item->len) + 1 );
             pointer += sizeof(item->type) + sizeof(item->len)  + 1;
 
