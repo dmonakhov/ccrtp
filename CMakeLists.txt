@@ -108,7 +108,7 @@ set(includedir ${prefix}/include)
 set(PACKAGE pkgconfig)
 
 configure_file(libccrtp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.pc @ONLY)
-configure_file(libccrtp.spec.cmake ${CMAKE_CURRENT_BINARY_DIR}/libccrtp.spec @ONLY)
+configure_file(ccrtp.spec.cmake ${CMAKE_CURRENT_BINARY_DIR}/ccrtp.spec @ONLY)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(-g -O2 -fno-strict-aliasing)
