@@ -1,7 +1,7 @@
 %{!?release: %define release 0}
 %{!?version: %define version @VERSION@}
 
-%define _libname libccrtp1
+%define _libname libccrtp2
 %define _devname libccrtp-devel
 
 Summary: A Common C++ Class Framework for RTP Packets

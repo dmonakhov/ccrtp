@@ -1,7 +1,7 @@
 %{!?release: %define release 0}
 %{!?version: %define version @VERSION@}
 
-%define _libname libccrtp
+%define _libname libccrtp2
 %define _devname libccrtp-devel
 
 Summary: A Common C++ Class Framework for RTP Packets
@@ -18,7 +18,7 @@ BuildRequires: pkgconfig libstdc++-devel libgcrypt-devel gcc-c++ cmake
 
 %define srcdirname %{name}-%{version}
 
-%description 
+%description
 ccRTP is a generic, extensible and efficient C++ framework for
 developing applications based on the Real-Time Transport Protocol
 (RTP) from the IETF. It is based on Common C++ and provides a full
