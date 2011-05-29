@@ -11,7 +11,7 @@ Release: %{release}%{?dist}
 License: LGPL v2 or later
 Group: Development/Libraries/C and C++
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
-Source0: http://www.gnutelephony.org/dist/tarballs/ccrtp-%{version}.tar.bz2
+Source0: http://www.gnutelephony.org/dist/tarballs/ccrtp-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ucommon-devel >= 5.0.0
 BuildRequires: pkgconfig libstdc++-devel libgcrypt-devel gcc-c++ cmake
