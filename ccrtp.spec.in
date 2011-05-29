@@ -11,7 +11,7 @@ Release: %{release}%{?dist}
 License: LGPL v2 or later
 Group: Development/Libraries/C and C++
 URL: http://www.gnu.org/software/commoncpp/commoncpp.html
-Source0: ccrtp-%{version}.tar.bz2
+Source0: ccrtp-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ucommon >= 5.0.0
 BuildRequires: pkgconfig
