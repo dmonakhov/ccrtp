@@ -29,8 +29,12 @@ set (REQUIRES 5.0.0)
 set (PACKAGE ccrtp)
 
 # Set library postfix in case of 64 bit architecture
-if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
-  set(LIB64 64)
+# this caused problems in debian where it has to always be lib....
+set(LIBDIRNAME "lib")
+if (EXISTS /usr/lib64)
+    if ( "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
+        set(LIBDIRNAME "lib64")
+    endif()
 endif()
 
 include(cmake/Modules/AutoArgs.cmake)
