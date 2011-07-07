@@ -19,35 +19,35 @@ ccxxincludedir=$(includedir)/cc++
 if SRTP_GCRYPT
 srtp_src = ccsrtptest
 ccsrtptest_SOURCES = ccsrtptest.cpp
-ccsrtptest_LDFLAGS = ../src/libccrtp.la
+ccsrtptest_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 endif
 
 if SRTP_OPENSSL
 srtp_src = ccsrtptest
 ccsrtptest_SOURCES = ccsrtptest.cpp
-ccsrtptest_LDFLAGS = ../src/libccrtp.la
+ccsrtptest_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 endif
 
 noinst_PROGRAMS = rtpsend rtplisten rtphello rtpduphello audiorx audiotx \
     ccrtptest $(srtp_src)
 
 rtpsend_SOURCES = rtpsend.cpp
-rtpsend_LDFLAGS = ../src/libccrtp.la
+rtpsend_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 rtplisten_SOURCES = rtplisten.cpp
-rtplisten_LDFLAGS = ../src/libccrtp.la
+rtplisten_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 rtphello_SOURCES = rtphello.cpp
-rtphello_LDFLAGS = ../src/libccrtp.la
+rtphello_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 rtpduphello_SOURCES = rtpduphello.cpp
-rtpduphello_LDFLAGS = ../src/libccrtp.la
+rtpduphello_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 audiorx_SOURCES = audiorx.cpp audio.h
-audiorx_LDFLAGS = ../src/libccrtp.la
+audiorx_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 audiotx_SOURCES = audiotx.cpp
-audiotx_LDFLAGS = ../src/libccrtp.la
+audiotx_LDFLAGS = ../src/libccrtp.la @GNULIBS@
 
 ccrtptest_SOURCES = ccrtptest.cpp
-ccrtptest_LDFLAGS = ../src/libccrtp.la
+ccrtptest_LDFLAGS = ../src/libccrtp.la @GNULIBS@
