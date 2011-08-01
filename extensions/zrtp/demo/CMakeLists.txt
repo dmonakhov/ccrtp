@@ -1,14 +1,14 @@
 ########### next target ###############
 
-add_executable(zrtptest zrtptest.cpp)
-target_link_libraries(zrtptest zrtpcpp)
-add_dependencies(zrtptest zrtpcpp)
+add_executable(demo-zrtptest zrtptest.cpp)
+target_link_libraries(demo-zrtptest zrtpcpp)
+add_dependencies(demo-zrtptest zrtpcpp)
 
 ########### next target ###############
 
-add_executable(zrtptestMulti zrtptestMulti.cpp)
-target_link_libraries(zrtptestMulti zrtpcpp)
-add_dependencies(zrtptestMulti zrtpcpp)
+add_executable(demo-zrtpMulti zrtptestMulti.cpp)
+target_link_libraries(demo-zrtpMulti zrtpcpp)
+add_dependencies(demo-zrtpMulti zrtpcpp)
 
 ########### next target ###############
 
