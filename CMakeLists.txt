@@ -30,10 +30,10 @@ set (PACKAGE ccrtp)
 
 # Set library postfix in case of 64 bit architecture
 # this caused problems in debian where it has to always be lib....
-set(LIBDIRNAME "lib")
+set(LIB64 "")
 if (NOT EXISTS /etc/debian_version)
     if ( "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
-        set(LIBDIRNAME "lib64")
+        set(LIB64 "64")
     endif()
 endif()
 
