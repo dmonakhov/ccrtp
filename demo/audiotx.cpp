@@ -37,6 +37,11 @@
 using namespace ost;
 using namespace std;
 
+// TODO: a temporary fix....just to allow building on broken platforms...
+#ifndef O_NDELAY
+#define O_NDELAY 0
+#endif
+
 /**
  * @class ccRTP_AudioTransmitter
  * This is the class that will do almost everything.

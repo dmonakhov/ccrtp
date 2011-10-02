@@ -1030,25 +1030,25 @@ startRunning()
 
 protected:
 inline void enableStack(void)
-{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
+{TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::enableStack();}
 
 inline void disableStack(void)
-{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::disableStack();}
+{TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::disableStack();}
 
 inline microtimeout_t getSchedulingTimeout(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::getSchedulingTimeout();}
 
 inline void controlReceptionService(void)
-{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
+{TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::controlReceptionService();}
 
 inline void controlTransmissionService(void)
-{TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
+{TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::controlTransmissionService();}
 
 inline timeval getRTCPCheckInterval(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::getRTCPCheckInterval();}
 
 inline size_t dispatchDataPacket(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchDataPacket();}
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300
 virtual void run(void);
@@ -1062,7 +1062,7 @@ virtual void timerTick(void)
 {return;}
 
 virtual bool isPendingData(microtimeout_t timeout)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::isPendingData(timeout);}
 
 /**
  * Single runnable method for this RTP stacks, schedules
@@ -1100,10 +1100,10 @@ virtual void run(void)
 #endif
 
 inline size_t takeInDataPacket(void)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::takeInDataPacket();}
 
 inline size_t dispatchBYE(const std::string &str)
-{return TRTPSessionBase<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
+{return TRTPSessionBaseIPV6<RTPDataChannel,RTCPChannel,ServiceQueue>::dispatchBYE(str);}
 };
 
 /**
