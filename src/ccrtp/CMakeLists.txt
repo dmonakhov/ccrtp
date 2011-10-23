@@ -12,7 +12,8 @@ set(ccrtp1_headers base.h
 		 ext.h
 		 rtp.h 
 		 pool.h
-		 CryptoContext.h)
+		 CryptoContext.h
+         CryptoContextCtrl.h)
 
 ########### install files ###############
 

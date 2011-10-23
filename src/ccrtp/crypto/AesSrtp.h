@@ -55,7 +55,7 @@
 
 #include <commoncpp/config.h>
 
-#include <ccrtp/CryptoContext.h>
+#include <ccrtp/base.h>
 
 #ifndef SRTP_BLOCK_SIZE
 #define SRTP_BLOCK_SIZE 16

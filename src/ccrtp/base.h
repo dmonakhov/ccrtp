@@ -114,6 +114,16 @@ const tpport_t DefaultRTCPPort = 5005;
 
 END_NAMESPACE
 
+const int SrtpAuthenticationNull     =  0;
+const int SrtpAuthenticationSha1Hmac =  1;
+const int SrtpAuthenticationSkeinHmac = 2;
+
+const int SrtpEncryptionNull  = 0;
+const int SrtpEncryptionAESCM = 1;
+const int SrtpEncryptionAESF8 = 2;
+const int SrtpEncryptionTWOCM = 3;
+const int SrtpEncryptionTWOF8 = 4;
+
 #endif  // ndef CCXX_RTP_BASE_H_
 
 /** EMACS **

@@ -51,7 +51,8 @@ set(ccrtp_srcs
     socket.cpp
     duplex.cpp
     pool.cpp
-    CryptoContext.cxx)
+    CryptoContext.cxx
+    CryptoContextCtrl.cpp)
 
 add_subdirectory(ccrtp)
 

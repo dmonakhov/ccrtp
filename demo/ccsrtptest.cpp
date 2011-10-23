@@ -20,6 +20,7 @@
 #include <ccrtp/rtppkt.h>
 #include <ccrtp/crypto/AesSrtp.h>
 #include <ccrtp/CryptoContext.h>
+#include <ccrtp/CryptoContextCtrl.h>
 
 #ifdef  CCXX_NAMESPACES
 using namespace ost;
@@ -171,7 +172,7 @@ public:
             new CryptoContext(pattern.getSsrc(),
                   0,                           // roc,
                   0L,                          // keydr << 48,
-                  SrtpEncryptionTWOCM,         // encryption algo
+                  SrtpEncryptionAESCM,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -182,8 +183,21 @@ public:
                   112 / 8,                     // session salt len
                   80 / 8);                     // authentication tag len
         txCryptoCtx->deriveSrtpKeys(0);
-
+        
         tx.setOutQueueCryptoContext(txCryptoCtx);
+
+        CryptoContextCtrl* txCryptoCtxCtrl = new CryptoContextCtrl(0,
+                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpAuthenticationSha1Hmac,  // authtication algo
+                  masterKey,                   // Master Key
+                  128 / 8,                     // Master Key length
+                  masterSalt,                  // Master Salt
+                  112 / 8,                     // Master Salt length
+                  128 / 8,                     // encryption keyl
+                  160 / 8,                     // authentication key len (SHA1))
+                  112 / 8,                     // session salt len
+                  80 / 8);                     // authentication tag len
+        tx.setOutQueueCryptoContextCtrl(txCryptoCtxCtrl);
 
         tx.startRunning();
 
@@ -226,7 +240,7 @@ public:
             new CryptoContext(0,                // SSRC == 0 -> Context template
                     0,                          // roc,
                     0L,                         // keydr << 48,
-                    SrtpEncryptionTWOCM,        // encryption algo
+                    SrtpEncryptionAESCM,        // encryption algo
                     SrtpAuthenticationSha1Hmac, // authtication algo
                     masterKey,                  // Master Key
                     128 / 8,                    // Master Key length
@@ -237,6 +251,20 @@ public:
                     112 / 8,                    // session salt len
                     80 / 8);                    // authentication tag len
         rx.setInQueueCryptoContext(rxCryptoCtx);
+
+        CryptoContextCtrl* rxCryptoCtxCtrl = new CryptoContextCtrl(0,
+                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpAuthenticationSha1Hmac,  // authtication algo
+                  masterKey,                   // Master Key
+                  128 / 8,                     // Master Key length
+                  masterSalt,                  // Master Salt
+                  112 / 8,                     // Master Salt length
+                  128 / 8,                     // encryption keyl
+                  160 / 8,                     // authentication key len (SHA1))
+                  112 / 8,                     // session salt len
+                  80 / 8);                     // authentication tag len
+
+        rx.setInQueueCryptoContextCtrl(rxCryptoCtxCtrl);
 
         rx.startRunning();
         rx.setPayloadFormat(StaticPayloadFormat(sptPCMU));

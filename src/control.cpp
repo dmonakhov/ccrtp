@@ -59,7 +59,7 @@ const microtimeout_t QueueRTCPManager::defaultEnd2EndDelay = 0;
 
 QueueRTCPManager::QueueRTCPManager(uint32 size, RTPApplication& app):
 RTPDataQueue(size), RTCPCompoundHandler(RTCPCompoundHandler::defaultPathMTU),
-queueApplication(app)
+queueApplication(app), srtcpIndex(0)
 {
     controlServiceActive = false;
     controlBwFract = 0.05f;
@@ -110,7 +110,7 @@ queueApplication(app)
 QueueRTCPManager::QueueRTCPManager(uint32 ssrc, uint32 size, RTPApplication& app):
 RTPDataQueue(&ssrc, size),
 RTCPCompoundHandler(RTCPCompoundHandler::defaultPathMTU),
-queueApplication(app)
+queueApplication(app), srtcpIndex(0)
 {
     controlServiceActive = false;
     controlBwFract = 0.05f;
@@ -167,6 +167,9 @@ void QueueRTCPManager::endQueueRTCPManager()
 {
     controlServiceActive = false;
     controlBwFract = sendControlBwFract = 0;
+    removeOutQueueCryptoContextCtrl(NULL);   // remove the outgoing crypto context
+    removeInQueueCryptoContextCtrl(NULL);    // Remove any incoming crypto contexts
+
 }
 
 bool QueueRTCPManager::checkSSRCInRTCPPkt(SyncSourceLink& sourceLink,
@@ -320,11 +323,34 @@ QueueRTCPManager::takeInControlPacket()
 
     // process a 'len' octets long RTCP compound packet
 
+    RTCPPacket *pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer);
+    
+    CryptoContextCtrl* pcc = getInQueueCryptoContextCtrl(pkt->getSSRC());
+    if (pcc == NULL) {
+        pcc = getInQueueCryptoContextCtrl(0);
+        if (pcc != NULL) {
+            pcc = pcc->newCryptoContextForSSRC(pkt->getSSRC());
+            if (pcc != NULL) {
+                pcc->deriveSrtcpKeys();
+                setInQueueCryptoContextCtrl(pcc);
+            }
+        }
+    }
+    // If no crypto context: then SRTP/SRTCP is off
+    // If crypto context is available then unprotect data here. If an error
+    // occurs report the error and discard the packet.
+    if (pcc != NULL) {
+        int32 ret;
+        if ((ret = unprotect(rtcpRecvBuffer, len, pcc)) < 0) {
+            // TODO: do more error handling?
+            return;
+        }
+        len = ret;      // adjust length after unprotecting the packet
+    }
     // Check validity of the header fields of the compound packet
     if ( !RTCPCompoundHandler::checkCompoundRTCPHeader(len) )
         return;
 
-    RTCPPacket *pkt = reinterpret_cast<RTCPPacket *>(rtcpRecvBuffer);
 
     // TODO: for now, we do nothing with the padding bit
     // in the header.
@@ -713,6 +739,8 @@ timeval QueueRTCPManager::computeRTCPInterval()
     return result;
 }
 
+#define BYE_BUFFER_LENGTH 500
+
 size_t QueueRTCPManager::dispatchBYE(const std::string& reason)
 {
     // for this method, see section 6.3.7 in RFC 3550
@@ -745,7 +773,7 @@ size_t QueueRTCPManager::dispatchBYE(const std::string& reason)
     }
 
 
-    unsigned char buffer[500];
+    unsigned char buffer[BYE_BUFFER_LENGTH];
     // Build an empty RR as first packet in the compound.
         // TODO: provide more information if available. Not really
     // important, since this is the last packet being sent.
@@ -1096,6 +1124,28 @@ size_t QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t
 {
     size_t count = 0;
     lockDestinationList();
+    
+    // Cast to have easy access to ssrc et al
+    RTCPPacket *pkt = reinterpret_cast<RTCPPacket *>(buffer);
+
+    CryptoContextCtrl* pcc = getOutQueueCryptoContextCtrl(pkt->getSSRC());
+    if (pcc == NULL) {
+        pcc = getOutQueueCryptoContextCtrl(0);
+        if (pcc != NULL) {
+            pcc = pcc->newCryptoContextForSSRC(pkt->getSSRC());
+            if (pcc != NULL) {
+                pcc->deriveSrtcpKeys();
+                setOutQueueCryptoContextCtrl(pcc);
+            }
+        }
+    }
+    // If no crypto context: then SRTP/SRTCP is off
+    // If crypto context is available then unprotect data here. If an error
+    // occurs report the error and discard the packet.
+    if (pcc != NULL) {
+        len = protect(buffer, len, pcc);
+    }
+
     if ( isSingleDestination() ) {
         count = sendControl(buffer,len);
     } else {
@@ -1111,6 +1161,186 @@ size_t QueueRTCPManager::sendControlToDestinations(unsigned char* buffer, size_t
     unlockDestinationList();
 
     return count;
+}
+
+int32
+QueueRTCPManager::protect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
+    /* Encrypt the packet */
+
+    pcc->srtcpEncrypt(pkt + 8, len - 8, srtcpIndex, pcc->getSsrc());
+
+    uint32 encIndex = srtcpIndex | 0x80000000;  // set the E flag
+
+    uint32* ip = reinterpret_cast<uint32*>(pkt+len);
+    *ip = htonl(encIndex);   
+
+    // NO MKI support yet - here we assume MKI is zero. To build in MKI
+    // take MKI length into account when storing the authentication tag.
+
+    // Compute MAC and store in packet after the SRTCP index field
+    pcc->srtcpAuthenticate(pkt, len, encIndex, pkt + len + sizeof(uint32));
+
+    srtcpIndex++;
+    srtcpIndex &= ~0x80000000;       // clear possible overflow
+    
+    return len + pcc->getTagLength() + sizeof(uint32);
+}
+
+int32
+QueueRTCPManager::unprotect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
+    if (pcc == NULL) {
+        return true;
+    }
+
+    // Compute the total length of the payload
+    uint32 payloadLen = len - (pcc->getTagLength() + pcc->getMkiLength() + 4);
+    
+    // point to the SRTCP index field just after the real payload
+    const uint32* index = reinterpret_cast<uint32*>(pkt + payloadLen);
+
+    uint32 encIndex = ntohl(*index);
+    uint32 remoteIndex = encIndex & ~0x80000000;    // index without Encryption flag
+    
+    if (!pcc->checkReplay(remoteIndex)) {
+       return -2;
+    }
+    
+    uint8 mac[20];
+
+    // Now get a pointer to the authentication tag field
+    const uint8* tag = pkt + (len - pcc->getTagLength());
+    
+    // Authenticate includes the index, but not MKI and not (obviously) the tag itself
+    pcc->srtcpAuthenticate(pkt, payloadLen, encIndex, mac);
+    if (memcmp(tag, mac, pcc->getTagLength()) != 0) {
+        return -1;
+    }
+
+    // Decrypt the content, exclude the very first SRTCP header (fixed, 8 bytes)
+    if (encIndex & 0x80000000)
+        pcc->srtcpEncrypt(pkt + 8, payloadLen - 8, remoteIndex, pcc->getSsrc());
+
+    // Update the Crypto-context
+    pcc->update(remoteIndex);
+
+    return payloadLen;
+}
+
+
+void
+QueueRTCPManager::setOutQueueCryptoContextCtrl(CryptoContextCtrl* cc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(outCryptoMutex);
+        // check if a CryptoContext for a SSRC already exists. If yes
+        // remove it from list before inserting the new one.
+    for( i = outCryptoContexts.begin(); i!= outCryptoContexts.end(); i++ ) {
+        if( (*i)->getSsrc() == cc->getSsrc() ) {
+            CryptoContextCtrl* tmp = *i;
+            outCryptoContexts.erase(i);
+            delete tmp;
+            break;
+        }
+    }
+    outCryptoContexts.push_back(cc);
+}
+
+void
+QueueRTCPManager::removeOutQueueCryptoContextCtrl(CryptoContextCtrl* cc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(outCryptoMutex);
+    if (cc == NULL) {     // Remove any incoming crypto contexts
+        for (i = outCryptoContexts.begin(); i != outCryptoContexts.end(); ) {
+            CryptoContextCtrl* tmp = *i;
+            i = outCryptoContexts.erase(i);
+            delete tmp;
+        }
+    }
+    else {
+        for( i = outCryptoContexts.begin(); i != outCryptoContexts.end(); i++ ) {
+            if( (*i)->getSsrc() == cc->getSsrc() ) {
+                CryptoContextCtrl* tmp = *i;
+                outCryptoContexts.erase(i);
+                delete tmp;
+                return;
+            }
+        }
+    }
+}
+
+CryptoContextCtrl*
+QueueRTCPManager::getOutQueueCryptoContextCtrl(uint32 ssrc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(outCryptoMutex);
+    for( i = outCryptoContexts.begin(); i != outCryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == ssrc) {
+            return (*i);
+        }
+    }
+    return NULL;
+}
+
+void
+QueueRTCPManager::setInQueueCryptoContextCtrl(CryptoContextCtrl* cc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(inCryptoMutex);
+    // check if a CryptoContext for a SSRC already exists. If yes
+    // remove it from list before inserting the new one.
+    for( i = inCryptoContexts.begin(); i!= inCryptoContexts.end(); i++ ) {
+        if( (*i)->getSsrc() == cc->getSsrc() ) {
+            CryptoContextCtrl* tmp = *i;
+            inCryptoContexts.erase(i);
+            delete tmp;
+            break;
+        }
+    }
+    inCryptoContexts.push_back(cc);
+}
+
+void
+QueueRTCPManager::removeInQueueCryptoContextCtrl(CryptoContextCtrl* cc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(inCryptoMutex);
+    if (cc == NULL) {     // Remove any incoming crypto contexts
+        for (i = inCryptoContexts.begin(); i != inCryptoContexts.end(); ) {
+            CryptoContextCtrl* tmp = *i;
+            i = inCryptoContexts.erase(i);
+            delete tmp;
+        }
+    }
+    else {
+        for( i = inCryptoContexts.begin(); i!= inCryptoContexts.end(); i++ ){
+            if( (*i)->getSsrc() == cc->getSsrc() ) {
+                CryptoContextCtrl* tmp = *i;
+                inCryptoContexts.erase(i);
+                delete tmp;
+                return;
+            }
+        }
+    }
+}
+
+CryptoContextCtrl*
+QueueRTCPManager::getInQueueCryptoContextCtrl(uint32 ssrc)
+{
+    std::list<CryptoContextCtrl *>::iterator i;
+
+    MutexLock lock(inCryptoMutex);
+    for( i = inCryptoContexts.begin(); i!= inCryptoContexts.end(); i++ ){
+        if( (*i)->getSsrc() == ssrc) {
+            return (*i);
+        }
+    }
+    return NULL;
 }
 
 END_NAMESPACE

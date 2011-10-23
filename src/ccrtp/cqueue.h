@@ -45,6 +45,8 @@
 #define CCXX_RTP_CQUEUE_H_
 
 #include <ccrtp/ioqueue.h>
+#include <ccrtp/CryptoContextCtrl.h>
+#include <list>
 
 NAMESPACE_COMMONCPP
 
@@ -175,6 +177,73 @@ public:
     inline uint32
     getSendRTCPPacketCount() const
     { return ctrlSendCount; }
+
+    /**
+     * Set ouput queue CryptoContext.
+     *
+     * The endQueue method (provided by RTPQueue) deletes all
+     * registered CryptoContexts.
+     *
+     * @param cc Pointer to initialized CryptoContext.
+     */
+    void
+    setOutQueueCryptoContextCtrl(CryptoContextCtrl* cc);
+
+    /**
+     * Remove output queue CryptoContext.
+     *
+     * The endQueue method (provided by RTPQueue) also deletes all
+     * registered CryptoContexts.
+     *
+     * @param cc Pointer to initialized CryptoContext to remove.
+     */
+    void
+    removeOutQueueCryptoContextCtrl(CryptoContextCtrl* cc);
+
+    /**
+     * Get an output queue CryptoContext identified by SSRC
+     *
+     * @param ssrc Request CryptoContext for this incoming SSRC
+     * @return Pointer to CryptoContext of the SSRC of NULL if no context
+     * available for this SSRC.
+     */
+    CryptoContextCtrl*
+    getOutQueueCryptoContextCtrl(uint32 ssrc);
+
+
+    /**
+     * Set input queue CryptoContext.
+     *
+     * The endQueue method (provided by RTPQueue) deletes all
+     * registered CryptoContexts.
+     *
+     * @param cc Pointer to initialized CryptoContext.
+     */
+    void
+    setInQueueCryptoContextCtrl(CryptoContextCtrl* cc);
+
+    /**
+     * Remove input queue CryptoContext.
+     *
+     * The endQueue method (provided by RTPQueue) also deletes all
+     * registered CryptoContexts.
+     *
+     * @param cc
+     *     Pointer to initialized CryptoContext to remove. If pointer
+     *     if <code>NULL</code> then delete the whole queue
+     */
+    void
+    removeInQueueCryptoContextCtrl(CryptoContextCtrl* cc);
+
+    /**
+     * Get an input queue CryptoContext identified by SSRC
+     *
+     * @param ssrc Request CryptoContext for this incoming SSRC
+     * @return Pointer to CryptoContext of the SSRC of NULL if no context
+     * available for this SSRC.
+     */
+    CryptoContextCtrl*
+    getInQueueCryptoContextCtrl(uint32 ssrc);
 
 protected:
     QueueRTCPManager(uint32 size = RTPDataQueue::defaultMembersHashSize,
@@ -550,6 +619,11 @@ private:
     transportHeaderSize()
     { return 8; }
 
+
+    int32 protect(uint8* pkt, size_t len, CryptoContextCtrl* cc);
+    int32 unprotect(uint8* pkt, size_t len, CryptoContextCtrl* cc);
+    
+    
     SDESItemType
     nextSDESType(SDESItemType t);
 
@@ -615,6 +689,14 @@ private:
     // an empty RTPData
     static const uint16 TIMEOUT_MULTIPLIER;
     static const double RECONSIDERATION_COMPENSATION;
+    
+    mutable Mutex outCryptoMutex;
+    std::list<CryptoContextCtrl *> outCryptoContexts;
+    uint32 srtcpIndex;
+
+    mutable Mutex inCryptoMutex;
+    std::list<CryptoContextCtrl *> inCryptoContexts;
+
 };
 
 /**

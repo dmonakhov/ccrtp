@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2004-2006 the Minisip Team
-
+  Copyright (C) 2011 Werner Dittmann for the SRTCP support
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -18,26 +19,12 @@
 
 
 
-#ifndef CRYPTOCONTEXT_H
-#define CRYPTOCONTEXT_H
+#ifndef CRYPTOCONTEXTCTRL_H
+#define CRYPTOCONTEXTCTRL_H
 
 #include <commoncpp/config.h>
 
-#include <ccrtp/rtppkt.h>
-
-
 #define REPLAY_WINDOW_SIZE 64
-
-
-// const int SrtpAuthenticationNull     =  0;
-// const int SrtpAuthenticationSha1Hmac =  1;
-// const int SrtpAuthenticationSkeinHmac = 2;
-// 
-// const int SrtpEncryptionNull  = 0;
-// const int SrtpEncryptionAESCM = 1;
-// const int SrtpEncryptionAESF8 = 2;
-// const int SrtpEncryptionTWOCM = 3;
-// const int SrtpEncryptionTWOF8 = 4;
 
 #ifdef SRTP_SUPPORT
 #include <ccrtp/crypto/AesSrtp.h>
@@ -45,10 +32,8 @@
 
 NAMESPACE_COMMONCPP
 
-    class RTPPacket;
-
     /**
-     * The implementation for a SRTP cryptographic context.
+     * The implementation for a SRTCP cryptographic context.
      *
      * This class holds data and provides functions that implement a
      * cryptographic context for SRTP, Refer to RFC 3711, chapter 3.2 for some
@@ -63,10 +48,9 @@ NAMESPACE_COMMONCPP
      * length and so on. The key management mechanisms are not part of
      * SRTP. Refer to MIKEY (RFC 3880) or to Phil Zimmermann's ZRTP protocol
      * (draft-zimmermann-avt-zrtp-01). After key management negotiated the
-     * data the application can setup the SRTP cryptographic context and
-     * enable SRTP processing.
+     * data the application can setup the SRTCP cryptographic context and
+     * enable SRTCP processing.
      *
-     * Currently this implementation supports RTP only, not RTCP.
      *
      * @author Israel Abad <i_abad@terra.es>
      * @author Erik Eliasson <eliasson@it.kth.se>
@@ -75,7 +59,7 @@ NAMESPACE_COMMONCPP
      * @author Werner Dittmann <Werner.Dittmann@t-online.de>
      */
 
-    class __EXPORT CryptoContext {
+    class __EXPORT CryptoContextCtrl {
     public:
     /**
      * Constructor for empty SRTP cryptographic context.
@@ -86,7 +70,7 @@ NAMESPACE_COMMONCPP
      *
      * @param ssrc The RTP SSRC that this SRTP cryptographic context protects.
      */
-        CryptoContext( uint32 ssrc );
+    CryptoContextCtrl( uint32 ssrc );
 
     /**
      * Constructor for an active SRTP cryptographic context.
@@ -97,15 +81,6 @@ NAMESPACE_COMMONCPP
      *
      * @param ssrc
      *    The RTP SSRC that this SRTP cryptographic context protects.
-     *
-     * @param roc
-     *    The initial Roll-Over-Counter according to RFC 3711. These are the
-     *    upper 32 bit of the overall 48 bit SRTP packet index. Refer to
-     *    chapter 3.2.1 of the RFC.
-     *
-     * @param keyDerivRate
-     *    The key derivation rate defines when to recompute the SRTP session
-     *    keys. Refer to chapter 4.3.1 in the RFC.
      *
      * @param ealg
      *    The encryption algorithm to use. Possible values are <code>
@@ -162,8 +137,7 @@ NAMESPACE_COMMONCPP
      *    The length is bytes of the authentication tag that SRTP appends
      *    to the RTP packet. Refer to chapter 4.2. in the RFC 3711.
      */
-        CryptoContext( uint32 ssrc, int32 roc,
-               int64  keyDerivRate,
+    CryptoContextCtrl( uint32 ssrc,
                const  int32 ealg,
                const  int32 aalg,
                uint8* masterKey,
@@ -179,32 +153,7 @@ NAMESPACE_COMMONCPP
      *
      * Cleans the SRTP cryptographic context.
      */
-        ~CryptoContext();
-
-    /**
-     * Set the Roll-Over-Counter.
-     *
-     * Ths method sets the upper 32 bit of the 48 bit SRTP packet index
-     * (the roll-over-part)
-     *
-     * @param r
-     *   The roll-over-counter
-     */
-        inline void
-        setRoc(uint32 r)
-        {roc = r;}
-
-    /**
-     * Get the Roll-Over-Counter.
-     *
-     * Ths method get the upper 32 bit of the 48 bit SRTP packet index
-     * (the roll-over-part)
-     *
-     * @return The roll-over-counter
-     */
-        inline uint32
-        getRoc() const
-        {return roc;}
+    ~CryptoContextCtrl();
 
     /**
      * Perform SRTP encryption.
@@ -222,7 +171,7 @@ NAMESPACE_COMMONCPP
      * @param ssrc
      *    The RTP SSRC data in <em>host</em> order.
      */
-        void srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc );
+    void srtcpEncrypt( uint8* rtp, size_t len, uint64 index, uint32 ssrc );
 
     /**
      * Compute the authentication tag.
@@ -240,7 +189,7 @@ NAMESPACE_COMMONCPP
      *    Points to a buffer that hold the computed tag. This buffer must
      *    be able to hold <code>tagLength</code> bytes.
      */
-        void srtpAuthenticate(RTPPacket* rtp, uint32 roc, uint8* tag );
+    void srtcpAuthenticate(uint8* rtp, size_t len, uint32 roc, uint8* tag );
 
     /**
      * Perform key derivation according to SRTP specification
@@ -253,21 +202,7 @@ NAMESPACE_COMMONCPP
      *    The 48 bit SRTP packet index. See the <code>guessIndex</code>
      *    method.
      */
-        void deriveSrtpKeys(uint64 index);
-
-    /**
-     * Compute (guess) the new SRTP index based on the sequence number of
-     * a received RTP packet.
-     *
-     * The method uses the algorithm show in RFC3711, Appendix A, to compute
-     * the new index.
-     *
-     * @param newSeqNumber
-     *    The sequence number of the received RTP packet in host order.
-     *
-     * @return The new SRTP packet index
-     */
-        uint64 guessIndex(uint16 newSeqNumber);
+     void deriveSrtcpKeys();
 
     /**
      * Check for packet replay.
@@ -284,7 +219,7 @@ NAMESPACE_COMMONCPP
      * @return <code>true</code> if no replay, <code>false</code> if packet
      *    is too old ar was already received.
      */
-        bool checkReplay(uint16 newSeqNumber);
+     bool checkReplay(uint16 newSeqNumber);
 
     /**
      * Update the SRTP packet index.
@@ -295,15 +230,15 @@ NAMESPACE_COMMONCPP
      * @param newSeqNumber
      *    The sequence number of the received RTP packet in host order.
      */
-        void update( uint16 newSeqNumber );
+    void update( uint16 newSeqNumber );
 
     /**
      * Get the length of the SRTP authentication tag in bytes.
      *
      * @return the length of the authentication tag.
      */
-        inline int32
-        getTagLength() const
+    inline int32
+    getTagLength() const
         {return tagLength;}
 
 
@@ -312,8 +247,8 @@ NAMESPACE_COMMONCPP
      *
      * @return the length of the MKI.
      */
-        inline int32
-        getMkiLength() const
+    inline int32
+    getMkiLength() const
         {return mkiLength;}
 
     /**
@@ -321,33 +256,32 @@ NAMESPACE_COMMONCPP
      *
      * @return the SSRC.
      */
-        inline uint32
-        getSsrc() const
+    inline uint32
+    getSsrc() const
         {return ssrc;}
 
-        /**
-         * Derive a new Crypto Context for use with a new SSRC
-         *
-         * This method returns a new Crypto Context initialized with the data
-         * of this crypto context. Replacing the SSRC, Roll-over-Counter, and
-         * the key derivation rate the application cab use this Crypto Context
-         * to encrypt / decrypt a new stream (Synchronization source) inside
-         * one RTP session.
-         *
-         * Before the application can use this crypto context it must call
-         * the <code>deriveSrtpKeys</code> method.
-         *
-         * @param ssrc
-         *     The SSRC for this context
-         * @param roc
-         *     The Roll-Over-Counter for this context
-         * @param keyDerivRate
-         *     The key derivation rate for this context
-         * @return
-         *     a new CryptoContext with all relevant data set.
-         */
-
-            CryptoContext* newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate);
+    /**
+     * Derive a new Crypto Context for use with a new SSRC
+     *
+     * This method returns a new Crypto Context initialized with the data
+     * of this crypto context. Replacing the SSRC, Roll-over-Counter, and
+     * the key derivation rate the application cab use this Crypto Context
+     * to encrypt / decrypt a new stream (Synchronization source) inside
+     * one RTP session.
+     *
+     * Before the application can use this crypto context it must call
+     * the <code>deriveSrtpKeys</code> method.
+     *
+     * @param ssrc
+     *     The SSRC for this context
+     * @param roc
+     *     The Roll-Over-Counter for this context
+     * @param keyDerivRate
+     *     The key derivation rate for this context
+     * @return
+     *     a new CryptoContext with all relevant data set.
+     */
+    CryptoContextCtrl* newCryptoContextForSSRC(uint32 ssrc);
 
     private:
 
@@ -356,18 +290,13 @@ NAMESPACE_COMMONCPP
         uint32 mkiLength;
         uint8* mki;
 
-        uint32 roc;
-        uint32 guessed_roc;
         uint16 s_l;
-        int64  key_deriv_rate;
 
         /* bitmask for replay check */
         uint64 replay_window;
 
         uint8* master_key;
         uint32 master_key_length;
-        uint32 master_key_srtp_use_nb;
-        uint32 master_key_srtcp_use_nb;
         uint8* master_salt;
         uint32 master_salt_length;
 
@@ -385,7 +314,6 @@ NAMESPACE_COMMONCPP
         int32 akeyl;
         int32 skeyl;
         int32 tagLength;
-        bool  seqNumSet;
 
         void*   macCtx;
 
