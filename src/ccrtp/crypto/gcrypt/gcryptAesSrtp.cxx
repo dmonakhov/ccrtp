@@ -48,7 +48,7 @@ AesSrtp::AesSrtp(int algo) : key(NULL), algorithm(algo) {
     initializeGcrypt();
 }
 
-AesSrtp::AesSrtp( uint8* k, int32 keyLength, int algo) : 
+AesSrtp::AesSrtp( uint8* k, int32 keyLength, int algo) :
     key(NULL),  algorithm(algo) {
 
     initializeGcrypt();
@@ -88,9 +88,9 @@ bool AesSrtp::setNewKey(const uint8* k, int32 keyLength) {
             return false;
         }
         gcry_cipher_hd_t tmp;
-        int err = gcry_cipher_open(&tmp, algo, GCRY_CIPHER_MODE_ECB, 0);
+        gcry_cipher_open(&tmp, algo, GCRY_CIPHER_MODE_ECB, 0);
         key = tmp;
-        err = gcry_cipher_setkey(static_cast<gcry_cipher_hd_t>(key), k, keyLength);
+        gcry_cipher_setkey(static_cast<gcry_cipher_hd_t>(key), k, keyLength);
     }
     else if (algorithm == SrtpEncryptionTWOCM) {
         if (!twoFishInit) {
@@ -146,7 +146,7 @@ void AesSrtp::get_ctr_cipher_stream( uint8* output, uint32 length,
 }
 
 void AesSrtp::ctr_encrypt( const uint8* input, uint32 input_length,
-			   uint8* output, uint8* iv ) {
+               uint8* output, uint8* iv ) {
 
     if (key == NULL)
         return;
@@ -182,7 +182,7 @@ void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
 
     if (key == NULL)
         return;
-    
+
     uint16 ctr = 0;
     unsigned char temp[SRTP_BLOCK_SIZE];
 
@@ -212,8 +212,8 @@ void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
 }
 
 void AesSrtp::f8_encrypt(const uint8* data, uint32 data_length,
-			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
+             uint8* iv, uint8* origKey, int32 keyLen,
+             uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
 
     f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, origKey, keyLen, salt, saltLen, f8Cipher);
 }
@@ -221,8 +221,8 @@ void AesSrtp::f8_encrypt(const uint8* data, uint32 data_length,
 #define MAX_KEYLEN 32
 
 void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
-			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
+             uint8* iv, uint8* origKey, int32 keyLen,
+             uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
 
 
     unsigned char *cp_in, *cp_in1, *cp_out;
@@ -237,7 +237,7 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
     F8_CIPHER_CTX f8ctx;
 
     if (key == NULL)
-	return;
+    return;
 
     if (keyLen > MAX_KEYLEN)
         return;
@@ -280,7 +280,7 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
     f8Cipher->encrypt(iv, f8ctx.ivAccent);
 
     f8ctx.J = 0;                       // initialize the counter
-    f8ctx.S = S;		       // get the key stream buffer
+    f8ctx.S = S;               // get the key stream buffer
 
     memset(f8ctx.S, 0, SRTP_BLOCK_SIZE); // initial value for key stream
 

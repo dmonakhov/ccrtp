@@ -30,9 +30,8 @@ void hmac_sha1(uint8* key, int32 keyLength,
                  uint8* mac, int32* macLength)
 {
     gcry_md_hd_t hd;
-    gcry_error_t err = 0;
 
-    err = gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+    gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(hd, key, keyLength);
 
     gcry_md_write (hd, data, dataLength);
@@ -51,9 +50,8 @@ void hmac_sha1( uint8* key, int32 keyLength,
                   uint8* mac, int32* macLength )
 {
     gcry_md_hd_t hd;
-    gcry_error_t err = 0;
 
-    err = gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+    gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(hd, key, keyLength);
 
     while (*dataChunks) {
@@ -72,9 +70,8 @@ void hmac_sha1( uint8* key, int32 keyLength,
 void* createSha1HmacContext(uint8_t* key, int32_t key_length)
 {
     gcry_md_hd_t ctx;
-    gcry_error_t err = 0;
-    
-    err = gcry_md_open(&ctx, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+
+    gcry_md_open(&ctx, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(ctx, key, key_length);
     return ctx;
 }
@@ -83,11 +80,11 @@ void hmacSha1Ctx(void* ctx, const uint8_t* data, uint32_t data_length,
                 uint8_t* mac, int32_t* mac_length)
 {
     gcry_md_hd_t pctx = (gcry_md_hd_t)ctx;
-    
+
     gcry_md_reset(pctx);
 
     gcry_md_write (pctx, data, data_length);
-    
+
     uint8_t* p = gcry_md_read (pctx, GCRY_MD_SHA1);
     memcpy(mac, p, SHA1_DIGEST_LENGTH);
     if (mac_length != NULL) {
@@ -99,7 +96,7 @@ void hmacSha1Ctx(void* ctx, const uint8_t* data[], uint32_t data_length[],
                 uint8_t* mac, int32_t* mac_length )
 {
     gcry_md_hd_t pctx = (gcry_md_hd_t)ctx;
-    
+
     gcry_md_reset (pctx);
     while (*data) {
         gcry_md_write (pctx, *data, (uint32)(*data_length));
