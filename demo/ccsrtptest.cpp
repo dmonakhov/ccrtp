@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <cstdlib>
+#include <cstring>
 #include <ccrtp/rtp.h>
 #include <ccrtp/rtppkt.h>
 #include <ccrtp/crypto/AesSrtp.h>
@@ -389,30 +390,21 @@ int main(int argc, char *argv[])
 
     char c;
     char* inputKey = NULL;
+    char *args = *(++argv);
 
-    /* check args */
-    while (1) {
-        c = getopt(argc, argv, "k:rs8");
-        if (c == -1) {
-            break;
-        }
-        switch (c) {
-        case 'k':
-            inputKey = optarg;
-            break;
-        case 'r':
+    while(NULL != (args = *(++argv))) {
+        if(*args == '-')
+            ++args;
+        if(!strcmp(args, "r") || !strcmp(args, "recv"))
             recv = true;
-            break;
-        case 's':
+        else if(!strcmp(args, "s") || !strcmp(args, "send"))
             send = true;
-            break;
-        case '8':
+        else if(!strcmp(args, "8") || !strcmp(args, "8test"))
             f8Test = true;
-            break;
-        default:
-            cerr << "Wrong Arguments" << endl;
-            exit(1);
-        }
+        else if(!strcmp(args, "k") || !strcmp(args, "key"))
+            inputKey = *(++argv);
+        else
+            fprintf(stderr, "*** ccsrtptest: %s: unknown option", *args);
     }
 
     if (inputKey == NULL) {

@@ -53,8 +53,8 @@ target_link_libraries(demo-ccrtptest ccrtp)
 add_dependencies(demo-ccrtptest ccrtp)
 
 ########### next target ###############
-
-if (SRTP_SUPPORT)
+# SOME build issue remains...
+if (SRTP_SUPPORT AND NOT WIN32)
   set(ccsrtptest_SRCS ccsrtptest.cpp)
   add_executable(demo-ccsrtptest ${ccsrtptest_SRCS})
   target_link_libraries(demo-ccsrtptest ccrtp)
