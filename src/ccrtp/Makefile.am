@@ -14,7 +14,7 @@ ccxxincludedir=$(includedir)/ccrtp
 
 ccxxinclude_HEADERS = base.h formats.h rtppkt.h rtcppkt.h sources.h channel.h \
 	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h rtp.h pool.h \
-	CryptoContext.h
+	CryptoContext.h CryptoContextCtrl.h
 
 kdoc_headers = base.h formats.h rtppkt.h rtcppkt.h sources.h channel.h \
 	queuebase.h iqueue.h oqueue.h ioqueue.h cqueue.h ext.h CryptoContext.h
