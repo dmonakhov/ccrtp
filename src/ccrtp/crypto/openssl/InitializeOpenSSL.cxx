@@ -74,7 +74,7 @@ static HANDLE *lock_cs;
 static void threadLockSetup(void) {
     int i;
 
-    lock_cs=OPENSSL_malloc(CRYPTO_num_locks() * sizeof(HANDLE));
+    lock_cs=(HANDLE *)OPENSSL_malloc(CRYPTO_num_locks() * sizeof(HANDLE));
     for (i = 0; i < CRYPTO_num_locks(); i++) {
 	lock_cs[i] = CreateMutex(NULL,FALSE,NULL);
     }
