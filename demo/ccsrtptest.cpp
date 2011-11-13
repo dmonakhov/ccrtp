@@ -184,7 +184,7 @@ public:
                   112 / 8,                     // session salt len
                   80 / 8);                     // authentication tag len
         txCryptoCtx->deriveSrtpKeys(0);
-        
+
         tx.setOutQueueCryptoContext(txCryptoCtx);
 
         CryptoContextCtrl* txCryptoCtxCtrl = new CryptoContextCtrl(0,
@@ -388,7 +388,6 @@ int main(int argc, char *argv[])
     bool recv = false;
     bool f8Test = false;
 
-    char c;
     char* inputKey = NULL;
     char *args = *(++argv);
 
@@ -404,7 +403,7 @@ int main(int argc, char *argv[])
         else if(!strcmp(args, "k") || !strcmp(args, "key"))
             inputKey = *(++argv);
         else
-            fprintf(stderr, "*** ccsrtptest: %s: unknown option", *args);
+            fprintf(stderr, "*** ccsrtptest: %s: unknown option\n", args);
     }
 
     if (inputKey == NULL) {
