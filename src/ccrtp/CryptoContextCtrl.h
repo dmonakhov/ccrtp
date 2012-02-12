@@ -290,7 +290,7 @@ NAMESPACE_COMMONCPP
         uint32 mkiLength;
         uint8* mki;
 
-        uint16 s_l;
+        uint32 s_l;
 
         /* bitmask for replay check */
         uint64 replay_window;
