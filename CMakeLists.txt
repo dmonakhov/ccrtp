@@ -107,7 +107,7 @@ endif()
 # compatibility with autoconf stuff to generate the pc file
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${prefix}/bin)
-set(libdir ${prefix}/lib)
+set(libdir ${prefix}/lib${LIB64})
 set(includedir ${prefix}/include)
 set(PACKAGE pkgconfig)
 
