@@ -38,7 +38,7 @@ SUBDIRS = ccrtp ccrtp/crypto
 
 libccrtp_la_SOURCES = rtppkt.cpp rtcppkt.cpp source.cpp data.cpp incqueue.cpp \
     outqueue.cpp queue.cpp control.cpp members.cpp socket.cpp duplex.cpp pool.cpp \
-    CryptoContext.cxx $(srtp_src_g) $(srtp_src_o) $(skein_srcs)
+    CryptoContext.cxx CryptoContextCtrl.cpp $(srtp_src_g) $(srtp_src_o) $(skein_srcs)
 
 libccrtp_la_LDFLAGS = $(RELEASE) @GNULIBS@
 

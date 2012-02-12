@@ -37,6 +37,7 @@
 #include <commoncpp/config.h>
 #include <commoncpp/export.h>
 #include <ccrtp/CryptoContextCtrl.h>
+#include <ccrtp/base.h>
 
 NAMESPACE_COMMONCPP
 
@@ -235,7 +236,7 @@ void CryptoContextCtrl::srtcpEncrypt( uint8* rtp, size_t len, uint64 index, uint
         iv[1] = 0;
         iv[2] = 0;
         iv[3] = 0;
-      
+
         // Need the encryption flag
         index = index | 0x80000000;
 

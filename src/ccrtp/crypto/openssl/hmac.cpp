@@ -35,7 +35,7 @@
  *          Werner Dittmann
  */
 
-#include <stdint.h>
+#include <ucommon/platform.h>
 #include <openssl/hmac.h>
 #include <ccrtp/crypto/hmac.h>
 
