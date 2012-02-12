@@ -353,7 +353,7 @@ void CryptoContextCtrl::deriveSrtcpKeys()
 #endif
 }
 
-bool CryptoContextCtrl::checkReplay( uint16 index )
+bool CryptoContextCtrl::checkReplay( uint32 index )
 {
 #ifdef SRTP_SUPPORT
     if ( aalg == SrtpAuthenticationNull && ealg == SrtpEncryptionNull ) {
@@ -388,7 +388,7 @@ bool CryptoContextCtrl::checkReplay( uint16 index )
 #endif
 }
 
-void CryptoContextCtrl::update(uint16 index)
+void CryptoContextCtrl::update(uint32 index)
 {
 #ifdef SRTP_SUPPORT
     int64 delta = index - s_l;

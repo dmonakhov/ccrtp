@@ -219,7 +219,7 @@ NAMESPACE_COMMONCPP
      * @return <code>true</code> if no replay, <code>false</code> if packet
      *    is too old ar was already received.
      */
-     bool checkReplay(uint16 newSeqNumber);
+     bool checkReplay(uint32 newSeqNumber);
 
     /**
      * Update the SRTP packet index.
@@ -228,9 +228,9 @@ NAMESPACE_COMMONCPP
      * 3.3.1 in the RFC when to update the ROC and ROC processing.
      *
      * @param newSeqNumber
-     *    The sequence number of the received RTP packet in host order.
+     *    The sequence number of the received RTCP packet in host order.
      */
-    void update( uint16 newSeqNumber );
+    void update( uint32 newSeqNumber );
 
     /**
      * Get the length of the SRTP authentication tag in bytes.
