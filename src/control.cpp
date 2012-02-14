@@ -1167,7 +1167,10 @@ int32
 QueueRTCPManager::protect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
     /* Encrypt the packet */
 
-    pcc->srtcpEncrypt(pkt + 8, len - 8, srtcpIndex, pcc->getSsrc());
+    uint32 ssrc = *(reinterpret_cast<uint32*>(pkt + 4)); // always SSRC of sender
+    ssrc =ntohl(ssrc);
+
+    pcc->srtcpEncrypt(pkt + 8, len - 8, srtcpIndex, ssrc);
 
     uint32 encIndex = srtcpIndex | 0x80000000;  // set the E flag
 
@@ -1182,7 +1185,7 @@ QueueRTCPManager::protect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
 
     srtcpIndex++;
     srtcpIndex &= ~0x80000000;       // clear possible overflow
-    
+
     return len + pcc->getTagLength() + sizeof(uint32);
 }
 
@@ -1194,22 +1197,24 @@ QueueRTCPManager::unprotect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
 
     // Compute the total length of the payload
     uint32 payloadLen = len - (pcc->getTagLength() + pcc->getMkiLength() + 4);
-    
+
     // point to the SRTCP index field just after the real payload
     const uint32* index = reinterpret_cast<uint32*>(pkt + payloadLen);
+    uint32 ssrc = *(reinterpret_cast<uint32*>(pkt + 4)); // always SSRC of sender
+    ssrc =ntohl(ssrc);
 
     uint32 encIndex = ntohl(*index);
     uint32 remoteIndex = encIndex & ~0x80000000;    // index without Encryption flag
-    
+
     if (!pcc->checkReplay(remoteIndex)) {
        return -2;
     }
-    
+
     uint8 mac[20];
 
     // Now get a pointer to the authentication tag field
     const uint8* tag = pkt + (len - pcc->getTagLength());
-    
+
     // Authenticate includes the index, but not MKI and not (obviously) the tag itself
     pcc->srtcpAuthenticate(pkt, payloadLen, encIndex, mac);
     if (memcmp(tag, mac, pcc->getTagLength()) != 0) {
@@ -1218,7 +1223,7 @@ QueueRTCPManager::unprotect(uint8* pkt, size_t len, CryptoContextCtrl* pcc) {
 
     // Decrypt the content, exclude the very first SRTCP header (fixed, 8 bytes)
     if (encIndex & 0x80000000)
-        pcc->srtcpEncrypt(pkt + 8, payloadLen - 8, remoteIndex, pcc->getSsrc());
+        pcc->srtcpEncrypt(pkt + 8, payloadLen - 8, remoteIndex, ssrc);
 
     // Update the Crypto-context
     pcc->update(remoteIndex);
