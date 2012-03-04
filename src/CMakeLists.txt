@@ -16,8 +16,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 ########### next target ###############
 
 set(openssl_srcs ccrtp/crypto/openssl/hmac.cpp
-         ccrtp/crypto/openssl/AesSrtp.cxx
-         ccrtp/crypto/openssl/InitializeOpenSSL.cxx)
+         ccrtp/crypto/openssl/AesSrtp.cxx)
 
 set(gcrypt_srcs ccrtp/crypto/gcrypt/gcrypthmac.cxx
         ccrtp/crypto/gcrypt/gcryptAesSrtp.cxx
