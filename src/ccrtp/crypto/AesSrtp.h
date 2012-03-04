@@ -162,6 +162,28 @@ public:
               uint8* iv );
 
     /**
+     * Derive a AES context to compute the IV'.
+     *
+     * See chapter 4.1.2.1 in RFC 3711.
+     *
+     * @param f8Cipher
+     *    Pointer to the AES context that will be used to encrypt IV to IV'
+     *
+     * @param key
+     *    The master key
+     *
+     * @param keyLen
+     *    Length of the master key.
+     *
+     * @param salt
+     *   Master salt.
+     *
+     * @param saltLen
+     *   length of master salt.
+     */
+    void f8_deriveForIV(AesSrtp* f8Cipher, uint8* key, int32 keyLen, uint8* salt, int32 saltLen);
+
+    /**
      * AES F8 mode encryption, in place.
      *
      * This method performs the AES F8 encryption, see chapter 4.1.2
@@ -178,29 +200,10 @@ public:
      *    The initialization vector as input to create the cipher stream.
      *    Refer to chapter 4.1.1 in RFC 3711.
      *
-     * @param key
-     *    Pointer to the computed SRTP session key.
-     *
-     * @param keyLen
-     *    The length in bytes of the computed SRTP session key.
-     *
-     * @param salt
-     *    pointer to the computed session salt.
-     *
-     * @param saltLen
-     *    The length in bytes of the computed SRTP session salt.
-     *
      * @param f8Cipher
-     *   An AES cipher context used for intermediate f8 AES encryption.
+     *   An AES cipher context used to encrypt IV to IV'.
      */
-    void f8_encrypt( const uint8* data,
-             uint32 dataLen,
-             uint8* iv,
-             uint8* key,
-             int32  keyLen,
-             uint8* salt,
-             int32  saltLen,
-    AesSrtp* f8Cipher);
+    void f8_encrypt(const uint8* data, uint32 dataLen, uint8* iv, AesSrtp* f8Cipher);
 
     /**
      * AES F8 mode encryption.
@@ -222,27 +225,10 @@ public:
      *    The initialization vector as input to create the cipher stream.
      *    Refer to chapter 4.1.1 in RFC 3711.
      *
-     * @param key
-     *    Pointer to the computed SRTP session key.
-     *
-     * @param keyLen
-     *    The length in bytes of the computed SRTP session key.
-     *
-     * @param salt
-     *    pointer to the computed session salt.
-     *
-     * @param saltLen
-     *    The length in bytes of the computed SRTP session salt.
+     * @param f8Cipher
+     *   An AES cipher context used to encrypt IV to IV'.
      */
-    void f8_encrypt(const uint8* data,
-            uint32 dataLen,
-            uint8* out,
-            uint8* iv,
-            uint8* key,
-            int32  keyLen,
-            uint8* salt,
-            int32  saltLen,
-    AesSrtp* f8Cipher);
+    void f8_encrypt(const uint8* data, uint32 dataLen, uint8* out, uint8* iv, AesSrtp* f8Cipher);
 
 
 private:

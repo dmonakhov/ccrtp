@@ -249,7 +249,7 @@ void CryptoContextCtrl::srtcpEncrypt( uint8* rtp, size_t len, uint64 index, uint
         // The fixed header follows and fills the rest of the IV
         memcpy(iv+8, rtp, 8);
 
-        cipher->f8_encrypt(rtp, len, iv, k_e, n_e, k_s, n_s, f8Cipher);
+        cipher->f8_encrypt(rtp, len, iv, f8Cipher);
     }
 #endif
 }
@@ -324,6 +324,7 @@ void CryptoContextCtrl::deriveSrtcpKeys()
 
     // prepare AES cipher to compute derived keys.
     cipher->setNewKey(master_key, master_key_length);
+    memset(master_key, 0, master_key_length);
 
     // compute the session encryption key
     uint8 label = 3;
@@ -344,13 +345,19 @@ void CryptoContextCtrl::deriveSrtcpKeys()
         macCtx = createSkeinMacContext(k_a, n_a, tagLength*8, Skein512);
         break;
     }
+    memset(k_a, 0, n_a);
+
     // compute the session salt
     label = 5;
     computeIv(iv, label, master_salt);
     cipher->get_ctr_cipher_stream(k_s, n_s, iv);
+    memset(master_salt, 0, master_key_length);
 
-    // as last step prepare AES cipher with derived key.
+    // as last step prepare ciphers with derived key.
     cipher->setNewKey(k_e, n_e);
+    if (f8Cipher != NULL)
+        cipher->f8_deriveForIV(f8Cipher, k_e, n_e, k_s, n_s);
+    memset(k_e, 0, n_e);
 #endif
 }
 

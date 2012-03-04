@@ -243,9 +243,7 @@ void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
         ui32p[3] = htonl(roc);
 
         int32 pad = rtp->isPadded() ? rtp->getPaddingSize() : 0;
-        cipher->f8_encrypt(rtp->getPayload(),
-                  rtp->getPayloadSize()+pad,
-                  iv, k_e, n_e, k_s, n_s, f8Cipher);
+        cipher->f8_encrypt(rtp->getPayload(), rtp->getPayloadSize()+pad, iv, f8Cipher);
     }
 #endif
 }
@@ -338,6 +336,7 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
 
     // prepare AES cipher to compute derived keys.
     cipher->setNewKey(master_key, master_key_length);
+    memset(master_key, 0, master_key_length);
 
     // compute the session encryption key
     uint64 label = 0;
@@ -358,13 +357,19 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
         macCtx = createSkeinMacContext(k_a, n_a, tagLength*8, Skein512);
         break;
     }
+    memset(k_a, 0, n_a);
     // compute the session salt
     label = 0x02;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
     cipher->get_ctr_cipher_stream(k_s, n_s, iv);
+    memset(master_salt, 0, master_key_length);
 
-    // as last step prepare AES cipher with derived key.
+    // as last step prepare ciphers with derived key.
     cipher->setNewKey(k_e, n_e);
+    if (f8Cipher != NULL)
+        cipher->f8_deriveForIV(f8Cipher, k_e, n_e, k_s, n_s);
+    memset(k_e, 0, n_e);
+
 #endif
 }
 

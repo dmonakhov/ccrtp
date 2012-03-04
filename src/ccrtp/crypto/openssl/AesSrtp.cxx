@@ -35,8 +35,6 @@
  * @author Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
-extern void initializeOpenSSL();
-
 #include <stdlib.h>
 #include <openssl/aes.h>                // the include of openSSL
 #include <ccrtp/crypto/AesSrtp.h>
@@ -84,7 +82,7 @@ bool AesSrtp::setNewKey(const uint8* k, int32 keyLength) {
     }
     else
         return false;
-    
+
     return true;
 }
 
@@ -158,7 +156,7 @@ void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
 
     if (key == NULL)
         return;
-    
+
     uint16 ctr = 0;
     unsigned char temp[SRTP_BLOCK_SIZE];
 
@@ -187,44 +185,26 @@ void AesSrtp::ctr_encrypt( uint8* data, uint32 data_length, uint8* iv ) {
 }
 
 void AesSrtp::f8_encrypt(const uint8* data, uint32 data_length,
-			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
+                         uint8* iv, AesSrtp* f8Cipher ) {
 
-    f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, origKey, keyLen, salt, saltLen, f8Cipher);
+    f8_encrypt(data, data_length, const_cast<uint8*>(data), iv, f8Cipher);
 }
 
 #define MAX_KEYLEN 32
 
-void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
-			 uint8* iv, uint8* origKey, int32 keyLen,
-			 uint8* salt, int32 saltLen, AesSrtp* f8Cipher ) {
-
+void AesSrtp::f8_deriveForIV(AesSrtp* f8Cipher, uint8* key, int32 keyLen,
+             uint8* salt, int32 saltLen) {
 
     unsigned char *cp_in, *cp_in1, *cp_out;
-    int i;
-    int offset = 0;
 
-    unsigned char ivAccent[SRTP_BLOCK_SIZE];
     unsigned char maskedKey[MAX_KEYLEN];
     unsigned char saltMask[MAX_KEYLEN];
-    unsigned char S[SRTP_BLOCK_SIZE];
-
-    F8_CIPHER_CTX f8ctx;
-
-    if (key == NULL)
-        return;
 
     if (keyLen > MAX_KEYLEN)
         return;
 
     if (saltLen > keyLen)
         return;
-
-    /*
-     * Get memory for the derived IV (IV')
-     */
-    f8ctx.ivAccent = ivAccent;
-
     /*
      * First copy the salt into the mask field, then fill with 0x55 to
      * get a full key.
@@ -237,20 +217,36 @@ void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
      * get the special key.
      */
     cp_out = maskedKey;
-    cp_in = origKey;
+    cp_in = key;
     cp_in1 = saltMask;
-    for (i = 0; i < keyLen; i++) {
+    for (int i = 0; i < keyLen; i++) {
         *cp_out++ = *cp_in++ ^ *cp_in1++;
     }
     /*
      * Prepare the a new AES cipher with the special key to compute IV'
      */
     f8Cipher->setNewKey(maskedKey, keyLen);
+}
 
+void AesSrtp::f8_encrypt(const uint8* in, uint32 in_length, uint8* out,
+                         uint8* iv, AesSrtp* f8Cipher ) {
+
+
+    int offset = 0;
+
+    unsigned char ivAccent[SRTP_BLOCK_SIZE];
+    unsigned char S[SRTP_BLOCK_SIZE];
+
+    F8_CIPHER_CTX f8ctx;
+
+    if (key == NULL)
+        return;
     /*
-     * Use the masked key to encrypt the original IV to produce IV'.
-     *
-     * After computing the IV' we don't need this cipher context anymore, free it.
+     * Get memory for the derived IV (IV')
+     */
+    f8ctx.ivAccent = ivAccent;
+    /*
+     * Use the derived IV encryption setup to encrypt the original IV to produce IV'.
      */
     f8Cipher->encrypt(iv, f8ctx.ivAccent);
 
