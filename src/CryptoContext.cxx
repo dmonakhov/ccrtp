@@ -362,7 +362,7 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
     label = 0x02;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
     cipher->get_ctr_cipher_stream(k_s, n_s, iv);
-    memset(master_salt, 0, master_key_length);
+    memset(master_salt, 0, master_salt_length);
 
     // as last step prepare ciphers with derived key.
     cipher->setNewKey(k_e, n_e);
