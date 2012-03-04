@@ -28,6 +28,10 @@ using namespace ost;
 using namespace std;
 #endif
 
+// Select one of SrtpEncryptionAESF8, SrtpEncryptionAESCM, SrtpEncryptionTWOCM, SrtpEncryptionTWOF8
+// per RFC 3711 standard is: SrtpEncryptionAESCM
+static int cryptoAlgo = SrtpEncryptionAESCM;
+
 static void hexdump(const char* title, const unsigned char *s, int l)
 {
     int n=0;
@@ -173,7 +177,7 @@ public:
             new CryptoContext(pattern.getSsrc(),
                   0,                           // roc,
                   0L,                          // keydr << 48,
-                  SrtpEncryptionAESF8,         // encryption algo
+                  cryptoAlgo,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -188,7 +192,7 @@ public:
         tx.setOutQueueCryptoContext(txCryptoCtx);
 
         CryptoContextCtrl* txCryptoCtxCtrl = new CryptoContextCtrl(0,
-                  SrtpEncryptionAESF8,         // encryption algo
+                  cryptoAlgo,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -241,7 +245,7 @@ public:
             new CryptoContext(0,                // SSRC == 0 -> Context template
                     0,                          // roc,
                     0L,                         // keydr << 48,
-                    SrtpEncryptionAESF8,        // encryption algo
+                    cryptoAlgo,        // encryption algo
                     SrtpAuthenticationSha1Hmac, // authtication algo
                     masterKey,                  // Master Key
                     128 / 8,                    // Master Key length
@@ -254,7 +258,7 @@ public:
         rx.setInQueueCryptoContext(rxCryptoCtx);
 
         CryptoContextCtrl* rxCryptoCtxCtrl = new CryptoContextCtrl(0,
-                  SrtpEncryptionAESF8,         // encryption algo
+                  cryptoAlgo,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
