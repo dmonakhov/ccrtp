@@ -173,7 +173,7 @@ public:
             new CryptoContext(pattern.getSsrc(),
                   0,                           // roc,
                   0L,                          // keydr << 48,
-                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpEncryptionAESF8,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -188,7 +188,7 @@ public:
         tx.setOutQueueCryptoContext(txCryptoCtx);
 
         CryptoContextCtrl* txCryptoCtxCtrl = new CryptoContextCtrl(0,
-                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpEncryptionAESF8,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -241,7 +241,7 @@ public:
             new CryptoContext(0,                // SSRC == 0 -> Context template
                     0,                          // roc,
                     0L,                         // keydr << 48,
-                    SrtpEncryptionAESCM,        // encryption algo
+                    SrtpEncryptionAESF8,        // encryption algo
                     SrtpAuthenticationSha1Hmac, // authtication algo
                     masterKey,                  // Master Key
                     128 / 8,                    // Master Key length
@@ -254,7 +254,7 @@ public:
         rx.setInQueueCryptoContext(rxCryptoCtx);
 
         CryptoContextCtrl* rxCryptoCtxCtrl = new CryptoContextCtrl(0,
-                  SrtpEncryptionAESCM,         // encryption algo
+                  SrtpEncryptionAESF8,         // encryption algo
                   SrtpAuthenticationSha1Hmac,  // authtication algo
                   masterKey,                   // Master Key
                   128 / 8,                     // Master Key length
@@ -355,9 +355,10 @@ static int testF8()
         return -1;
     }
 
+    aesCipher->f8_deriveForIV(f8AesCipher, key, sizeof(key), salt, sizeof(salt));
     // now encrypt the RTP payload data
     aesCipher->f8_encrypt(rtp->getPayload(), rtp->getPayloadSize()+pad,
-        derivedIv, key, sizeof(key), salt, sizeof(salt), f8AesCipher);
+        derivedIv, f8AesCipher);
 
     // compare with test vector cipher data
     if (memcmp(rtp->getPayload(), cipherText, rtp->getPayloadSize()+pad) != 0) {
@@ -369,7 +370,7 @@ static int testF8()
 
     // Now decrypt the data to get the payload data again
     aesCipher->f8_encrypt(rtp->getPayload(), rtp->getPayloadSize()+pad,
-        derivedIv, key, sizeof(key), salt, sizeof(salt), f8AesCipher);
+        derivedIv, f8AesCipher);
 
     // compare decrypted data with test vector payload data
     if (memcmp(rtp->getPayload(), payload, rtp->getPayloadSize()+pad) != 0) {
@@ -389,9 +390,9 @@ int main(int argc, char *argv[])
     bool f8Test = false;
 
     char* inputKey = NULL;
-    char *args = *(++argv);
+    char *args = *argv++;
 
-    while(NULL != (args = *(++argv))) {
+    while(NULL != (args = *argv++)) {
         if(*args == '-')
             ++args;
         if(!strcmp(args, "r") || !strcmp(args, "recv"))
@@ -401,7 +402,7 @@ int main(int argc, char *argv[])
         else if(!strcmp(args, "8") || !strcmp(args, "8test"))
             f8Test = true;
         else if(!strcmp(args, "k") || !strcmp(args, "key"))
-            inputKey = *(++argv);
+            inputKey = *argv++;
         else
             fprintf(stderr, "*** ccsrtptest: %s: unknown option\n", args);
     }
@@ -420,10 +421,11 @@ int main(int argc, char *argv[])
         }
     }
     else if (f8Test) {
+        cout << "Running F8 test: ";
         int ret = testF8();
+        cout << ret << endl;
         exit(ret);
     }
-
     RecvPacketTransmissionTest *rx;
     SendPacketTransmissionTest *tx;
 
