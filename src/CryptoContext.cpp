@@ -16,12 +16,12 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* Copyright (C) 2004-2006
+/* Copyright (C) 2004-2012
  *
  * Authors: Israel Abad <i_abad@terra.es>
  *          Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *      Joachim Orrblad <joachim@orrblad.com>
+ *          Joachim Orrblad <joachim@orrblad.com>
  *          Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
@@ -189,7 +189,7 @@ CryptoContext::~CryptoContext(){
 #endif
 }
 
-void CryptoContext::srtpEncrypt( RTPPacket* rtp, uint64 index, uint32 ssrc )
+void CryptoContext::srtpEncrypt(RTPPacket* rtp, uint64 index, uint32 ssrc)
 {
     if (ealg == SrtpEncryptionNull) {
         return;
@@ -347,6 +347,7 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
     label = 0x01;
     computeIv(iv, label, index, key_deriv_rate, master_salt);
     cipher->get_ctr_cipher_stream(k_a, n_a, iv);
+
     // Initialize MAC context with the derived key
     switch (aalg) {
     case SrtpAuthenticationSha1Hmac:
@@ -358,6 +359,7 @@ void CryptoContext::deriveSrtpKeys(uint64 index)
         break;
     }
     memset(k_a, 0, n_a);
+
     // compute the session salt
     label = 0x02;
     computeIv(iv, label, index, key_deriv_rate, master_salt);

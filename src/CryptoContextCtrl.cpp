@@ -16,12 +16,12 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-/* Copyright (C) 2004-2006
+/* Copyright (C) 2004-2012
  *
  * Authors: Israel Abad <i_abad@terra.es>
  *          Erik Eliasson <eliasson@it.kth.se>
  *          Johan Bilien <jobi@via.ecp.fr>
- *      Joachim Orrblad <joachim@orrblad.com>
+ *          Joachim Orrblad <joachim@orrblad.com>
  *          Werner Dittmann <Werner.Dittmann@t-online.de>
  */
 
@@ -335,6 +335,7 @@ void CryptoContextCtrl::deriveSrtcpKeys()
     label = 4;
     computeIv(iv, label, master_salt);
     cipher->get_ctr_cipher_stream(k_a, n_a, iv);
+
     // Initialize MAC context with the derived key
     switch (aalg) {
     case SrtpAuthenticationSha1Hmac:
@@ -368,7 +369,6 @@ bool CryptoContextCtrl::checkReplay( uint32 index )
         /* No security policy, don't use the replay protection */
         return true;
     }
-
 
     int64 delta = s_l - index;
     if (delta > 0) {

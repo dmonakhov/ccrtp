@@ -16,11 +16,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 ########### next target ###############
 
 set(openssl_srcs ccrtp/crypto/openssl/hmac.cpp
-         ccrtp/crypto/openssl/AesSrtp.cxx)
+         ccrtp/crypto/openssl/AesSrtp.cpp)
 
-set(gcrypt_srcs ccrtp/crypto/gcrypt/gcrypthmac.cxx
-        ccrtp/crypto/gcrypt/gcryptAesSrtp.cxx
-        ccrtp/crypto/gcrypt/InitializeGcrypt.cxx)
+set(gcrypt_srcs ccrtp/crypto/gcrypt/gcrypthmac.cpp
+        ccrtp/crypto/gcrypt/gcryptAesSrtp.cpp
+        ccrtp/crypto/gcrypt/InitializeGcrypt.cpp)
 
 set(skein_srcs ccrtp/crypto/macSkein.cpp
         ccrtp/crypto/skein.c
@@ -50,7 +50,7 @@ set(ccrtp_srcs
     socket.cpp
     duplex.cpp
     pool.cpp
-    CryptoContext.cxx
+    CryptoContext.cpp
     CryptoContextCtrl.cpp)
 
 add_subdirectory(ccrtp)
