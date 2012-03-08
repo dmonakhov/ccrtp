@@ -78,7 +78,7 @@ OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
 
-#include <ccrtp/crypto/skein.h>
+#include <crypto/skein.h>
 
 #ifdef _MSC_VER
 typedef signed __int8 int8_t;

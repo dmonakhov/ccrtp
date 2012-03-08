@@ -13,7 +13,7 @@ AUTOMAKE_OPTIONS = no-dependencies dist-shar
 LT_VERSION=@LT_CCXX_VERSION@
 #ignored for programs
 #$(LT_VERSION) -release $(LT_RELEASE)
-AM_CXXFLAGS = @WARN_FLAGS@ -I$(top_srcdir)/src
+AM_CXXFLAGS = @WARN_FLAGS@ -I$(top_srcdir)/src -I$(top_srcdir)/src/ccrtp
 ccxxincludedir=$(includedir)/cc++
 
 if SRTP_GCRYPT

@@ -129,7 +129,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 # now prepare and go for the sub-directories
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/ccrtp)
 
 add_subdirectory(src)
 

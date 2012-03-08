@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #define SKEIN_ERR_CHECK 1
-#include <ccrtp/crypto/skeinApi.h>
+#include <crypto/skeinApi.h>
 #include <string.h>
 #include <stdio.h>
 

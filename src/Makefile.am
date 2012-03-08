@@ -10,7 +10,11 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AUTOMAKE_OPTIONS = no-dependencies dist-shar
-AM_CXXFLAGS= @WARN_FLAGS@
+
+# additional include path necessary to compile the srtp crypto sources
+AM_CXXFLAGS= @WARN_FLAGS@ -I$(top_srcdir)/src/ccrtp
+AM_CPPFLAGS= @WARN_FLAGS@ -I$(top_srcdir)/src/ccrtp
+
 # RELEASE = $(LT_VERSION) -release $(LT_RELEASE)
 RELEASE = --version-info $(LT_VERSION)
 
@@ -18,13 +22,13 @@ lib_LTLIBRARIES = libccrtp.la
 
 if SRTP_OPENSSL
 srtp_src_o =    ccrtp/crypto/openssl/hmac.cpp \
-        ccrtp/crypto/openssl/AesSrtp.cpp \
+        ccrtp/crypto/openssl/SrtpSymCrypto.cpp \
         ccrtp/crypto/openssl/InitializeOpenSSL.cpp
 endif
 
 if SRTP_GCRYPT
 srtp_src_g =    ccrtp/crypto/gcrypt/gcrypthmac.cpp \
-        ccrtp/crypto/gcrypt/gcryptAesSrtp.cpp \
+        ccrtp/crypto/gcrypt/gcryptSrtpSymCrypto.cpp \
         ccrtp/crypto/gcrypt/InitializeGcrypt.cpp ccrtp/crypto/twofish.c
 endif
 

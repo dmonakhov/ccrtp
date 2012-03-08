@@ -28,20 +28,25 @@
 
 #define REPLAY_WINDOW_SIZE 64
 
+const int SrtpAuthenticationNull     =  0;
+const int SrtpAuthenticationSha1Hmac =  1;
+const int SrtpAuthenticationSkeinHmac = 2;
 
-// const int SrtpAuthenticationNull     =  0;
-// const int SrtpAuthenticationSha1Hmac =  1;
-// const int SrtpAuthenticationSkeinHmac = 2;
-// 
-// const int SrtpEncryptionNull  = 0;
-// const int SrtpEncryptionAESCM = 1;
-// const int SrtpEncryptionAESF8 = 2;
-// const int SrtpEncryptionTWOCM = 3;
-// const int SrtpEncryptionTWOF8 = 4;
+const int SrtpEncryptionNull  = 0;
+const int SrtpEncryptionAESCM = 1;
+const int SrtpEncryptionAESF8 = 2;
+const int SrtpEncryptionTWOCM = 3;
+const int SrtpEncryptionTWOF8 = 4;
+
+#ifndef CRYPTOCONTEXTCTRL_H
+
+#include <stdint.h>
 
 #ifdef SRTP_SUPPORT
-#include <ccrtp/crypto/AesSrtp.h>
+#include <ccrtp/crypto/SrtpSymCrypto.h>
 #endif
+
+class SrtpSymCrypto;
 
 NAMESPACE_COMMONCPP
 
@@ -390,8 +395,8 @@ NAMESPACE_COMMONCPP
         void*   macCtx;
 
 #ifdef SRTP_SUPPORT
-        AesSrtp* cipher;
-        AesSrtp* f8Cipher;
+        SrtpSymCrypto* cipher;
+        SrtpSymCrypto* f8Cipher;
 #else
         void* cipher;
         void* f8Cipher;
@@ -400,6 +405,8 @@ NAMESPACE_COMMONCPP
     };
 
 END_NAMESPACE
+
+#endif
 
 #endif
 

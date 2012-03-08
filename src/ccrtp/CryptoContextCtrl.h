@@ -27,7 +27,7 @@
 #define REPLAY_WINDOW_SIZE 64
 
 #ifdef SRTP_SUPPORT
-#include <ccrtp/crypto/AesSrtp.h>
+#include <ccrtp/crypto/SrtpSymCrypto.h>
 #endif
 
 NAMESPACE_COMMONCPP
@@ -318,8 +318,8 @@ NAMESPACE_COMMONCPP
         void*   macCtx;
 
 #ifdef SRTP_SUPPORT
-        AesSrtp* cipher;
-        AesSrtp* f8Cipher;
+        SrtpSymCrypto* cipher;
+        SrtpSymCrypto* f8Cipher;
 #else
         void* cipher;
         void* f8Cipher;

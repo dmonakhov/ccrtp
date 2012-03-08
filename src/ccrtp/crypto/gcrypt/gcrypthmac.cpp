@@ -22,16 +22,16 @@
  */
 #include <gcrypt.h>
 
-#include <ccrtp/crypto/hmac.h>
+#include <crypto/hmac.h>
 #include <stdio.h>
 
-void hmac_sha1(uint8* key, int32 keyLength,
-                 const uint8* data, int32 dataLength,
-                 uint8* mac, int32* macLength)
+void hmac_sha1(uint8_t* key, int32_t keyLength,
+                 const uint8_t* data, int32_t dataLength,
+                 uint8_t* mac, int32_t* macLength)
 {
     gcry_md_hd_t hd;
 
-    gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+     gcry_md_open(&hd, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
     gcry_md_setkey(hd, key, keyLength);
 
     gcry_md_write (hd, data, dataLength);
@@ -44,10 +44,10 @@ void hmac_sha1(uint8* key, int32 keyLength,
     gcry_md_close (hd);
 }
 
-void hmac_sha1( uint8* key, int32 keyLength,
-                  const uint8* dataChunks[],
-                  uint32 dataChunkLength[],
-                  uint8* mac, int32* macLength )
+void hmac_sha1( uint8_t* key, int32_t keyLength,
+                  const uint8_t* dataChunks[],
+                  uint32_t dataChunkLength[],
+                  uint8_t* mac, int32_t* macLength )
 {
     gcry_md_hd_t hd;
 
@@ -55,7 +55,7 @@ void hmac_sha1( uint8* key, int32 keyLength,
     gcry_md_setkey(hd, key, keyLength);
 
     while (*dataChunks) {
-        gcry_md_write (hd, *dataChunks, (uint32)(*dataChunkLength));
+        gcry_md_write (hd, *dataChunks, (uint32_t)(*dataChunkLength));
         dataChunks++;
         dataChunkLength++;
     }
@@ -99,7 +99,7 @@ void hmacSha1Ctx(void* ctx, const uint8_t* data[], uint32_t data_length[],
 
     gcry_md_reset (pctx);
     while (*data) {
-        gcry_md_write (pctx, *data, (uint32)(*data_length));
+        gcry_md_write (pctx, *data, (uint32_t)(*data_length));
         data++;
         data_length++;
     }
