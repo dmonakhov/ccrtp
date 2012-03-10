@@ -91,10 +91,10 @@ bool SrtpSymCrypto::setNewKey(const uint8_t* k, int32_t keyLength) {
 
 
 void SrtpSymCrypto::encrypt(const uint8_t* input, uint8_t* output ) {
-    if (algorithm == SrtpEncryptionAESCM) {
+    if (algorithm == SrtpEncryptionAESCM || algorithm == SrtpEncryptionAESF8) {
         AES_encrypt(input, output, (AES_KEY *)key);
     }
-    else if (algorithm == SrtpEncryptionTWOCM) {
+    else if (algorithm == SrtpEncryptionTWOCM || algorithm == SrtpEncryptionTWOF8) {
         Twofish_encrypt((Twofish_key*)key, (Twofish_Byte*)input,
                         (Twofish_Byte*)output); 
     }
