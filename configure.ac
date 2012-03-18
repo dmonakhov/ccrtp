@@ -32,7 +32,7 @@ if test ! -z "$cfg_options" ; then
         exit -1
 fi
 
-VERSION="2.0.2"
+VERSION="2.0.3"
 REQUIRES="5.0.0"
 LT_VERSION="2:1:0"
 AC_CONFIG_AUX_DIR(autoconf)
