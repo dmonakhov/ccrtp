@@ -61,9 +61,10 @@ SrtpSymCrypto::~SrtpSymCrypto() {
     if (key) {
         if (algorithm == SrtpEncryptionAESCM || algorithm == SrtpEncryptionAESF8)
             gcry_cipher_close(static_cast<gcry_cipher_hd_t>(key));
-        else if (algorithm == SrtpEncryptionTWOCM || algorithm == SrtpEncryptionTWOF8)
+        else if (algorithm == SrtpEncryptionTWOCM || algorithm == SrtpEncryptionTWOF8) {
+            memset(key, 0, sizeof(Twofish_key));
             delete[] (uint8_t*)key;
-
+        }
         key = NULL;
     }
 }

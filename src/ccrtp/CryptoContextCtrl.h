@@ -258,7 +258,7 @@ NAMESPACE_COMMONCPP
      */
     inline uint32
     getSsrc() const
-        {return ssrc;}
+        {return ssrcCtx;}
 
     /**
      * Derive a new Crypto Context for use with a new SSRC
@@ -285,7 +285,7 @@ NAMESPACE_COMMONCPP
 
     private:
 
-        uint32 ssrc;
+        uint32 ssrcCtx;
         bool   using_mki;
         uint32 mkiLength;
         uint8* mki;

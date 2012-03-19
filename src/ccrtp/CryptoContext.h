@@ -328,35 +328,34 @@ NAMESPACE_COMMONCPP
      */
         inline uint32
         getSsrc() const
-        {return ssrc;}
+        {return ssrcCtx;}
 
-        /**
-         * Derive a new Crypto Context for use with a new SSRC
-         *
-         * This method returns a new Crypto Context initialized with the data
-         * of this crypto context. Replacing the SSRC, Roll-over-Counter, and
-         * the key derivation rate the application cab use this Crypto Context
-         * to encrypt / decrypt a new stream (Synchronization source) inside
-         * one RTP session.
-         *
-         * Before the application can use this crypto context it must call
-         * the <code>deriveSrtpKeys</code> method.
-         *
-         * @param ssrc
-         *     The SSRC for this context
-         * @param roc
-         *     The Roll-Over-Counter for this context
-         * @param keyDerivRate
-         *     The key derivation rate for this context
-         * @return
-         *     a new CryptoContext with all relevant data set.
-         */
-
-            CryptoContext* newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate);
+    /**
+     * Derive a new Crypto Context for use with a new SSRC
+     *
+     * This method returns a new Crypto Context initialized with the data
+     * of this crypto context. Replacing the SSRC, Roll-over-Counter, and
+     * the key derivation rate the application cab use this Crypto Context
+     * to encrypt / decrypt a new stream (Synchronization source) inside
+     * one RTP session.
+     *
+     * Before the application can use this crypto context it must call
+     * the <code>deriveSrtpKeys</code> method.
+     *
+     * @param ssrc
+     *     The SSRC for this context
+     * @param roc
+     *     The Roll-Over-Counter for this context
+     * @param keyDerivRate
+     *     The key derivation rate for this context
+     * @return
+     *     a new CryptoContext with all relevant data set.
+     */
+     CryptoContext* newCryptoContextForSSRC(uint32 ssrc, int roc, int64 keyDerivRate);
 
     private:
 
-        uint32 ssrc;
+        uint32 ssrcCtx;
         bool   using_mki;
         uint32 mkiLength;
         uint8* mki;

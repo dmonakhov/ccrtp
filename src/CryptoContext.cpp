@@ -41,7 +41,7 @@
 NAMESPACE_COMMONCPP
 
 CryptoContext::CryptoContext( uint32 ssrc ):
-ssrc(ssrc),
+ssrcCtx(ssrc),
 using_mki(false),mkiLength(0),mki(NULL),
 roc(0),guessed_roc(0),s_l(0),key_deriv_rate(0),
 replay_window(0),
@@ -69,7 +69,7 @@ CryptoContext::CryptoContext(   uint32 ssrc,
                                 int32 skeyl,
                                 int32 tagLength):
 
-ssrc(ssrc),using_mki(false),mkiLength(0),mki(NULL),
+ssrcCtx(ssrc),using_mki(false),mkiLength(0),mki(NULL),
 roc(roc),guessed_roc(0),s_l(0),key_deriv_rate(key_deriv_rate),
 replay_window(0),
 master_key_srtp_use_nb(0), master_key_srtcp_use_nb(0), seqNumSet(false),
@@ -140,30 +140,32 @@ cipher(NULL), f8Cipher(NULL)
 
 CryptoContext::~CryptoContext(){
 
-    ealg = SrtpEncryptionNull;
-    aalg = SrtpAuthenticationNull;
-
 #ifdef SRTP_SUPPORT
     if (mki)
         delete [] mki;
 
     if (master_key_length > 0) {
+        memset(master_key, 0, master_key_length);
         master_key_length = 0;
         delete [] master_key;
     }
     if (master_salt_length > 0) {
+        memset(master_salt, 0, master_salt_length);
         master_salt_length = 0;
         delete [] master_salt;
     }
     if (n_e > 0) {
+        memset(k_e, 0, n_e);
         n_e = 0;
         delete [] k_e;
     }
     if (n_s > 0) {
+        memset(k_s, 0, n_s);
         n_s = 0;
         delete [] k_s;
     }
     if (n_a > 0) {
+        memset(k_a, 0, n_a);
         n_a = 0;
         delete [] k_a;
     }
@@ -187,6 +189,9 @@ CryptoContext::~CryptoContext(){
         }
     }
 #endif
+
+    ealg = SrtpEncryptionNull;
+    aalg = SrtpAuthenticationNull;
 }
 
 void CryptoContext::srtpEncrypt(RTPPacket* rtp, uint64 index, uint32 ssrc)
