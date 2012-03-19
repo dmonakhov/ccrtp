@@ -22,8 +22,7 @@ lib_LTLIBRARIES = libccrtp.la
 
 if SRTP_OPENSSL
 srtp_src_o =    ccrtp/crypto/openssl/hmac.cpp \
-        ccrtp/crypto/openssl/SrtpSymCrypto.cpp \
-        ccrtp/crypto/openssl/InitializeOpenSSL.cpp
+        ccrtp/crypto/openssl/SrtpSymCrypto.cpp
 endif
 
 if SRTP_GCRYPT
