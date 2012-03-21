@@ -75,7 +75,7 @@ else()
     pkg_check_modules(USES_UCOMMON commoncpp>=${REQUIRES})
 endif()
 
-include_directories(${USES_UCOMMON_INCLUDE_DIRS})
+include_directories(${USES_UCOMMON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src/ccrtp)
 link_directories(${USES_UCOMMON_LIBRARY_DIRS})
 add_definitions(${USES_UCOMMON_CFLAGS})
 set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
