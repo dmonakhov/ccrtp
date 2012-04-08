@@ -20,10 +20,10 @@ set(CMAKE_VERBOSE_MAKEFILE FALSE)
 
 SET(CPACK_PACKAGE_VERSION_MAJOR 2)
 SET(CPACK_PACKAGE_VERSION_MINOR 0)
-SET(CPACK_PACKAGE_VERSION_PATCH 2)
+SET(CPACK_PACKAGE_VERSION_PATCH 3)
 
 # set some global variables, in particular version variables
-set (VERSION 2.0.2)
+set (VERSION 2.0.3)
 set (SOVERSION 2)
 set (REQUIRES 5.0.0)
 set (PACKAGE ccrtp)
@@ -75,7 +75,7 @@ else()
     pkg_check_modules(USES_UCOMMON commoncpp>=${REQUIRES})
 endif()
 
-include_directories(${USES_UCOMMON_INCLUDE_DIRS})
+include_directories(${USES_UCOMMON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/src/ccrtp)
 link_directories(${USES_UCOMMON_LIBRARY_DIRS})
 add_definitions(${USES_UCOMMON_CFLAGS})
 set (LIBS ${LIBS} ${USES_UCOMMON_LDFLAGS} commoncpp ${USES_UCOMMON_LIBRARIES})
